@@ -12,12 +12,12 @@ module synapse_core #(
     input logic pre_spk,                // Pre-synaptic spike input
     input logic signed [3:0] dopamine,  // Dopamine signal for reward-based learning
     input logic reward_en,              // Reward enable signal
+    input logic [7:0] w_syn;                  // Synaptic weight
     output logic post_spk              // Post-synaptic spike output
   );
 
   // Internal registers
   logic [9:0] elig_trace;             // Eligibility trace for synaptic plasticity
   logic [3:0] pre_timer, post_timer;  // Timers for pre and post-synaptic spikes
-  logic [7:0] w_syn;                  // Synaptic weight
 
 endmodule
