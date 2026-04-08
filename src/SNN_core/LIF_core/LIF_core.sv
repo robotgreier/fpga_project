@@ -17,12 +17,13 @@ module LIF_core #(
   begin
     // Leak and integrate: subtract decay, add synaptic input, clamp to 0 if negative
     // mem <= (mem > DECAY) ? mem - DECAY + i_syn : i_syn;  // Membrane potential clamped to 0
-    mem_next = mem - DECAY + i_syn;
+    mem_next = (mem > DECAY) ? mem - DECAY + i_syn : i_syn;
+    pre_reset_mem <= mem_next;  // Capture membrane potential before reset (used for WTA tie-breaking)
+
 
     if (mem_next >= THRESHOLD)
     begin
       spk           <= 1;         // Fire spike
-      pre_reset_mem <= mem_next;  // Capture membrane potential before reset (used for WTA tie-breaking)
       mem           <= RESET;     // Reset membrane potential
     end
     else

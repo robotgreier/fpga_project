@@ -18,10 +18,9 @@ module eligibility_updater #(
 
   // Edge detection
   logic pre_spk_r, post_spk_r;
+  logic pre_edge, post_edge;
   assign pre_edge  = pre_spk  & ~pre_spk_r;
   assign post_edge = post_spk & ~post_spk_r;
-
-  logic pre_edge, post_edge;
   logic signed [4:0]  pre_timer, post_timer; // signed to hold DISABLED (-1)
   logic signed [8:0]  e_trace;
   logic signed [10:0] e_next;
@@ -39,7 +38,7 @@ module eligibility_updater #(
     // Pre timer
     if      (pre_edge)
       pre_timer  <= 0;
-    else if (pre_timer  >= T_PRE)
+    else if (pre_timer  > T_PRE)
       pre_timer  <= DISABLED;
     else if (pre_timer  >= 0)
       pre_timer  <= pre_timer  + 1;
@@ -47,7 +46,7 @@ module eligibility_updater #(
     // Post timer
     if      (post_edge)
       post_timer <= 0;
-    else if (post_timer >= T_POST)
+    else if (post_timer > T_POST)
       post_timer <= DISABLED;
     else if (post_timer >= 0)
       post_timer <= post_timer + 1;
@@ -56,14 +55,16 @@ module eligibility_updater #(
   // Compute next eligibility trace combinationally
   always_comb
   begin : e_next_calc
-    e_comb = e_trace - (e_trace >>> TAU_E_SHIFT); // Decay
-
-    if (LEARNING_MODE == 0)
+    if (LEARNING_MODE == 0) begin
       e_comb = 0;
-    if (pre_edge  && post_timer >= 0)
-      e_comb = e_comb - DW_NEG; // LTD
-    if (post_edge && pre_timer  >= 0)
-      e_comb = e_comb + DW_POS; // LTP
+    end else begin
+      e_comb = e_trace;
+      if (pre_edge  && post_timer >= 0)
+        e_comb = e_comb - DW_NEG; // LTD
+      if (post_edge && pre_timer  >= 0)
+        e_comb = e_comb + DW_POS; // LTP
+      e_comb = e_comb - (e_comb >>> TAU_E_SHIFT); // Decay after STDP updates
+    end
 
     e_next = e_comb;
   end
