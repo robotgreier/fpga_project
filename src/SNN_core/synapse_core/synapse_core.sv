@@ -2,17 +2,17 @@ module synapse_core #(
     parameter LR_SHIFT = 2,
     parameter W_INIT = NULL,
     parameter T_PRE = 2,
-    parameter T_POST = 2
+    parameter T_POST = 2,
     parameter TAU_E_SHIFT = 2,
     parameter  W_MIN = 8,
-    parameter W_MAX = 255
+    parameter W_MAX = 255,
     parameter LEARNING_MODE = 0
   ) (
     input logic clk,
     input logic pre_spk,                // Pre-synaptic spike input
     input logic signed [3:0] dopamine,  // Dopamine signal for reward-based learning
     input logic reward_en,              // Reward enable signal
-    output logic post_spk,              // Post-synaptic spike output
+    output logic post_spk              // Post-synaptic spike output
   );
 
   // Internal registers
