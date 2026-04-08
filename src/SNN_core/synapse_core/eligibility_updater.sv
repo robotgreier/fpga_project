@@ -21,7 +21,6 @@ module eligibility_updater #(
   assign pre_edge  = pre_spk  & ~pre_spk_r;
   assign post_edge = post_spk & ~post_spk_r;
 
-  logic pre_edge, post_edge;
   logic signed [4:0]  pre_timer, post_timer; // signed to hold DISABLED (-1)
   logic signed [8:0]  e_trace;
   logic signed [10:0] e_next;
