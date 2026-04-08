@@ -1,11 +1,13 @@
 module synapse_core #(
-    parameter LR_SHIFT = 2,
-    parameter T_PRE = 2,
-    parameter T_POST = 2,
-    parameter TAU_E_SHIFT = 2,
-    parameter  W_MIN = 8,
-    parameter W_MAX = 255,
-    parameter LEARNING_MODE = 0
+    parameter int LR_SHIFT     = 2,
+    parameter int T_PRE        = 2,
+    parameter int T_POST       = 2,
+    parameter int TAU_E_SHIFT  = 2,
+    parameter int DW_POS       = 16,
+    parameter int DW_NEG       = 64,
+    parameter int W_MIN        = 8,
+    parameter int W_MAX        = 255,
+    parameter int LEARNING_MODE = 0
   ) (
     input logic clk,
     input logic pre_spk,                // Pre-synaptic spike input
@@ -29,8 +31,8 @@ module synapse_core #(
     .T_PRE(T_PRE),
     .T_POST(T_POST),
     .TAU_E_SHIFT(TAU_E_SHIFT),
-    .DW_POS(W_MAX - W_MIN),
-    .DW_NEG(W_MAX - W_MIN),
+    .DW_POS(DW_POS),
+    .DW_NEG(DW_NEG),
     .LEARNING_MODE(LEARNING_MODE),
     .MAX_E_TRACE(255),
     .MIN_E_TRACE(-256)
