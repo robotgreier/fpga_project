@@ -1,1 +1,4 @@
 vivado_project/*
+vivado_project.hw/vivado_project.lpr
+vivado_project.xpr
+vivado_project.cache/wt/project.wpc
