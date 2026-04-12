@@ -59,50 +59,55 @@ module fifo_memory_tb(
         reset = 1;
         #5
         reset = 0;
-        #5
-        data_in = 1;
-        write = 1;
-        #5
-        write = 0;
-        #5
-        data_in = 2;
-        write = 1;
-        #5
-        write = 0;
-        #5
-        data_in = 3;
-        write = 1;
-        #5
-        write = 0;
-        #5
-        data_in = 4;
-        write = 1;
-        #5
-        write = 0;
-        #5
-        data_in = 5;
-        write = 1;
-        #5
-        write = 0;
-        #5
-        data_in = 6;
-        write = 1;
-        #5
-        write = 0;
-        #5
-        data_in = 7;
-        write = 1;
-        #5
-        write = 0;
-        #5
-        data_in = 8;
-        write = 1;
-        #5
-        write = 0;
-        #5
-        data_in = 9;
-        write = 1;
-        #5
-        write = 0;
+        #20
+        for (int i = 0; i < 10; i++) begin
+            @(negedge clk) begin
+                #1
+                data_in <= i;
+                write <= 1;
+            end
+
+            @(posedge clk) begin
+                #1
+                write <= 0;
+            end
+        end
+        #20
+        repeat(10) begin
+            @(negedge clk) begin
+            #1
+            read = 1;
+            end
+        
+            @(posedge clk) begin
+            #1
+            read = 0;
+            end
+        end
+        #20
+        for (int i = 0; i < 10; i++) begin
+            @(negedge clk) begin
+                #1
+                data_in <= i;
+                write <= 1;
+            end
+
+            @(posedge clk) begin
+                #1
+                write <= 0;
+            end
+        end
+        #20
+        repeat(10) begin
+            @(negedge clk) begin
+            #1
+            read = 1;
+            end
+        
+            @(posedge clk) begin
+            #1
+            read = 0;
+            end
+        end
     end
 endmodule
