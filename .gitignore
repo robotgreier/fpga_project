@@ -1,1 +1,5 @@
 vivado_project/*
+.Xil/
+Sims/
+.cxl/
+xvlog.pb
