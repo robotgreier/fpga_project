@@ -11,6 +11,7 @@ module eligibility_updater #(
     input  logic              clk,
     input  logic              pre_spk,
     input  logic              post_spk,
+    input  logic              rst,
     output logic signed [8:0] elig_trace
   );
 
@@ -28,28 +29,38 @@ module eligibility_updater #(
 
   always_ff @(posedge clk)
   begin
-    pre_spk_r  <= pre_spk;
-    post_spk_r <= post_spk;
+    if (rst) begin
+      pre_spk_r  <= 1'b0;
+      post_spk_r <= 1'b0;
+    end else begin
+      pre_spk_r  <= pre_spk;
+      post_spk_r <= post_spk;
+    end
   end
 
   // Timer logic (merged)
   always_ff @(posedge clk)
   begin : timer_block
-    // Pre timer
-    if      (pre_edge)
-      pre_timer  <= 0;
-    else if (pre_timer  > T_PRE)
+    if (rst) begin
       pre_timer  <= DISABLED;
-    else if (pre_timer  >= 0)
-      pre_timer  <= pre_timer  + 1;
-
-    // Post timer
-    if      (post_edge)
-      post_timer <= 0;
-    else if (post_timer > T_POST)
       post_timer <= DISABLED;
-    else if (post_timer >= 0)
-      post_timer <= post_timer + 1;
+    end else begin
+      // Pre timer
+      if      (pre_edge)
+        pre_timer  <= 0;
+      else if (pre_timer  > T_PRE)
+        pre_timer  <= DISABLED;
+      else if (pre_timer  >= 0)
+        pre_timer  <= pre_timer  + 1;
+
+      // Post timer
+      if      (post_edge)
+        post_timer <= 0;
+      else if (post_timer > T_POST)
+        post_timer <= DISABLED;
+      else if (post_timer >= 0)
+        post_timer <= post_timer + 1;
+    end
   end
 
   // Compute next eligibility trace combinationally
@@ -72,12 +83,15 @@ module eligibility_updater #(
   // Clamp and register
   always_ff @(posedge clk)
   begin : eligibility_update
-    if      (e_next > MAX_E_TRACE)
+    if (rst) begin
+      e_trace <= '0;
+    end else if (e_next > MAX_E_TRACE) begin
       e_trace <= MAX_E_TRACE;
-    else if (e_next < MIN_E_TRACE)
+    end else if (e_next < MIN_E_TRACE) begin
       e_trace <= MIN_E_TRACE;
-    else
+    end else begin
       e_trace <= e_next[8:0];
+    end
   end
 
   assign elig_trace = e_trace;
