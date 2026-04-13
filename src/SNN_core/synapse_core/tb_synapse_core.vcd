@@ -1,0 +1,2105 @@
+$date
+	Mon Apr 13 17:57:28 2026
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module tb_synapse_core $end
+$var wire 8 ! w_next_stdp [7:0] $end
+$var wire 8 " w_next_rstdp [7:0] $end
+$var wire 8 # w_next_none [7:0] $end
+$var wire 8 $ I_syn_stdp [7:0] $end
+$var wire 8 % I_syn_rstdp [7:0] $end
+$var wire 8 & I_syn_none [7:0] $end
+$var parameter 32 ' DW_NEG $end
+$var parameter 32 ( DW_POS $end
+$var parameter 32 ) LR_SHIFT $end
+$var parameter 32 * TAU_E_SHIFT $end
+$var parameter 32 + T_POST $end
+$var parameter 32 , T_PRE $end
+$var parameter 32 - W_MAX $end
+$var parameter 32 . W_MIN $end
+$var reg 1 / clk $end
+$var reg 4 0 dopamine [3:0] $end
+$var reg 1 1 post_spk $end
+$var reg 1 2 pre_spk $end
+$var reg 1 3 reward_en $end
+$var reg 1 4 rst $end
+$var reg 8 5 w_syn [7:0] $end
+$var integer 32 6 fail_count [31:0] $end
+$var integer 32 7 pass_count [31:0] $end
+$scope module dut_none $end
+$var wire 1 / clk $end
+$var wire 4 8 dopamine [3:0] $end
+$var wire 1 1 post_spk $end
+$var wire 1 2 pre_spk $end
+$var wire 1 3 reward_en $end
+$var wire 1 4 rst $end
+$var wire 8 9 w_syn [7:0] $end
+$var wire 9 : w_sum [8:0] $end
+$var wire 9 ; elig_trace [8:0] $end
+$var wire 8 < delta_w [7:0] $end
+$var wire 8 = I_syn [7:0] $end
+$var parameter 32 > DW_NEG $end
+$var parameter 32 ? DW_POS $end
+$var parameter 32 @ LEARNING_MODE $end
+$var parameter 32 A LR_SHIFT $end
+$var parameter 32 B TAU_E_SHIFT $end
+$var parameter 32 C T_POST $end
+$var parameter 32 D T_PRE $end
+$var parameter 32 E W_MAX $end
+$var parameter 32 F W_MIN $end
+$var reg 8 G w_next [7:0] $end
+$scope module elig_upd $end
+$var wire 1 / clk $end
+$var wire 9 H elig_trace [8:0] $end
+$var wire 1 I post_edge $end
+$var wire 1 1 post_spk $end
+$var wire 1 J pre_edge $end
+$var wire 1 2 pre_spk $end
+$var wire 1 4 rst $end
+$var parameter 32 K DISABLED $end
+$var parameter 32 L DW_NEG $end
+$var parameter 32 M DW_POS $end
+$var parameter 32 N LEARNING_MODE $end
+$var parameter 32 O MAX_E_TRACE $end
+$var parameter 32 P MIN_E_TRACE $end
+$var parameter 32 Q TAU_E_SHIFT $end
+$var parameter 32 R T_POST $end
+$var parameter 32 S T_PRE $end
+$var reg 11 T e_comb [10:0] $end
+$var reg 11 U e_next [10:0] $end
+$var reg 9 V e_trace [8:0] $end
+$var reg 1 W post_spk_r $end
+$var reg 5 X post_timer [4:0] $end
+$var reg 1 Y pre_spk_r $end
+$var reg 5 Z pre_timer [4:0] $end
+$scope begin e_next_calc $end
+$upscope $end
+$scope begin eligibility_update $end
+$upscope $end
+$scope begin timer_block $end
+$upscope $end
+$upscope $end
+$scope module reward_app $end
+$var wire 1 / clk $end
+$var wire 4 [ dopamine [3:0] $end
+$var wire 9 \ elig_trace [8:0] $end
+$var wire 1 3 reward_en $end
+$var wire 1 4 rst $end
+$var parameter 32 ] LEARNING_MODE $end
+$var parameter 32 ^ LR_SHIFT $end
+$var reg 8 _ delta_w [7:0] $end
+$upscope $end
+$upscope $end
+$scope module dut_rstdp $end
+$var wire 1 / clk $end
+$var wire 4 ` dopamine [3:0] $end
+$var wire 1 1 post_spk $end
+$var wire 1 2 pre_spk $end
+$var wire 1 3 reward_en $end
+$var wire 1 4 rst $end
+$var wire 8 a w_syn [7:0] $end
+$var wire 9 b w_sum [8:0] $end
+$var wire 9 c elig_trace [8:0] $end
+$var wire 8 d delta_w [7:0] $end
+$var wire 8 e I_syn [7:0] $end
+$var parameter 32 f DW_NEG $end
+$var parameter 32 g DW_POS $end
+$var parameter 32 h LEARNING_MODE $end
+$var parameter 32 i LR_SHIFT $end
+$var parameter 32 j TAU_E_SHIFT $end
+$var parameter 32 k T_POST $end
+$var parameter 32 l T_PRE $end
+$var parameter 32 m W_MAX $end
+$var parameter 32 n W_MIN $end
+$var reg 8 o w_next [7:0] $end
+$scope module elig_upd $end
+$var wire 1 / clk $end
+$var wire 9 p elig_trace [8:0] $end
+$var wire 1 q post_edge $end
+$var wire 1 1 post_spk $end
+$var wire 1 r pre_edge $end
+$var wire 1 2 pre_spk $end
+$var wire 1 4 rst $end
+$var parameter 32 s DISABLED $end
+$var parameter 32 t DW_NEG $end
+$var parameter 32 u DW_POS $end
+$var parameter 32 v LEARNING_MODE $end
+$var parameter 32 w MAX_E_TRACE $end
+$var parameter 32 x MIN_E_TRACE $end
+$var parameter 32 y TAU_E_SHIFT $end
+$var parameter 32 z T_POST $end
+$var parameter 32 { T_PRE $end
+$var reg 11 | e_comb [10:0] $end
+$var reg 11 } e_next [10:0] $end
+$var reg 9 ~ e_trace [8:0] $end
+$var reg 1 !" post_spk_r $end
+$var reg 5 "" post_timer [4:0] $end
+$var reg 1 #" pre_spk_r $end
+$var reg 5 $" pre_timer [4:0] $end
+$scope begin e_next_calc $end
+$upscope $end
+$scope begin eligibility_update $end
+$upscope $end
+$scope begin timer_block $end
+$upscope $end
+$upscope $end
+$scope module reward_app $end
+$var wire 1 / clk $end
+$var wire 4 %" dopamine [3:0] $end
+$var wire 9 &" elig_trace [8:0] $end
+$var wire 1 3 reward_en $end
+$var wire 1 4 rst $end
+$var parameter 32 '" LEARNING_MODE $end
+$var parameter 32 (" LR_SHIFT $end
+$var reg 8 )" delta_w [7:0] $end
+$var reg 13 *" product [12:0] $end
+$upscope $end
+$upscope $end
+$scope module dut_stdp $end
+$var wire 1 / clk $end
+$var wire 4 +" dopamine [3:0] $end
+$var wire 1 1 post_spk $end
+$var wire 1 2 pre_spk $end
+$var wire 1 3 reward_en $end
+$var wire 1 4 rst $end
+$var wire 8 ," w_syn [7:0] $end
+$var wire 9 -" w_sum [8:0] $end
+$var wire 9 ." elig_trace [8:0] $end
+$var wire 8 /" delta_w [7:0] $end
+$var wire 8 0" I_syn [7:0] $end
+$var parameter 32 1" DW_NEG $end
+$var parameter 32 2" DW_POS $end
+$var parameter 32 3" LEARNING_MODE $end
+$var parameter 32 4" LR_SHIFT $end
+$var parameter 32 5" TAU_E_SHIFT $end
+$var parameter 32 6" T_POST $end
+$var parameter 32 7" T_PRE $end
+$var parameter 32 8" W_MAX $end
+$var parameter 32 9" W_MIN $end
+$var reg 8 :" w_next [7:0] $end
+$scope module elig_upd $end
+$var wire 1 / clk $end
+$var wire 9 ;" elig_trace [8:0] $end
+$var wire 1 <" post_edge $end
+$var wire 1 1 post_spk $end
+$var wire 1 =" pre_edge $end
+$var wire 1 2 pre_spk $end
+$var wire 1 4 rst $end
+$var parameter 32 >" DISABLED $end
+$var parameter 32 ?" DW_NEG $end
+$var parameter 32 @" DW_POS $end
+$var parameter 32 A" LEARNING_MODE $end
+$var parameter 32 B" MAX_E_TRACE $end
+$var parameter 32 C" MIN_E_TRACE $end
+$var parameter 32 D" TAU_E_SHIFT $end
+$var parameter 32 E" T_POST $end
+$var parameter 32 F" T_PRE $end
+$var reg 11 G" e_comb [10:0] $end
+$var reg 11 H" e_next [10:0] $end
+$var reg 9 I" e_trace [8:0] $end
+$var reg 1 J" post_spk_r $end
+$var reg 5 K" post_timer [4:0] $end
+$var reg 1 L" pre_spk_r $end
+$var reg 5 M" pre_timer [4:0] $end
+$scope begin e_next_calc $end
+$upscope $end
+$scope begin eligibility_update $end
+$upscope $end
+$scope begin timer_block $end
+$upscope $end
+$upscope $end
+$scope module reward_app $end
+$var wire 1 / clk $end
+$var wire 4 N" dopamine [3:0] $end
+$var wire 9 O" elig_trace [8:0] $end
+$var wire 1 3 reward_en $end
+$var wire 1 4 rst $end
+$var parameter 32 P" LEARNING_MODE $end
+$var parameter 32 Q" LR_SHIFT $end
+$var reg 8 R" delta_w [7:0] $end
+$var reg 13 S" product [12:0] $end
+$upscope $end
+$upscope $end
+$scope task apply_inputs $end
+$upscope $end
+$scope task check_i $end
+$upscope $end
+$scope task check_w $end
+$upscope $end
+$scope task do_rst $end
+$upscope $end
+$scope task idle_cycles $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+b10 Q"
+b10 P"
+b10 F"
+b10 E"
+b10 D"
+b11111111111111111111111100000000 C"
+b11111111 B"
+b10 A"
+b10000 @"
+b1000000 ?"
+b11111111111111111111111111111111 >"
+b1000 9"
+b11111111 8"
+b10 7"
+b10 6"
+b10 5"
+b10 4"
+b10 3"
+b10000 2"
+b1000000 1"
+b10 ("
+b1 '"
+b10 {
+b10 z
+b10 y
+b11111111111111111111111100000000 x
+b11111111 w
+b1 v
+b10000 u
+b1000000 t
+b11111111111111111111111111111111 s
+b1000 n
+b11111111 m
+b10 l
+b10 k
+b10 j
+b10 i
+b1 h
+b10000 g
+b1000000 f
+b10 ^
+b0 ]
+b10 S
+b10 R
+b10 Q
+b11111111111111111111111100000000 P
+b11111111 O
+b0 N
+b10000 M
+b1000000 L
+b11111111111111111111111111111111 K
+b1000 F
+b11111111 E
+b10 D
+b10 C
+b10 B
+b10 A
+b0 @
+b10000 ?
+b1000000 >
+b1000 .
+b11111111 -
+b10 ,
+b10 +
+b10 *
+b10 )
+b10000 (
+b1000000 '
+$end
+#0
+$dumpvars
+bx S"
+bx R"
+bx O"
+b0 N"
+bx M"
+xL"
+bx K"
+xJ"
+bx I"
+bx H"
+bx G"
+0="
+0<"
+bx ;"
+bx :"
+b0 0"
+bx /"
+bx ."
+bx -"
+b1100100 ,"
+b0 +"
+bx *"
+bx )"
+bx &"
+b0 %"
+bx $"
+x#"
+bx ""
+x!"
+bx ~
+bx }
+bx |
+0r
+0q
+bx p
+bx o
+b0 e
+bx d
+bx c
+bx b
+b1100100 a
+b0 `
+bx _
+bx \
+b0 [
+bx Z
+xY
+bx X
+xW
+bx V
+b0 U
+b0 T
+0J
+0I
+bx H
+bx G
+b0 =
+bx <
+bx ;
+bx :
+b1100100 9
+b0 8
+b0 7
+b0 6
+b1100100 5
+14
+03
+02
+01
+b0 0
+0/
+b0 &
+b0 %
+b0 $
+bx #
+bx "
+bx !
+$end
+#5000
+b0 H"
+b0 G"
+b0 }
+b0 |
+b0 ."
+b0 ;"
+b0 O"
+b0 I"
+b11111 K"
+b11111 M"
+b0 c
+b0 p
+b0 &"
+b0 ~
+b11111 ""
+b11111 $"
+b0 ;
+b0 H
+b0 \
+b0 V
+b11111 X
+b11111 Z
+0W
+0Y
+b1100100 :
+b0 <
+b0 _
+b1000 #
+b1000 G
+0!"
+0#"
+b1100100 b
+b0 d
+b0 )"
+b1000 "
+b1000 o
+0J"
+0L"
+b1100100 -"
+b0 /"
+b0 R"
+b1000 !
+b1000 :"
+1/
+#10000
+0/
+#15000
+1/
+#20000
+0/
+#25000
+1/
+#26000
+b11 7
+#30000
+04
+0/
+#35000
+b1100100 !
+b1100100 :"
+b1100100 "
+b1100100 o
+b1100100 #
+b1100100 G
+1/
+#40000
+0/
+#45000
+1/
+#50000
+b1100100 &
+b1100100 =
+1J
+b1100100 %
+b1100100 e
+1r
+b1100100 $
+b1100100 0"
+1="
+12
+0/
+#55000
+0="
+0r
+0J
+b0 M"
+b0 $"
+b0 Z
+1L"
+1#"
+1Y
+1/
+#56000
+b100 7
+#60000
+b0 &
+b0 =
+b0 %
+b0 e
+b0 $
+b0 0"
+02
+0/
+#65000
+b1 M"
+b1 $"
+b1 Z
+0Y
+0#"
+0L"
+1/
+#66000
+b101 7
+#70000
+0/
+#75000
+b10 M"
+b10 $"
+b10 Z
+1/
+#80000
+14
+0/
+#85000
+b11111 M"
+b11111 $"
+b11111 Z
+b1000 #
+b1000 G
+b1000 "
+b1000 o
+b1000 !
+b1000 :"
+1/
+#90000
+0/
+#95000
+1/
+#96000
+04
+#100000
+b1100100 &
+b1100100 =
+1J
+b1100100 %
+b1100100 e
+1r
+b1100100 $
+b1100100 0"
+1="
+13
+b111 0
+b111 8
+b111 [
+b111 `
+b111 %"
+b111 +"
+b111 N"
+12
+0/
+#105000
+0J
+0r
+0="
+b0 M"
+b0 $"
+b0 Z
+1Y
+b1100100 #
+b1100100 G
+1#"
+b1100100 "
+b1100100 o
+1L"
+b1100100 !
+b1100100 :"
+b0 *"
+b0 S"
+1/
+#110000
+b1100 }
+b1100 |
+b1100 H"
+b1100 G"
+1I
+1q
+1<"
+b0 &
+b0 =
+b0 %
+b0 e
+b0 $
+b0 0"
+11
+02
+0/
+#115000
+0<"
+0q
+0I
+b1001 H"
+b1001 G"
+b1001 }
+b1001 |
+b1100 ."
+b1100 ;"
+b1100 O"
+b1100 I"
+b0 K"
+b1 M"
+b1100 c
+b1100 p
+b1100 &"
+b1100 ~
+b0 ""
+b1 $"
+b0 X
+b1 Z
+1J"
+0L"
+1!"
+0#"
+1W
+0Y
+1/
+#116000
+b110 7
+#120000
+03
+b0 0
+b0 8
+b0 [
+b0 `
+b0 %"
+b0 +"
+b0 N"
+01
+0/
+#125000
+b111 H"
+b111 G"
+b111 }
+b111 |
+b1001 ."
+b1001 ;"
+b1001 O"
+b1001 I"
+b1 K"
+b10 M"
+b1001 c
+b1001 p
+b1001 &"
+b1001 ~
+b1 ""
+b10 $"
+b1 X
+b10 Z
+0W
+0!"
+0J"
+1/
+#130000
+14
+0/
+#135000
+b0 H"
+b0 G"
+b0 }
+b0 |
+b0 ."
+b0 ;"
+b0 O"
+b0 I"
+b11111 K"
+b11111 M"
+b0 c
+b0 p
+b0 &"
+b0 ~
+b11111 ""
+b11111 $"
+b11111 X
+b11111 Z
+b1000 !
+b1000 :"
+b1000 "
+b1000 o
+b1000 #
+b1000 G
+1/
+#140000
+0/
+#145000
+1/
+#146000
+04
+#150000
+b1100100 &
+b1100100 =
+1J
+b1100100 %
+b1100100 e
+1r
+b1100100 $
+b1100100 0"
+1="
+13
+12
+0/
+#155000
+0="
+0r
+0J
+b0 M"
+b0 $"
+b0 Z
+b1100100 !
+b1100100 :"
+1L"
+b1100100 "
+b1100100 o
+1#"
+b1100100 #
+b1100100 G
+1Y
+1/
+#160000
+b1100 }
+b1100 |
+b1100 H"
+b1100 G"
+1I
+1q
+1<"
+b0 &
+b0 =
+b0 %
+b0 e
+b0 $
+b0 0"
+11
+02
+0/
+#165000
+0I
+0q
+0<"
+b1001 H"
+b1001 G"
+b1001 }
+b1001 |
+b1100 ."
+b1100 ;"
+b1100 O"
+b1100 I"
+b0 K"
+b1 M"
+b1100 c
+b1100 p
+b1100 &"
+b1100 ~
+b0 ""
+b1 $"
+b0 X
+b1 Z
+1W
+0Y
+1!"
+0#"
+1J"
+0L"
+1/
+#170000
+03
+01
+0/
+#175000
+b111 H"
+b111 G"
+b111 }
+b111 |
+b1001 ."
+b1001 ;"
+b1001 O"
+b1001 I"
+b1 K"
+b10 M"
+b1001 c
+b1001 p
+b1001 &"
+b1001 ~
+b1 ""
+b10 $"
+b1 X
+b10 Z
+0J"
+0!"
+0W
+1/
+#176000
+b1 6
+#180000
+0/
+#185000
+b110 H"
+b110 G"
+b110 }
+b110 |
+b111 ."
+b111 ;"
+b111 O"
+b111 I"
+b10 K"
+b11 M"
+b111 c
+b111 p
+b111 &"
+b111 ~
+b10 ""
+b11 $"
+b10 X
+b11 Z
+1/
+#190000
+14
+0/
+#195000
+b0 H"
+b0 G"
+b0 }
+b0 |
+b0 ."
+b0 ;"
+b0 O"
+b0 I"
+b11111 K"
+b11111 M"
+b0 c
+b0 p
+b0 &"
+b0 ~
+b11111 ""
+b11111 $"
+b11111 X
+b11111 Z
+b1000 !
+b1000 :"
+b1000 "
+b1000 o
+b1000 #
+b1000 G
+1/
+#200000
+0/
+#205000
+1/
+#206000
+04
+#210000
+1I
+1q
+1<"
+13
+11
+0/
+#215000
+0<"
+0q
+0I
+b0 K"
+b0 ""
+b0 X
+b1100100 !
+b1100100 :"
+1J"
+b1100100 "
+b1100100 o
+1!"
+b1100100 #
+b1100100 G
+1W
+1/
+#220000
+b11111010000 }
+b11111010000 |
+b11111010000 H"
+b11111010000 G"
+b1100100 &
+b1100100 =
+1J
+b1100100 %
+b1100100 e
+1r
+b1100100 $
+b1100100 0"
+1="
+01
+12
+0/
+#225000
+0J
+0r
+0="
+b11111011100 H"
+b11111011100 G"
+b11111011100 }
+b11111011100 |
+b111010000 ."
+b111010000 ;"
+b111010000 O"
+b111010000 I"
+b1 K"
+b0 M"
+b111010000 c
+b111010000 p
+b111010000 &"
+b111010000 ~
+b1 ""
+b0 $"
+b1 X
+b0 Z
+0W
+1Y
+0!"
+1#"
+0J"
+1L"
+1/
+#230000
+b0 &
+b0 =
+b0 %
+b0 e
+b0 $
+b0 0"
+03
+02
+0/
+#235000
+b11111100101 H"
+b11111100101 G"
+b11111100101 }
+b11111100101 |
+b111011100 ."
+b111011100 ;"
+b111011100 O"
+b111011100 I"
+b10 K"
+b1 M"
+b111011100 c
+b111011100 p
+b111011100 &"
+b111011100 ~
+b10 ""
+b1 $"
+b10 X
+b1 Z
+0L"
+0#"
+0Y
+1/
+#236000
+b10 6
+#240000
+0/
+#245000
+b11111101100 H"
+b11111101100 G"
+b11111101100 }
+b11111101100 |
+b111100101 ."
+b111100101 ;"
+b111100101 O"
+b111100101 I"
+b11 K"
+b10 M"
+b111100101 c
+b111100101 p
+b111100101 &"
+b111100101 ~
+b11 ""
+b10 $"
+b11 X
+b10 Z
+1/
+#250000
+14
+0/
+#255000
+b0 H"
+b0 G"
+b0 }
+b0 |
+b0 ."
+b0 ;"
+b0 O"
+b0 I"
+b11111 K"
+b11111 M"
+b0 c
+b0 p
+b0 &"
+b0 ~
+b11111 ""
+b11111 $"
+b11111 X
+b11111 Z
+b1000 !
+b1000 :"
+b1000 "
+b1000 o
+b1000 #
+b1000 G
+1/
+#260000
+0/
+#265000
+1/
+#266000
+04
+#270000
+b1100100 &
+b1100100 =
+1J
+b1100100 %
+b1100100 e
+1r
+b1100100 $
+b1100100 0"
+1="
+13
+b11 0
+b11 8
+b11 [
+b11 `
+b11 %"
+b11 +"
+b11 N"
+12
+0/
+#275000
+0="
+0r
+0J
+b0 M"
+b0 $"
+b0 Z
+b1100100 !
+b1100100 :"
+1L"
+b1100100 "
+b1100100 o
+1#"
+b1100100 #
+b1100100 G
+1Y
+1/
+#280000
+b1100 }
+b1100 |
+b1100 H"
+b1100 G"
+1I
+1q
+1<"
+b0 &
+b0 =
+b0 %
+b0 e
+b0 $
+b0 0"
+11
+02
+0/
+#285000
+0I
+0q
+0<"
+b1001 H"
+b1001 G"
+b1001 }
+b1001 |
+b1100 ."
+b1100 ;"
+b1100 O"
+b1100 I"
+b0 K"
+b1 M"
+b1100 c
+b1100 p
+b1100 &"
+b1100 ~
+b0 ""
+b1 $"
+b0 X
+b1 Z
+1W
+0Y
+1!"
+0#"
+1J"
+0L"
+1/
+#290000
+03
+b0 0
+b0 8
+b0 [
+b0 `
+b0 %"
+b0 +"
+b0 N"
+01
+0/
+#295000
+b111 H"
+b111 G"
+b111 }
+b111 |
+b1001 ."
+b1001 ;"
+b1001 O"
+b1001 I"
+b1 K"
+b10 M"
+b1001 c
+b1001 p
+b1001 &"
+b1001 ~
+b1 ""
+b10 $"
+b1 X
+b10 Z
+0J"
+0!"
+0W
+1/
+#296000
+b11 6
+#300000
+0/
+#305000
+b110 H"
+b110 G"
+b110 }
+b110 |
+b111 ."
+b111 ;"
+b111 O"
+b111 I"
+b10 K"
+b11 M"
+b111 c
+b111 p
+b111 &"
+b111 ~
+b10 ""
+b11 $"
+b10 X
+b11 Z
+1/
+#310000
+14
+0/
+#315000
+b0 H"
+b0 G"
+b0 }
+b0 |
+b0 ."
+b0 ;"
+b0 O"
+b0 I"
+b11111 K"
+b11111 M"
+b0 c
+b0 p
+b0 &"
+b0 ~
+b11111 ""
+b11111 $"
+b11111 X
+b11111 Z
+b1000 !
+b1000 :"
+b1000 "
+b1000 o
+b1000 #
+b1000 G
+1/
+#320000
+0/
+#325000
+1/
+#326000
+04
+#330000
+b1100100 &
+b1100100 =
+1J
+b1100100 %
+b1100100 e
+1r
+b1100100 $
+b1100100 0"
+1="
+13
+b1101 0
+b1101 8
+b1101 [
+b1101 `
+b1101 %"
+b1101 +"
+b1101 N"
+12
+0/
+#335000
+0="
+0r
+0J
+b0 M"
+b0 $"
+b0 Z
+b1100100 !
+b1100100 :"
+1L"
+b1100100 "
+b1100100 o
+1#"
+b1100100 #
+b1100100 G
+1Y
+1/
+#340000
+b1100 }
+b1100 |
+b1100 H"
+b1100 G"
+1I
+1q
+1<"
+b0 &
+b0 =
+b0 %
+b0 e
+b0 $
+b0 0"
+11
+02
+0/
+#345000
+0I
+0q
+0<"
+b1001 H"
+b1001 G"
+b1001 }
+b1001 |
+b1100 ."
+b1100 ;"
+b1100 O"
+b1100 I"
+b0 K"
+b1 M"
+b1100 c
+b1100 p
+b1100 &"
+b1100 ~
+b0 ""
+b1 $"
+b0 X
+b1 Z
+1W
+0Y
+1!"
+0#"
+1J"
+0L"
+1/
+#350000
+03
+b0 0
+b0 8
+b0 [
+b0 `
+b0 %"
+b0 +"
+b0 N"
+01
+0/
+#355000
+b111 H"
+b111 G"
+b111 }
+b111 |
+b1001 ."
+b1001 ;"
+b1001 O"
+b1001 I"
+b1 K"
+b10 M"
+b1001 c
+b1001 p
+b1001 &"
+b1001 ~
+b1 ""
+b10 $"
+b1 X
+b10 Z
+0J"
+0!"
+0W
+1/
+#356000
+b100 6
+#360000
+0/
+#365000
+b110 H"
+b110 G"
+b110 }
+b110 |
+b111 ."
+b111 ;"
+b111 O"
+b111 I"
+b10 K"
+b11 M"
+b111 c
+b111 p
+b111 &"
+b111 ~
+b10 ""
+b11 $"
+b10 X
+b11 Z
+1/
+#370000
+14
+0/
+#375000
+b0 H"
+b0 G"
+b0 }
+b0 |
+b0 ."
+b0 ;"
+b0 O"
+b0 I"
+b11111 K"
+b11111 M"
+b0 c
+b0 p
+b0 &"
+b0 ~
+b11111 ""
+b11111 $"
+b11111 X
+b11111 Z
+b1000 !
+b1000 :"
+b1000 "
+b1000 o
+b1000 #
+b1000 G
+1/
+#380000
+0/
+#385000
+1/
+#386000
+04
+#390000
+b1100100 &
+b1100100 =
+1J
+b1100100 %
+b1100100 e
+1r
+b1100100 $
+b1100100 0"
+1="
+13
+12
+0/
+#395000
+0="
+0r
+0J
+b0 M"
+b0 $"
+b0 Z
+b1100100 !
+b1100100 :"
+1L"
+b1100100 "
+b1100100 o
+1#"
+b1100100 #
+b1100100 G
+1Y
+1/
+#400000
+b1100 }
+b1100 |
+b1100 H"
+b1100 G"
+1I
+1q
+1<"
+b0 &
+b0 =
+b0 %
+b0 e
+b0 $
+b0 0"
+11
+02
+0/
+#405000
+0I
+0q
+0<"
+b1001 H"
+b1001 G"
+b1001 }
+b1001 |
+b1100 ."
+b1100 ;"
+b1100 O"
+b1100 I"
+b0 K"
+b1 M"
+b1100 c
+b1100 p
+b1100 &"
+b1100 ~
+b0 ""
+b1 $"
+b0 X
+b1 Z
+1W
+0Y
+1!"
+0#"
+1J"
+0L"
+1/
+#410000
+03
+01
+0/
+#415000
+b111 H"
+b111 G"
+b111 }
+b111 |
+b1001 ."
+b1001 ;"
+b1001 O"
+b1001 I"
+b1 K"
+b10 M"
+b1001 c
+b1001 p
+b1001 &"
+b1001 ~
+b1 ""
+b10 $"
+b1 X
+b10 Z
+0J"
+0!"
+0W
+1/
+#416000
+b101 6
+#420000
+b11111010111 }
+b11111010111 |
+b11111010111 H"
+b11111010111 G"
+b1100100 &
+b1100100 =
+1J
+b1100100 %
+b1100100 e
+1r
+b1100100 $
+b1100100 0"
+1="
+12
+0/
+#425000
+0J
+0r
+0="
+b11111100010 H"
+b11111100010 G"
+b11111100010 }
+b11111100010 |
+b111010111 ."
+b111010111 ;"
+b111010111 O"
+b111010111 I"
+b10 K"
+b0 M"
+b111010111 c
+b111010111 p
+b111010111 &"
+b111010111 ~
+b10 ""
+b0 $"
+b10 X
+b0 Z
+1Y
+1#"
+1L"
+1/
+#430000
+b11111101110 }
+b11111101110 |
+b11111101110 H"
+b11111101110 G"
+1I
+1q
+1<"
+b0 &
+b0 =
+b0 %
+b0 e
+b0 $
+b0 0"
+11
+02
+0/
+#435000
+0<"
+0q
+0I
+b11111110011 H"
+b11111110011 G"
+b11111110011 }
+b11111110011 |
+b111101110 ."
+b111101110 ;"
+b111101110 O"
+b111101110 I"
+b0 K"
+b1 M"
+b111101110 c
+b111101110 p
+b111101110 &"
+b111101110 ~
+b0 ""
+b1 $"
+b0 X
+b1 Z
+1J"
+0L"
+1!"
+0#"
+1W
+0Y
+1/
+#440000
+01
+0/
+#445000
+b11111110111 H"
+b11111110111 G"
+b11111110111 }
+b11111110111 |
+b111110011 ."
+b111110011 ;"
+b111110011 O"
+b111110011 I"
+b1 K"
+b10 M"
+b111110011 c
+b111110011 p
+b111110011 &"
+b111110011 ~
+b1 ""
+b10 $"
+b1 X
+b10 Z
+0W
+0!"
+0J"
+1/
+#446000
+b110 6
+#450000
+0/
+#455000
+b11111111010 H"
+b11111111010 G"
+b11111111010 }
+b11111111010 |
+b111110111 ."
+b111110111 ;"
+b111110111 O"
+b111110111 I"
+b10 K"
+b11 M"
+b111110111 c
+b111110111 p
+b111110111 &"
+b111110111 ~
+b10 ""
+b11 $"
+b10 X
+b11 Z
+1/
+#460000
+14
+0/
+#465000
+b0 H"
+b0 G"
+b0 }
+b0 |
+b0 ."
+b0 ;"
+b0 O"
+b0 I"
+b11111 K"
+b11111 M"
+b0 c
+b0 p
+b0 &"
+b0 ~
+b11111 ""
+b11111 $"
+b11111 X
+b11111 Z
+b1000 #
+b1000 G
+b1000 "
+b1000 o
+b1000 !
+b1000 :"
+1/
+#470000
+0/
+#475000
+1/
+#476000
+04
+#480000
+b11111101 &
+b11111101 =
+1J
+b11111101 %
+b11111101 e
+1r
+b11111101 $
+b11111101 0"
+1="
+b11111101 :
+b11111101 b
+b11111101 -"
+b11111101 5
+b11111101 9
+b11111101 a
+b11111101 ,"
+13
+12
+0/
+#485000
+0J
+0r
+0="
+b0 M"
+b0 $"
+b0 Z
+1Y
+b11111101 #
+b11111101 G
+1#"
+b11111101 "
+b11111101 o
+1L"
+b11111101 !
+b11111101 :"
+1/
+#490000
+b1100 }
+b1100 |
+b1100 H"
+b1100 G"
+1I
+1q
+1<"
+b0 &
+b0 =
+b0 %
+b0 e
+b0 $
+b0 0"
+11
+02
+0/
+#495000
+0<"
+0q
+0I
+b1001 H"
+b1001 G"
+b1001 }
+b1001 |
+b1100 ."
+b1100 ;"
+b1100 O"
+b1100 I"
+b0 K"
+b1 M"
+b1100 c
+b1100 p
+b1100 &"
+b1100 ~
+b0 ""
+b1 $"
+b0 X
+b1 Z
+1J"
+0L"
+1!"
+0#"
+1W
+0Y
+1/
+#500000
+03
+01
+0/
+#505000
+b111 H"
+b111 G"
+b111 }
+b111 |
+b1001 ."
+b1001 ;"
+b1001 O"
+b1001 I"
+b1 K"
+b10 M"
+b1001 c
+b1001 p
+b1001 &"
+b1001 ~
+b1 ""
+b10 $"
+b1 X
+b10 Z
+0W
+0!"
+0J"
+1/
+#506000
+b111 6
+#510000
+0/
+#515000
+b110 H"
+b110 G"
+b110 }
+b110 |
+b111 ."
+b111 ;"
+b111 O"
+b111 I"
+b10 K"
+b11 M"
+b111 c
+b111 p
+b111 &"
+b111 ~
+b10 ""
+b11 $"
+b10 X
+b11 Z
+1/
+#520000
+14
+0/
+#525000
+b0 H"
+b0 G"
+b0 }
+b0 |
+b0 ."
+b0 ;"
+b0 O"
+b0 I"
+b11111 K"
+b11111 M"
+b0 c
+b0 p
+b0 &"
+b0 ~
+b11111 ""
+b11111 $"
+b11111 X
+b11111 Z
+b1000 #
+b1000 G
+b1000 "
+b1000 o
+b1000 !
+b1000 :"
+1/
+#530000
+0/
+#535000
+1/
+#536000
+04
+#540000
+1I
+1q
+1<"
+b1111 :
+b1111 b
+b1111 -"
+b1111 5
+b1111 9
+b1111 a
+b1111 ,"
+13
+11
+0/
+#545000
+0I
+0q
+0<"
+b0 K"
+b0 ""
+b0 X
+1W
+b1111 #
+b1111 G
+1!"
+b1111 "
+b1111 o
+1J"
+b1111 !
+b1111 :"
+1/
+#550000
+b11111010000 }
+b11111010000 |
+b11111010000 H"
+b11111010000 G"
+b1111 &
+b1111 =
+1J
+b1111 %
+b1111 e
+1r
+b1111 $
+b1111 0"
+1="
+01
+12
+0/
+#555000
+0="
+0r
+0J
+b11111011100 H"
+b11111011100 G"
+b11111011100 }
+b11111011100 |
+b111010000 ."
+b111010000 ;"
+b111010000 O"
+b111010000 I"
+b1 K"
+b0 M"
+b111010000 c
+b111010000 p
+b111010000 &"
+b111010000 ~
+b1 ""
+b0 $"
+b1 X
+b0 Z
+0J"
+1L"
+0!"
+1#"
+0W
+1Y
+1/
+#560000
+b0 &
+b0 =
+b0 %
+b0 e
+b0 $
+b0 0"
+03
+02
+0/
+#565000
+b11111100101 H"
+b11111100101 G"
+b11111100101 }
+b11111100101 |
+b111011100 ."
+b111011100 ;"
+b111011100 O"
+b111011100 I"
+b10 K"
+b1 M"
+b111011100 c
+b111011100 p
+b111011100 &"
+b111011100 ~
+b10 ""
+b1 $"
+b10 X
+b1 Z
+0Y
+0#"
+0L"
+1/
+#566000
+b1000 6
+#570000
+0/
+#575000
+b11111101100 H"
+b11111101100 G"
+b11111101100 }
+b11111101100 |
+b111100101 ."
+b111100101 ;"
+b111100101 O"
+b111100101 I"
+b11 K"
+b10 M"
+b111100101 c
+b111100101 p
+b111100101 &"
+b111100101 ~
+b11 ""
+b10 $"
+b11 X
+b10 Z
+1/
+#580000
+14
+0/
+#585000
+b0 H"
+b0 G"
+b0 }
+b0 |
+b0 ."
+b0 ;"
+b0 O"
+b0 I"
+b11111 K"
+b11111 M"
+b0 c
+b0 p
+b0 &"
+b0 ~
+b11111 ""
+b11111 $"
+b11111 X
+b11111 Z
+b1000 #
+b1000 G
+b1000 "
+b1000 o
+b1000 !
+b1000 :"
+1/
+#590000
+0/
+#595000
+1/
+#596000
+04
+#600000
+1I
+1q
+1<"
+b1100100 :
+b1100100 b
+b1100100 -"
+b1100100 5
+b1100100 9
+b1100100 a
+b1100100 ,"
+13
+11
+0/
+#605000
+0I
+0q
+0<"
+b0 K"
+b0 ""
+b0 X
+1W
+b1100100 #
+b1100100 G
+1!"
+b1100100 "
+b1100100 o
+1J"
+b1100100 !
+b1100100 :"
+1/
+#610000
+03
+01
+0/
+#615000
+b1 K"
+b1 ""
+b1 X
+0J"
+0!"
+0W
+1/
+#616000
+b111 7
+#620000
+0/
+#625000
+b10 K"
+b10 ""
+b10 X
+1/
+#630000
+0/
+#635000
+b11 K"
+b11 ""
+b11 X
+1/
+#640000
+0/
+#645000
+b11111 K"
+b11111 ""
+b11111 X
+1/
+#650000
+0/
+#655000
+1/
+#660000
+0/
+#665000
+1/
+#670000
+b1100100 &
+b1100100 =
+1J
+b1100100 %
+b1100100 e
+1r
+b1100100 $
+b1100100 0"
+1="
+13
+12
+0/
+#675000
+0="
+0r
+0J
+b0 M"
+b0 $"
+b0 Z
+1L"
+1#"
+1Y
+1/
+#680000
+b0 &
+b0 =
+b0 %
+b0 e
+b0 $
+b0 0"
+03
+02
+0/
+#685000
+b1 M"
+b1 $"
+b1 Z
+0Y
+0#"
+0L"
+1/
+#686000
+b1000 7
+#690000
+0/
+#695000
+b10 M"
+b10 $"
+b10 Z
+1/
+#696000
