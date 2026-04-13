@@ -6,6 +6,7 @@ module apply_reward #(
     input  logic signed [3:0] dopamine,   // Dopamine signal, 4-bit signed
     input  logic signed [8:0] elig_trace, // Eligibility trace, 9-bit signed to allow for negative values
     input  logic              reward_en,  // Enable signal for applying reward
+    input  logic              rst,       // Reset signal
     output logic signed [7:0] delta_w     // Weight change, 8-bit signed to allow for negative updates
   );
 
@@ -13,10 +14,13 @@ module apply_reward #(
 
   always_ff @(posedge clk)
   begin
-    if (reward_en) begin
+    if (rst) begin
+      delta_w <= 1'b0; // Reset weight delta to zero
+    end
+    else if (reward_en) begin
       // Only apply reward if learning mode is R-STDP or STDP
       if (LEARNING_MODE == 0)
-        delta_w <= '0; // No learning
+        delta_w <= 1'b0; // No learning
       else if (LEARNING_MODE == 1) begin
         product = (elig_trace * dopamine) >>> LR_SHIFT;
         delta_w <= product[7:0];
