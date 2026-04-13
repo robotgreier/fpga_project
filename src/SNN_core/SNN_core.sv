@@ -17,7 +17,7 @@ module SNN_core #(
     input  logic                           clk,
     input  logic [N_INPUTS-1:0]           pre_spk,   // Pre-synaptic input spikes
     input  logic signed [3:0]             dopamine,  // Reward signal (R-STDP only)
-    input  logic                           reward_en, // Apply reward pulse (R-STDP only)
+    input  logic                          reward_en, // Apply reward pulse (R-STDP only)
     output logic [N_OUTPUTS-1:0]          spk_out,   // Output spikes
     output logic [$clog2(N_OUTPUTS)-1:0]  winner_idx // WTA winner index
   );
