@@ -10,11 +10,12 @@ module synapse_core #(
     parameter int LEARNING_MODE = 0
   ) (
     input logic clk,
-    input logic pre_spk,                // Pre-synaptic spike input
-    input logic signed [3:0] dopamine,  // Dopamine signal for reward-based learning
-    input logic reward_en,              // Reward enable signal
-    input logic [7:0] w_syn,            // Synaptic weight
-    input logic post_spk,              // Post-synaptic spike output
+    input logic rst,                     // Synchronous reset (active high)
+    input logic pre_spk,                 // Pre-synaptic spike input
+    input logic signed [3:0] dopamine,   // Dopamine signal for reward-based learning
+    input logic reward_en,               // Reward enable signal
+    input logic [7:0] w_syn,             // Synaptic weight
+    input logic post_spk,                // Post-synaptic spike input
     output logic [7:0] w_next,           // Updated synaptic weight
     output logic [7:0] I_syn             // Synaptic current output
   );
@@ -24,7 +25,7 @@ module synapse_core #(
   logic signed [7:0] delta_w;    // Weight change from reward application
   logic signed [8:0] w_sum;      // Intermediate sum before clamping
 
-  assign I_syn = (pre_spk) ? w_syn : 0; // Output synaptic current based on pre-synaptic spike
+  assign I_syn = (pre_spk) ? w_syn : 8'h00; // Output synaptic current based on pre-synaptic spike
 
   // Instantiate eligibility updater
   eligibility_updater #(
@@ -37,9 +38,10 @@ module synapse_core #(
     .MAX_E_TRACE(255),
     .MIN_E_TRACE(-256)
   ) elig_upd (
-    .clk(clk),
-    .pre_spk(pre_spk),
-    .post_spk(post_spk),
+    .clk       (clk),
+    .rst       (rst),        // was unconnected; now wired
+    .pre_spk   (pre_spk),
+    .post_spk  (post_spk),
     .elig_trace(elig_trace)
   );
 
@@ -48,21 +50,25 @@ module synapse_core #(
     .LR_SHIFT(LR_SHIFT),
     .LEARNING_MODE(LEARNING_MODE)
   ) reward_app (
-    .clk(clk),
-    .dopamine(dopamine),
+    .clk       (clk),
+    .rst       (rst),        // was unconnected; now wired
+    .dopamine  (dopamine),
     .elig_trace(elig_trace),
-    .reward_en(reward_en),
-    .delta_w(delta_w)
+    .reward_en (reward_en),
+    .delta_w   (delta_w)
   );
 
   // Compute sum combinationally, then clamp and register
   assign w_sum = $signed({1'b0, w_syn}) + delta_w;
 
-  always_ff @(posedge clk)
-  begin
-    if      (w_sum > signed'(W_MAX)) w_next <= W_MAX;
-    else if (w_sum < signed'(W_MIN)) w_next <= W_MIN;
-    else                             w_next <= w_sum[7:0];
+  always_ff @(posedge clk) begin
+    if (rst) begin
+      w_next <= W_MIN[7:0]; // Reset to minimum valid weight
+    end else begin
+      if      (w_sum > signed'(W_MAX)) w_next <= W_MAX;
+      else if (w_sum < signed'(W_MIN)) w_next <= W_MIN;
+      else                             w_next <= w_sum[7:0];
+    end
   end
 
 endmodule
