@@ -1,0 +1,197 @@
+$date
+	Mon Apr 13 09:31:04 2026
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module tb_LIF_core $end
+$var wire 1 ! spk $end
+$var wire 16 " pre_reset_mem [15:0] $end
+$var parameter 32 # DECAY $end
+$var parameter 32 $ RESET $end
+$var parameter 32 % THRESHOLD $end
+$var reg 1 & clk $end
+$var reg 16 ' i_syn [15:0] $end
+$var reg 1 ( inhibit $end
+$scope module dut $end
+$var wire 1 & clk $end
+$var wire 16 ) i_syn [15:0] $end
+$var wire 1 ( inhibit $end
+$var parameter 32 * DECAY $end
+$var parameter 32 + RESET $end
+$var parameter 32 , THRESHOLD $end
+$var reg 16 - mem [15:0] $end
+$var reg 16 . mem_next [15:0] $end
+$var reg 16 / pre_reset_mem [15:0] $end
+$var reg 1 ! spk $end
+$upscope $end
+$scope task apply_input $end
+$upscope $end
+$scope task idle_cycles $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+b10000000000 ,
+b0 +
+b100000000 *
+b10000000000 %
+b0 $
+b100000000 #
+$end
+#0
+$dumpvars
+bx /
+bx .
+bx -
+b0 )
+0(
+b0 '
+0&
+bx "
+x!
+$end
+#5000
+0!
+1&
+#10000
+0&
+#15000
+1&
+#20000
+0&
+#25000
+1&
+#30000
+b100101100 '
+b100101100 )
+0&
+#35000
+1&
+#40000
+0&
+#45000
+1&
+#50000
+0&
+#55000
+1&
+#60000
+b0 '
+b0 )
+0&
+#65000
+1&
+#70000
+0&
+#75000
+1&
+#80000
+b10000000000 '
+b10000000000 )
+0&
+#85000
+1&
+#90000
+b0 '
+b0 )
+0&
+#95000
+1&
+#100000
+0&
+#105000
+1&
+#110000
+b1000000000 '
+b1000000000 )
+0&
+#115000
+1&
+#120000
+b0 '
+b0 )
+0&
+#125000
+1&
+#130000
+0&
+#135000
+1&
+#140000
+0&
+#145000
+1&
+#150000
+0&
+#155000
+1&
+#160000
+b1000000000 '
+b1000000000 )
+0&
+#165000
+1&
+#170000
+1(
+b10000000000 '
+b10000000000 )
+0&
+#175000
+b0 -
+1&
+#180000
+0(
+b0 '
+b0 )
+0&
+#185000
+b0 "
+b0 /
+b0 .
+1&
+#190000
+0&
+#195000
+1&
+#200000
+b10001001100 '
+b10001001100 )
+0&
+#205000
+1!
+b10001001100 "
+b10001001100 /
+b10001001100 .
+1&
+#210000
+0&
+#215000
+1&
+#220000
+0&
+#225000
+1&
+#230000
+0&
+#235000
+1&
+#240000
+b0 '
+b0 )
+0&
+#245000
+0!
+b0 "
+b0 /
+b0 .
+1&
+#250000
+0&
+#255000
+1&
+#256000

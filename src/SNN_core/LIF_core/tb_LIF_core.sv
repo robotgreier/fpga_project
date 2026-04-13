@@ -140,9 +140,9 @@ module tb_LIF_core ();
     // --------------------------------------------------------------------------
     // Optional: waveform dump (uncomment for iVerilog / non-Vivado flows)
     // --------------------------------------------------------------------------
-    // initial begin
-    //     $dumpfile("tb_LIF_core.vcd");
-    //     $dumpvars(0, tb_LIF_core);
-    // end
+    initial begin
+        $dumpfile("tb_LIF_core.vcd");
+        $dumpvars(0, tb_LIF_core);
+    end
 
 endmodule
