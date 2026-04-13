@@ -16,7 +16,7 @@ module LIF_core #(
   always_ff @(posedge clk)
   begin
     mem_next = (mem > DECAY) ? mem - DECAY + i_syn : i_syn;
-    pre_reset_mem <= mem_next; // always capture natural value before any override
+    pre_reset_mem <= mem_next;
 
     if (inhibit) begin
       spk <= 0;

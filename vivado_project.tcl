@@ -23,13 +23,14 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/src/SNN_core/synapse_core/eligibility_updater.sv"]"\
  "[file normalize "$origin_dir/src/SNN_core/synapse_core/synapse_core.sv"]"\
  "[file normalize "$origin_dir/src/main/fletcher.sv"]"\
+ "[file normalize "$origin_dir/src/SNN_core/SNN_core.sv"]"\
+ "[file normalize "$origin_dir/src/SNN_core/LIF_core/tb_LIF_core.sv"]"\
+ "[file normalize "$origin_dir/src/SNN_core/WTA.sv"]"\
  "[file normalize "$origin_dir/src/main/fifo_memory.sv"]"\
  "[file normalize "$origin_dir/src/timer.sv"]"\
  "[file normalize "$origin_dir/src/main/uart_rx.sv"]"\
  "[file normalize "$origin_dir/src/main/uart_tx.sv"]"\
  "[file normalize "$origin_dir/src/main/main.sv"]"\
- "[file normalize "$origin_dir/sims/fifo.wcfg"]"\
- "[file normalize "$origin_dir/src/main/fifo_memory_tb.sv"]"\
   ]
   foreach ifile $files {
     if { ![file isfile $ifile] } {
@@ -134,6 +135,7 @@ set_property -name "ip_cache_permissions" -value "read write" -objects $obj
 set_property -name "ip_output_repo" -value "$proj_dir/${_xil_proj_name_}.cache/ip" -objects $obj
 set_property -name "mem.enable_memory_map_generation" -value "1" -objects $obj
 set_property -name "part" -value "xc7a100tcsg324-2" -objects $obj
+set_property -name "platform.board_id" -value "ac701" -objects $obj
 set_property -name "revised_directory_structure" -value "1" -objects $obj
 set_property -name "sim.central_dir" -value "$proj_dir/${_xil_proj_name_}.ip_user_files" -objects $obj
 set_property -name "sim.ip.auto_export_scripts" -value "1" -objects $obj
@@ -171,6 +173,9 @@ set files [list \
  [file normalize "${origin_dir}/src/SNN_core/synapse_core/eligibility_updater.sv"] \
  [file normalize "${origin_dir}/src/SNN_core/synapse_core/synapse_core.sv"] \
  [file normalize "${origin_dir}/src/main/fletcher.sv"] \
+ [file normalize "${origin_dir}/src/SNN_core/SNN_core.sv"] \
+ [file normalize "${origin_dir}/src/SNN_core/LIF_core/tb_LIF_core.sv"] \
+ [file normalize "${origin_dir}/src/SNN_core/WTA.sv"] \
  [file normalize "${origin_dir}/src/main/fifo_memory.sv"] \
  [file normalize "${origin_dir}/src/timer.sv"] \
  [file normalize "${origin_dir}/src/main/uart_rx.sv"] \
@@ -201,6 +206,21 @@ set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 
 set file "$origin_dir/src/main/fletcher.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
+set file "$origin_dir/src/SNN_core/SNN_core.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
+set file "$origin_dir/src/SNN_core/LIF_core/tb_LIF_core.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
+set file "$origin_dir/src/SNN_core/WTA.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
@@ -261,27 +281,12 @@ if {[string equal [get_filesets -quiet sim_1] ""]} {
 
 # Set 'sim_1' fileset object
 set obj [get_filesets sim_1]
-set files [list \
- [file normalize "${origin_dir}/sims/fifo.wcfg"] \
- [file normalize "${origin_dir}/src/main/fifo_memory_tb.sv"] \
-]
-add_files -norecurse -fileset $obj $files
-
-# Set 'sim_1' fileset file properties for remote files
-set file "$origin_dir/src/main/fifo_memory_tb.sv"
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sim_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-
-# Set 'sim_1' fileset file properties for local files
-# None
+# Empty (no sources present)
 
 # Set 'sim_1' fileset properties
 set obj [get_filesets sim_1]
 set_property -name "sim_wrapper_top" -value "1" -objects $obj
-set_property -name "top" -value "fifo_memory_tb" -objects $obj
-set_property -name "top_auto_set" -value "0" -objects $obj
+set_property -name "top" -value "main" -objects $obj
 set_property -name "top_lib" -value "xil_defaultlib" -objects $obj
 
 # Set 'utils_1' fileset object
