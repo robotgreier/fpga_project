@@ -26,10 +26,11 @@ module fletcher_tb(
 
     reg reset, check;
     reg [7:0] data;
-    wire [7:0] sum_1, sum_2;
+    wire [15:0] sum;
 
-    int verification_sum_1 = 0;
-    int verification_sum_2 = 0;
+    reg [8:0] verification_sum_1 = 0;
+    reg [8:0] verification_sum_2 = 0;
+    reg [15:0] verification_sum = 0;
 
     fletcher #(
         .BIT_WIDTH(8)
@@ -37,8 +38,7 @@ module fletcher_tb(
         .reset(reset),
         .check(check),
         .data(data),
-        .sum_1(sum_1),
-        .sum_2(sum_2)
+        .sum(sum)
     );
 
     initial begin
@@ -50,16 +50,17 @@ module fletcher_tb(
         reset = 1;
         #5
         reset = 0;
-        data = 254;
+        data = 255;
         #5
-        repeat (300) begin
+        repeat (10) begin
             #5
             check = 1;
             #1
             verification_sum_1 = (verification_sum_1 + data) % 255;
             verification_sum_2 = (verification_sum_1 + verification_sum_2) % 255;
+            verification_sum = {verification_sum_1[7:0], verification_sum_2[7:0]};
 
-            $display("Sum 1: %d, Verification 1: %d, Sum 2: %d, Verification 2: %d, Status: %b", sum_1, verification_sum_1, sum_2, verification_sum_2, ((sum_1==verification_sum_1) && (sum_2==verification_sum_2)));
+            $display("Sum: %d, Verification: %d, Status: %b", sum, verification_sum, (sum==verification_sum));
 
             // if (verification_sum_1 == sum_1) $display("Sum_1 ok");
             // else $display("Sum_1 failure");

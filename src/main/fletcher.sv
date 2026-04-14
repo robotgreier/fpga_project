@@ -26,17 +26,21 @@ module fletcher #(
     input  wire reset,
     input  wire check,
     input  wire [BIT_WIDTH-1:0] data,
-    output reg  [BIT_WIDTH-1:0] sum_1,
-    output reg  [BIT_WIDTH-1:0] sum_2
+    output wire  [(BIT_WIDTH * 2)-1:0] sum
 );
 
 localparam MODULO = (1<<BIT_WIDTH)-1;
+
+reg  [BIT_WIDTH-1:0] sum_1;
+reg  [BIT_WIDTH-1:0] sum_2;
 
 wire [BIT_WIDTH:0] temp_sum_1;
 wire [BIT_WIDTH:0] temp_sum_2;
 
 assign temp_sum_1 = ({1'b0, sum_1} + {1'b0, data} >= MODULO) ? {1'b0, sum_1} + {1'b0, data} - MODULO: {1'b0, sum_1} + {1'b0, data};
 assign temp_sum_2 = ({1'b0, temp_sum_1} + {1'b0, sum_2} >= MODULO) ? {1'b0, temp_sum_1} + {1'b0, sum_2} - MODULO : {1'b0, temp_sum_1} + {1'b0, sum_2};
+
+assign sum = {sum_1, sum_2};
 
 always @(posedge check or posedge reset) begin
     if (reset) begin
