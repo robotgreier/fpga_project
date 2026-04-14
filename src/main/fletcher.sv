@@ -23,7 +23,6 @@
 module fletcher #(
     parameter BIT_WIDTH = 8
 )(
-    input  wire clk,
     input  wire reset,
     input  wire check,
     input  wire [BIT_WIDTH-1:0] data,
@@ -33,33 +32,21 @@ module fletcher #(
 
 localparam MODULO = (1<<BIT_WIDTH)-1;
 
-wire [BIT_WIDTH:0] s1_tmp;
-wire [BIT_WIDTH-1:0] s1_next;
-wire [BIT_WIDTH:0] s2_tmp;
-wire [BIT_WIDTH-1:0] s2_next;
+wire [BIT_WIDTH:0] temp_sum_1;
+wire [BIT_WIDTH:0] temp_sum_2;
 
-assign s1_tmp = {1'b0,sum_1} + {1'b0,data};
+assign temp_sum_1 = ({1'b0, sum_1} + {1'b0, data} >= MODULO) ? {1'b0, sum_1} + {1'b0, data} - MODULO: {1'b0, sum_1} + {1'b0, data};
+assign temp_sum_2 = ({1'b0, temp_sum_1} + {1'b0, sum_2} >= MODULO) ? {1'b0, temp_sum_1} + {1'b0, sum_2} - MODULO : {1'b0, temp_sum_1} + {1'b0, sum_2};
 
-assign s1_next =
-    (s1_tmp >= MODULO) ?
-        s1_tmp - MODULO :
-        s1_tmp[BIT_WIDTH-1:0];
-
-assign s2_tmp = {1'b0,sum_2} + {1'b0,s1_next};
-
-assign s2_next =
-    (s2_tmp >= MODULO) ?
-        s2_tmp - MODULO :
-        s2_tmp[BIT_WIDTH-1:0];
-
-always_ff @(posedge clk or posedge reset) begin
+always @(posedge check or posedge reset) begin
     if (reset) begin
         sum_1 <= 0;
         sum_2 <= 0;
     end
-    else if (check) begin
-        sum_1 <= s1_next;
-        sum_2 <= s2_next;
+
+    else begin
+    sum_1 <= temp_sum_1[BIT_WIDTH-1:0];
+    sum_2 <= temp_sum_2[BIT_WIDTH-1:0];
     end
 end
 

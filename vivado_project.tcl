@@ -33,6 +33,7 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/src/SNN_core/LIF_core/tb_LIF_core.sv"]"\
  "[file normalize "$origin_dir/sims/fifo.wcfg"]"\
  "[file normalize "$origin_dir/src/main/fifo_memory_tb.sv"]"\
+ "[file normalize "$origin_dir/src/main/fletcher_tb.sv"]"\
   ]
   foreach ifile $files {
     if { ![file isfile $ifile] } {
@@ -160,7 +161,7 @@ set_property -name "simulator.xsim_version" -value "2025.2" -objects $obj
 set_property -name "simulator_language" -value "Mixed" -objects $obj
 set_property -name "sim_compile_state" -value "1" -objects $obj
 set_property -name "use_inline_hdl_ip" -value "1" -objects $obj
-set_property -name "webtalk.xsim_launch_sim" -value "80" -objects $obj
+set_property -name "webtalk.xsim_launch_sim" -value "108" -objects $obj
 
 # Create 'sources_1' fileset (if not found)
 if {[string equal [get_filesets -quiet sources_1] ""]} {
@@ -296,11 +297,17 @@ set obj [get_filesets sim_1]
 set files [list \
  [file normalize "${origin_dir}/sims/fifo.wcfg"] \
  [file normalize "${origin_dir}/src/main/fifo_memory_tb.sv"] \
+ [file normalize "${origin_dir}/src/main/fletcher_tb.sv"] \
 ]
 add_files -norecurse -fileset $obj $files
 
 # Set 'sim_1' fileset file properties for remote files
 set file "$origin_dir/src/main/fifo_memory_tb.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sim_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
+set file "$origin_dir/src/main/fletcher_tb.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sim_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
@@ -312,7 +319,7 @@ set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 # Set 'sim_1' fileset properties
 set obj [get_filesets sim_1]
 set_property -name "sim_wrapper_top" -value "1" -objects $obj
-set_property -name "top" -value "SNN_core" -objects $obj
+set_property -name "top" -value "fletcher_tb" -objects $obj
 set_property -name "top_auto_set" -value "0" -objects $obj
 set_property -name "top_lib" -value "xil_defaultlib" -objects $obj
 
