@@ -32,11 +32,14 @@ module verifier#(
 
     // State parameters
     parameter IDLE = 0;
-    parameter LEN = 1;
-    parameter DATA = 2;
-    parameter CHECK_1_WAIT = 3;
-    parameter CHECK_2_WAIT = 4;
-    parameter CHECK = 5;
+    parameter CMD = 1;
+    parameter LEN = 2;
+    parameter DATA = 3;
+    parameter CHECK_1_WAIT = 4;
+    parameter CHECK_2_WAIT = 5;
+    parameter CHECK = 6;
+
+    parameter SOF = 8'b10101010;
 
     reg [2:0] state;
     reg [$clog2(LEN_MAX)-1:0] n = 0;
@@ -62,6 +65,16 @@ module verifier#(
 
             case (state)
                 IDLE: begin
+                    if (rx_ready & rx_success & rx_data == SOF) begin // SOF Packet received and verified
+                        check <= 1; // Add SOF to fletcher
+                        state <= CMD; // Transition to CMD
+                        n <= 0;
+                        i <= 0;
+                    end
+                    else reset <= 1;
+                end
+
+                CMD: begin
                     if (rx_ready & rx_success) begin // CMD Packet received
                         write <= 1; // Write CMD to fifo
                         check <= 1; // Add CMD to fletcher
@@ -73,11 +86,17 @@ module verifier#(
 
                 LEN: begin
                     if (rx_ready & rx_success) begin // LEN Packet received
-                        n <= rx_data; // Store LEN as n
-                        write <= 1; // Write LEN to fifo
-                        check <= 1; // Add LEN to fletcher
-                        state <= DATA; // Transition to LEN
-
+                        if (rx_data <= LEN_MAX) begin // Check if data is within bounds
+                            n <= rx_data; // Store LEN as n
+                            write <= 1; // Write LEN to fifo
+                            check <= 1; // Add LEN to fletcher
+                            state <= DATA; // Transition to DATA
+                        end
+                        else begin
+                            ready <= 1;
+                            success <= 0;
+                            state <= IDLE;
+                        end
                     end
                 end
 

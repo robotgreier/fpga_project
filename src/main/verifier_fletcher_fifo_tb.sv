@@ -36,7 +36,7 @@ module verifier_fletcher_fifo_tb(
 
     verifier #(
         .BIT_WIDTH(8),
-        .LEN_MAX(256)
+        .LEN_MAX(128)
     ) veri (
         .clk(clk),
         .rx_ready(rx_ready),
@@ -83,7 +83,7 @@ module verifier_fletcher_fifo_tb(
         master_reset = 0;
         master_read = 0;
 
-        repeat(100) #5 clk = ~clk;
+        repeat(200) #5 clk = ~clk;
     end
 
     initial begin // Runtime
@@ -91,6 +91,46 @@ module verifier_fletcher_fifo_tb(
         master_reset = 1;
         #5
         master_reset = 0;
+
+        #25 // Garbage
+        rx_ready = 1;
+        rx_success = 1;
+        rx_data = 8'b00101000;
+        #5
+        rx_ready = 0;
+        rx_success = 0;
+
+        #25 // Garbage
+        rx_ready = 1;
+        rx_success = 1;
+        rx_data = 8'b00001100;
+        #5
+        rx_ready = 0;
+        rx_success = 0;
+
+        #25 // Garbage
+        rx_ready = 1;
+        rx_success = 1;
+        rx_data = 8'b11100000;
+        #5
+        rx_ready = 0;
+        rx_success = 0;
+        
+        #25 // Garbage
+        rx_ready = 1;
+        rx_success = 1;
+        rx_data = 8'b00000000;
+        #5
+        rx_ready = 0;
+        rx_success = 0;
+
+        #25 // SOF
+        rx_ready = 1;
+        rx_success = 1;
+        rx_data = 8'b10101010;
+        #5
+        rx_ready = 0;
+        rx_success = 0;
 
         #25 // INIT
         rx_ready = 1;
@@ -103,7 +143,7 @@ module verifier_fletcher_fifo_tb(
         #25 // LEN
         rx_ready = 1;
         rx_success = 1;
-        rx_data = 5; // 5 packets
+        rx_data = 130; // 130 packets
         #5
         rx_ready = 0;
         rx_success = 0;
@@ -151,7 +191,7 @@ module verifier_fletcher_fifo_tb(
         #25 // Checksum 1
         rx_ready = 1;
         rx_success = 1;
-        rx_data = 42;
+        rx_data = 212;
         #5
         rx_ready = 0;
         rx_success = 0;
@@ -159,7 +199,73 @@ module verifier_fletcher_fifo_tb(
         #25 // Checksum 2
         rx_ready = 1;
         rx_success = 1;
-        rx_data = 6;
+        rx_data = 91;
+        #5
+        rx_ready = 0;
+        rx_success = 0;
+
+
+
+        #25 // SOF
+        rx_ready = 1;
+        rx_success = 1;
+        rx_data = 8'b10101010;
+        #5
+        rx_ready = 0;
+        rx_success = 0;
+
+        #25 // INIT
+        rx_ready = 1;
+        rx_success = 1;
+        rx_data = 0;
+        #5
+        rx_ready = 0;
+        rx_success = 0;
+
+        #25 // LEN
+        rx_ready = 1;
+        rx_success = 1;
+        rx_data = 3; // 3 packets
+        #5
+        rx_ready = 0;
+        rx_success = 0;
+
+        #25 // DATA 1
+        rx_ready = 1;
+        rx_success = 1;
+        rx_data = 85;
+        #5
+        rx_ready = 0;
+        rx_success = 0;
+
+        #25 // DATA 2
+        rx_ready = 1;
+        rx_success = 1;
+        rx_data = 40;
+        #5
+        rx_ready = 0;
+        rx_success = 0;
+
+        #25 // DATA 3
+        rx_ready = 1;
+        rx_success = 1;
+        rx_data = 90;
+        #5
+        rx_ready = 0;
+        rx_success = 0;
+
+        #25 // Checksum 1
+        rx_ready = 1;
+        rx_success = 1;
+        rx_data = 133;
+        #5
+        rx_ready = 0;
+        rx_success = 0;
+
+        #25 // Checksum 2
+        rx_ready = 1;
+        rx_success = 1;
+        rx_data = 182;
         #5
         rx_ready = 0;
         rx_success = 0;
