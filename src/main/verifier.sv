@@ -64,6 +64,7 @@ module verifier#(
             write <= 0;
             check <= 0;
             soft_reset <= 0;
+            hard_reset <= 0;
             commit <= 0;
 
             case (state)
