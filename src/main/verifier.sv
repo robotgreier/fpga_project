@@ -77,6 +77,7 @@ module verifier#(
                         write <= 1; // Write LEN to fifo
                         check <= 1; // Add CMD to fletcher
                         state <= DATA; // Transition to LEN
+
                     end
                 end
 

@@ -20,14 +20,16 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module verifier_tb(
+module verifier_fletcher_fifo_tb(
 
     );
 
-    reg clk, rx_ready, rx_success, master_reset, fifo_full;
+    reg clk, rx_ready, rx_success, master_reset, master_read;
     reg [7:0] rx_data;
-    reg [15:0] fletcher_sum;
-    wire ready, success, write, check, reset;
+    wire verifier_ready, verifier_success, verifier_write, verifier_check, verifier_reset; // verifier signals
+    wire [15:0] fletcher_sum; // fletcher signals
+    wire fifo_full, fifo_empty;
+    wire [7:0] fifo_data; // fifo signals
 
     verifier #(
         .BIT_WIDTH(8),
@@ -40,35 +42,53 @@ module verifier_tb(
         .fifo_full(fifo_full),
         .rx_data(rx_data),
         .fletcher_sum(fletcher_sum),
-        .ready(ready),
-        .success(success),
-        .write(write),
-        .check(check),
-        .reset(reset)
+        .ready(verifier_ready),
+        .success(verifier_success),
+        .write(verifier_write),
+        .check(verifier_check),
+        .reset(verifier_reset)
+    );
+
+    fletcher #(
+        .BIT_WIDTH(8)
+    ) fletch (
+        .reset(verifier_reset),
+        .check(verifier_check),
+        .data(rx_data),
+        .sum(fletcher_sum)
+    );
+
+    fifo_memory #(
+        .BIT_WIDTH(8),
+        .ADDRESS_COUNT(256)
+    ) fifo (
+        .clk(clk),
+        .reset(master_reset),
+        .write(verifier_write),
+        .read(master_read),
+        .full(fifo_full),
+        .empty(fifo_empty),
+        .data_in(rx_data),
+        .data_out(fifo_out)
     );
 
     initial begin // Initial values and clock
         clk = 0;
         rx_ready = 0;
         rx_success = 0;
-        master_reset = 0;
-        fifo_full = 0;
         rx_data = 0;
-        fletcher_sum = 16'h25E7;
+        master_reset = 0;
+        master_read = 0;
 
         repeat(100) #5 clk = ~clk;
     end
 
-    initial begin // Master
+    initial begin // Runtime
         #5
         master_reset = 1;
         #5
         master_reset = 0;
-        // #1
 
-    end
-
-    initial begin // RX
         #25 // INIT
         rx_ready = 1;
         rx_success = 1;
