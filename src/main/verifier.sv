@@ -34,9 +34,9 @@ module verifier#(
     parameter IDLE = 0;
     parameter LEN = 1;
     parameter DATA = 2;
-    parameter CHECK = 3;
-    parameter ERROR = 4;
-    parameter SUCCESS = 5;
+    parameter CHECK_1_WAIT = 3;
+    parameter CHECK_2_WAIT = 4;
+    parameter CHECK = 5;
 
     reg [2:0] state;
     reg [$clog2(LEN_MAX)-1:0] n = 0;
@@ -95,7 +95,7 @@ module verifier#(
 
                 CHECK_1_WAIT: begin // Wait for checksum packet to arrive
                     if (rx_ready & rx_success) begin // First checksum packet received
-                        checksum_1 <= data; // Store received checksum
+                        checksum_1 <= rx_data; // Store received checksum
                         check <= 1; // Add packet to fletcher, ignore fifo
                         state <= CHECK_2_WAIT; // Transition to CHECK_2_WAIT
                     end
@@ -103,7 +103,7 @@ module verifier#(
 
                 CHECK_2_WAIT: begin
                     if (rx_ready & rx_success) begin // Last checksum packet received
-                    checksum_2 <= data; // Store received checksum
+                    checksum_2 <= rx_data; // Store received checksum
                         check <= 1; // Add packet to fletcher, ignore fifo
                         state <= CHECK; // Transition to CHECK
                     end
@@ -113,6 +113,7 @@ module verifier#(
                     reset <= 1; // Reset fletcher
                     ready <= 1; // Tell master system is ready
                     success <= ({checksum_1, checksum_2} == fletcher_sum); // Tell master it was success
+                    state <= IDLE;
                 end
             endcase
 

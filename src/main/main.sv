@@ -39,7 +39,7 @@ uart_tx #(
 
   fletcher #(
       .BIT_WIDTH(8)
-  ) fletcher_in (
+  ) fletcher_out (
       .reset(reset),
       .check(check_out),
       .data(data),
