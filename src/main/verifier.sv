@@ -75,7 +75,7 @@ module verifier#(
                     if (rx_ready & rx_success) begin // LEN Packet received
                         n <= rx_data; // Store LEN as n
                         write <= 1; // Write LEN to fifo
-                        check <= 1; // Add CMD to fletcher
+                        check <= 1; // Add LEN to fletcher
                         state <= DATA; // Transition to LEN
 
                     end
@@ -97,7 +97,7 @@ module verifier#(
                 CHECK_1_WAIT: begin // Wait for checksum packet to arrive
                     if (rx_ready & rx_success) begin // First checksum packet received
                         checksum_1 <= rx_data; // Store received checksum
-                        check <= 1; // Add packet to fletcher, ignore fifo
+                        // check <= 1; // Add packet to fletcher, ignore fifo
                         state <= CHECK_2_WAIT; // Transition to CHECK_2_WAIT
                     end
                 end
@@ -105,7 +105,7 @@ module verifier#(
                 CHECK_2_WAIT: begin
                     if (rx_ready & rx_success) begin // Last checksum packet received
                     checksum_2 <= rx_data; // Store received checksum
-                        check <= 1; // Add packet to fletcher, ignore fifo
+                        // check <= 1; // Add packet to fletcher, ignore fifo
                         state <= CHECK; // Transition to CHECK
                     end
                 end

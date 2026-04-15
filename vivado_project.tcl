@@ -164,7 +164,7 @@ set_property -name "simulator.xsim_version" -value "2025.2" -objects $obj
 set_property -name "simulator_language" -value "Mixed" -objects $obj
 set_property -name "sim_compile_state" -value "1" -objects $obj
 set_property -name "use_inline_hdl_ip" -value "1" -objects $obj
-set_property -name "webtalk.xsim_launch_sim" -value "145" -objects $obj
+set_property -name "webtalk.xsim_launch_sim" -value "156" -objects $obj
 
 # Create 'sources_1' fileset (if not found)
 if {[string equal [get_filesets -quiet sources_1] ""]} {
@@ -226,8 +226,6 @@ set file "$origin_dir/src/main/fifo_memory.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-set_property -name "used_in" -value "synthesis implementation" -objects $file_obj
-set_property -name "used_in_simulation" -value "0" -objects $file_obj
 
 set file "$origin_dir/src/timer.sv"
 set file [file normalize $file]

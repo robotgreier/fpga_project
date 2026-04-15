@@ -31,6 +31,9 @@ module verifier_fletcher_fifo_tb(
     wire fifo_full, fifo_empty;
     wire [7:0] fifo_data; // fifo signals
 
+    wire fletcher_reset;
+    assign fletcher_reset = master_reset | verifier_reset;
+
     verifier #(
         .BIT_WIDTH(8),
         .LEN_MAX(256)
@@ -52,7 +55,7 @@ module verifier_fletcher_fifo_tb(
     fletcher #(
         .BIT_WIDTH(8)
     ) fletch (
-        .reset(verifier_reset),
+        .reset(fletcher_reset),
         .check(verifier_check),
         .data(rx_data),
         .sum(fletcher_sum)
@@ -69,7 +72,7 @@ module verifier_fletcher_fifo_tb(
         .full(fifo_full),
         .empty(fifo_empty),
         .data_in(rx_data),
-        .data_out(fifo_out)
+        .data_out(fifo_data)
     );
 
     initial begin // Initial values and clock
@@ -108,7 +111,7 @@ module verifier_fletcher_fifo_tb(
         #25 // DATA 1
         rx_ready = 1;
         rx_success = 1;
-        rx_data = 100; // Weight 1
+        rx_data = 100;
         #5
         rx_ready = 0;
         rx_success = 0;
@@ -148,7 +151,7 @@ module verifier_fletcher_fifo_tb(
         #25 // Checksum 1
         rx_ready = 1;
         rx_success = 1;
-        rx_data = 37;
+        rx_data = 42;
         #5
         rx_ready = 0;
         rx_success = 0;
@@ -156,7 +159,7 @@ module verifier_fletcher_fifo_tb(
         #25 // Checksum 2
         rx_ready = 1;
         rx_success = 1;
-        rx_data = 231;
+        rx_data = 6;
         #5
         rx_ready = 0;
         rx_success = 0;
