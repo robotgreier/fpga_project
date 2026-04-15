@@ -27,7 +27,7 @@ module verifier#(
         input wire clk, rx_ready, rx_success, master_reset, fifo_full,
         input wire [BIT_WIDTH-1:0] rx_data,
         input wire [(BIT_WIDTH*2)-1:0] fletcher_sum,
-        output reg ready, success, write, check, reset
+        output reg ready, success, write, commit, check, soft_reset, hard_reset
     );
 
     // State parameters
@@ -53,7 +53,8 @@ module verifier#(
             state <= IDLE;
             n <= 0;
             i <= 0;
-            reset <= 1;
+            soft_reset <= 1;
+            hard_reset <= 1;
         end
 
         else begin // Clock
@@ -62,7 +63,8 @@ module verifier#(
             success <= 0;
             write <= 0;
             check <= 0;
-            reset <= 0;
+            soft_reset <= 0;
+            commit <= 0;
 
             case (state)
                 IDLE: begin
@@ -72,7 +74,6 @@ module verifier#(
                         n <= 0;
                         i <= 0;
                     end
-                    else reset <= 1;
                 end
 
                 CMD: begin
@@ -132,22 +133,24 @@ module verifier#(
                 end
 
                 CHECK: begin
-                    reset <= 1; // Reset fletcher
+                    // soft_reset <= 1; // Reset fletcher
                     ready <= 1; // Tell master system is ready
                     success <= ({checksum_1, checksum_2} == fletcher_sum); // Tell master it was success
+                    commit <= ({checksum_1, checksum_2} == fletcher_sum); // Commit to fifo
                     state <= IDLE;
                 end
             endcase
 
             if ((rx_ready & !rx_success) || fifo_full) begin
                 state <= IDLE;
-                reset <= 1;
+                soft_reset <= 1;
                 ready <= 1;
                 success <= 0;
             end
 
             if (rx_ready & rx_success & (rx_data == SOF) & (state != IDLE)) begin // Unexpected SOF
                 state <= IDLE; // Transition to IDLE
+                soft_reset <= 1;
             end
         end
     end

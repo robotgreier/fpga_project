@@ -26,7 +26,7 @@ module verifier_fletcher_fifo_tb(
 
     reg clk, rx_ready, rx_success, master_reset, master_read;
     reg [7:0] rx_data;
-    wire verifier_ready, verifier_success, verifier_write, verifier_check, verifier_reset; // verifier signals
+    wire verifier_ready, verifier_success, verifier_write, verifier_commit, verifier_check, verifier_soft_reset, verifier_hard_reset; // verifier signals
     wire [15:0] fletcher_sum; // fletcher signals
     wire fifo_full, fifo_empty;
     wire [7:0] fifo_data; // fifo signals
@@ -45,14 +45,16 @@ module verifier_fletcher_fifo_tb(
         .ready(verifier_ready),
         .success(verifier_success),
         .write(verifier_write),
+        .commit(verifier_commit),
         .check(verifier_check),
-        .reset(verifier_reset)
+        .soft_reset(verifier_soft_reset),
+        .hard_reset(verifier_hard_reset)
     );
 
     fletcher #(
         .BIT_WIDTH(8)
     ) fletch (
-        .reset(verifier_reset),
+        .reset(verifier_soft_reset),
         .check(verifier_check),
         .data(rx_data),
         .sum(fletcher_sum)
@@ -63,8 +65,10 @@ module verifier_fletcher_fifo_tb(
         .ADDRESS_COUNT(32)
     ) fifo (
         .clk(clk),
-        .reset(verifier_reset),
+        .soft_reset(verifier_soft_reset),
+        .hard_reset(verifier_hard_reset),
         .write(verifier_write),
+        .commit(verifier_commit),
         .read(master_read),
         .full(fifo_full),
         .empty(fifo_empty),
@@ -282,5 +286,35 @@ module verifier_fletcher_fifo_tb(
         #5
         rx_ready = 0;
         rx_success = 0;
+
+        #5
+        master_read = 1;
+        #5
+        master_read = 0;
+        #5
+        master_read = 1;
+        #5
+        master_read = 0;
+        #5
+        master_read = 1;
+        #5
+        master_read = 0;
+        #5
+        master_read = 1;
+        #5
+        master_read = 0;
+        #5
+        master_read = 1;
+        #5
+        master_read = 0;
+        #5
+        master_read = 1;
+        #5
+        master_read = 0;
+        #5
+        master_read = 1;
+        #5
+        master_read = 0;
+
     end
 endmodule
