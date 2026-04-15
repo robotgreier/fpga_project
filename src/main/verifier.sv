@@ -53,6 +53,7 @@ module verifier#(
             state <= IDLE;
             n <= 0;
             i <= 0;
+            reset <= 1;
         end
 
         else begin // Clock
@@ -65,7 +66,7 @@ module verifier#(
 
             case (state)
                 IDLE: begin
-                    if (rx_ready & rx_success & rx_data == SOF) begin // SOF Packet received and verified
+                    if (rx_ready & rx_success & (rx_data == SOF)) begin // SOF Packet received and verified
                         check <= 1; // Add SOF to fletcher
                         state <= CMD; // Transition to CMD
                         n <= 0;
@@ -75,17 +76,18 @@ module verifier#(
                 end
 
                 CMD: begin
-                    if (rx_ready & rx_success) begin // CMD Packet received
+                    if (rx_ready & rx_success & (rx_data != SOF)) begin // CMD Packet received
                         write <= 1; // Write CMD to fifo
                         check <= 1; // Add CMD to fletcher
                         state <= LEN; // Transition to LEN
                         n <= 0;
                         i <= 0;
                     end
+
                 end
 
                 LEN: begin
-                    if (rx_ready & rx_success) begin // LEN Packet received
+                    if (rx_ready & rx_success & (rx_data != SOF)) begin // LEN Packet received
                         if (rx_data <= LEN_MAX) begin // Check if data is within bounds
                             n <= rx_data; // Store LEN as n
                             write <= 1; // Write LEN to fifo
@@ -105,7 +107,7 @@ module verifier#(
                         state <= CHECK_1_WAIT; // Transition to CHECK_1_WAIT
                     end
                     else begin // Packets remaining
-                        if (rx_ready & rx_success) begin // New packet ready
+                        if (rx_ready & rx_success & (rx_data != SOF)) begin // New packet ready
                             write <= 1; // Write packet to fifo
                             check <= 1; // Add packet to fletcher
                             i = i + 1; // Increment counter
@@ -114,7 +116,7 @@ module verifier#(
                 end
 
                 CHECK_1_WAIT: begin // Wait for checksum packet to arrive
-                    if (rx_ready & rx_success) begin // First checksum packet received
+                    if (rx_ready & rx_success & (rx_data != SOF)) begin // First checksum packet received
                         checksum_1 <= rx_data; // Store received checksum
                         // check <= 1; // Add packet to fletcher, ignore fifo
                         state <= CHECK_2_WAIT; // Transition to CHECK_2_WAIT
@@ -122,7 +124,7 @@ module verifier#(
                 end
 
                 CHECK_2_WAIT: begin
-                    if (rx_ready & rx_success) begin // Last checksum packet received
+                    if (rx_ready & rx_success & (rx_data != SOF)) begin // Last checksum packet received
                     checksum_2 <= rx_data; // Store received checksum
                         // check <= 1; // Add packet to fletcher, ignore fifo
                         state <= CHECK; // Transition to CHECK
@@ -142,6 +144,10 @@ module verifier#(
                 reset <= 1;
                 ready <= 1;
                 success <= 0;
+            end
+
+            if (rx_ready & rx_success & (rx_data == SOF) & (state != IDLE)) begin // Unexpected SOF
+                state <= IDLE; // Transition to IDLE
             end
         end
     end

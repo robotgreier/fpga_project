@@ -31,12 +31,9 @@ module verifier_fletcher_fifo_tb(
     wire fifo_full, fifo_empty;
     wire [7:0] fifo_data; // fifo signals
 
-    wire fletcher_reset;
-    assign fletcher_reset = master_reset | verifier_reset;
-
     verifier #(
         .BIT_WIDTH(8),
-        .LEN_MAX(128)
+        .LEN_MAX(32)
     ) veri (
         .clk(clk),
         .rx_ready(rx_ready),
@@ -55,7 +52,7 @@ module verifier_fletcher_fifo_tb(
     fletcher #(
         .BIT_WIDTH(8)
     ) fletch (
-        .reset(fletcher_reset),
+        .reset(verifier_reset),
         .check(verifier_check),
         .data(rx_data),
         .sum(fletcher_sum)
@@ -63,10 +60,10 @@ module verifier_fletcher_fifo_tb(
 
     fifo_memory #(
         .BIT_WIDTH(8),
-        .ADDRESS_COUNT(256)
+        .ADDRESS_COUNT(32)
     ) fifo (
         .clk(clk),
-        .reset(master_reset),
+        .reset(verifier_reset),
         .write(verifier_write),
         .read(master_read),
         .full(fifo_full),
@@ -143,7 +140,7 @@ module verifier_fletcher_fifo_tb(
         #25 // LEN
         rx_ready = 1;
         rx_success = 1;
-        rx_data = 130; // 130 packets
+        rx_data = 19;
         #5
         rx_ready = 0;
         rx_success = 0;
@@ -172,10 +169,10 @@ module verifier_fletcher_fifo_tb(
         rx_ready = 0;
         rx_success = 0;
 
-        #25 // DATA 4
+        #25 // Unwanted SOF
         rx_ready = 1;
         rx_success = 1;
-        rx_data = 230;
+        rx_data = 8'b10101010;
         #5
         rx_ready = 0;
         rx_success = 0;
@@ -225,7 +222,7 @@ module verifier_fletcher_fifo_tb(
         #25 // LEN
         rx_ready = 1;
         rx_success = 1;
-        rx_data = 3; // 3 packets
+        rx_data = 5; // 3 packets
         #5
         rx_ready = 0;
         rx_success = 0;
@@ -254,10 +251,26 @@ module verifier_fletcher_fifo_tb(
         rx_ready = 0;
         rx_success = 0;
 
+        #25 // DATA 4
+        rx_ready = 1;
+        rx_success = 1;
+        rx_data = 200;
+        #5
+        rx_ready = 0;
+        rx_success = 0;
+
+        #25 // DATA 5
+        rx_ready = 1;
+        rx_success = 1;
+        rx_data = 1;
+        #5
+        rx_ready = 0;
+        rx_success = 0;
+
         #25 // Checksum 1
         rx_ready = 1;
         rx_success = 1;
-        rx_data = 133;
+        rx_data = 81;
         #5
         rx_ready = 0;
         rx_success = 0;
@@ -265,7 +278,7 @@ module verifier_fletcher_fifo_tb(
         #25 // Checksum 2
         rx_ready = 1;
         rx_success = 1;
-        rx_data = 182;
+        rx_data = 96;
         #5
         rx_ready = 0;
         rx_success = 0;
