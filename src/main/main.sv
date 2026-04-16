@@ -2,7 +2,10 @@ module main (
   input wire clk
 );
 
-wire  master_reset, master_read; // Master signals
+parameter MAX_DATA = 16;
+
+wire  master_reset, master_read, master_transmit; // Master signals
+wire  [7:0] master_data;
 
 wire  verifier_ready, // Verifier in signals
       verifier_success,
@@ -22,6 +25,19 @@ wire  [7:0] rx_data;
 
 wire  tx, tx_ready, tx_success; // TX signals
 wire  [7:0] tx_data;
+
+master #(
+  .BIT_WIDTH(8),
+  .LEN_MAX(MAX_DATA)
+) mas (
+  .clk(clk),
+  .ready(verifier_ready),
+  .success(verifier_success),
+  .data_in(fifo_data),
+  .read(master_read),
+  .transmit(master_transmit),
+  .data_out(master_data)
+);
 
 uart_rx #(
   .CLOCK_BAUD_RATIO(400),
@@ -55,7 +71,7 @@ fletcher #(
 );
 
 fifo_memory #(
-    .ADDRESS_COUNT(8),
+    .ADDRESS_COUNT(MAX_DATA),
     .BIT_WIDTH(8)
 ) fifo (
     .clk(clk),
@@ -72,7 +88,7 @@ fifo_memory #(
 
 verifier #(
     .BIT_WIDTH(8),
-    .LEN_MAX(16)
+    .LEN_MAX(MAX_DATA)
 ) veri (
     .clk(clk),
     .rx_ready(rx_ready),
