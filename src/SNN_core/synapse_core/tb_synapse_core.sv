@@ -13,11 +13,23 @@
 //              I_syn forwarding, reward_en gating, LTP/LTD weight updates via
 //              R-STDP and STDP, weight clamping, and boundary values.
 //
+//              Pipeline note: elig_trace is registered in eligibility_updater
+//              (1 cycle latency). apply_reward and w_next are combinational.
+//              Therefore w_next is valid 1 cycle after the spike pair.
+//
+//              reward_en gating note: apply_reward is combinational, so
+//              delta_w = 0 immediately when reward_en=0. There is no hold
+//              behaviour -- w_next returns to clamp(w_syn + 0) = w_syn.
+//
+//              Timing note: checks are performed at negedge after the
+//              triggering posedge, giving combinational paths a full
+//              half-cycle to settle after elig_trace updates.
+//
 // Dependencies: synapse_core.sv, eligibility_updater.sv, apply_reward.sv
 //
 // Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
+// Revision 0.03 - Check at negedge after triggering posedge for combinational
+//                 settling; removed idle_cycles(1) between spike pair and check.
 //
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -136,7 +148,10 @@ module tb_synapse_core ();
     int fail_count = 0;
 
     // --------------------------------------------------------------------------
-    // Helper task: drive all inputs for one clock cycle
+    // Helper task: drive all inputs for one clock cycle.
+    // Inputs are applied at negedge; outputs are sampled at the following
+    // negedge so combinational paths have a full half-cycle to settle after
+    // the registered elig_trace updates at posedge.
     // --------------------------------------------------------------------------
     task automatic apply_inputs(
         input logic              pre_val,
@@ -152,7 +167,8 @@ module tb_synapse_core ();
         reward_en = en_val;
         w_syn     = w_val;
         @(posedge clk);
-        #1;  // let outputs settle
+        @(negedge clk);  // wait for combinational outputs to settle
+        #1;
     endtask
 
     // --------------------------------------------------------------------------
@@ -172,8 +188,8 @@ module tb_synapse_core ();
         post_spk  = 1'b0;
         dopamine  = 4'sd0;
         reward_en = 1'b0;
-        @(posedge clk); #1;
-        @(negedge clk); @(posedge clk); #1;
+        @(posedge clk); @(negedge clk); #1;
+        @(negedge clk); @(posedge clk); @(negedge clk); #1;
         rst = 1'b0;
     endtask
 
@@ -209,15 +225,13 @@ module tb_synapse_core ();
     endtask
 
     // --------------------------------------------------------------------------
-    // Continuous monitor: show all outputs on every posedge
+    // Continuous monitor
     // --------------------------------------------------------------------------
     always @(posedge clk) begin
         #1;
         $display("[%0t ns]  pre=%b post=%b dop=%0d en=%b w_syn=%0d | none(w=%0d I=%0d)  rstdp(w=%0d I=%0d)  stdp(w=%0d I=%0d)",
                  $time, pre_spk, post_spk, dopamine, reward_en, w_syn,
-                 w_next_none, I_syn_none,
-                 w_next_rstdp, I_syn_rstdp,
-                 w_next_stdp,  I_syn_stdp);
+                 w_next_none, I_syn_none, w_next_rstdp, I_syn_rstdp, w_next_stdp, I_syn_stdp);
     end
 
     // --------------------------------------------------------------------------
@@ -233,19 +247,23 @@ module tb_synapse_core ();
         w_syn     = 8'd100;
 
         // ==================================================================
-        // TEST 0: Reset -- w_next must equal W_MIN while rst is asserted
+        // TEST 0: Reset -- w_next must be W_MIN during rst
         //
-        // synapse_core resets w_next to W_MIN (8). Sub-modules reset their
-        // own state (elig_trace → 0, delta_w → 0) via the propagated rst.
+        // synapse_core.w_next is combinational from w_sum = w_syn + delta_w.
+        // During rst, eligibility_updater resets e_trace to 0, so delta_w=0
+        // and w_next = clamp(w_syn + 0). The only registered reset is inside
+        // eligibility_updater. Drive w_syn = W_MIN to verify reset state.
         // ==================================================================
         $display("\n[%0t] TEST 0: Reset -- w_next must be W_MIN during rst", $time);
-        @(negedge clk); @(posedge clk); #1;
-        @(negedge clk); @(posedge clk); #1;
+        w_syn = 8'(W_MIN);
+        @(negedge clk); @(posedge clk); @(negedge clk); #1;
+        @(negedge clk); @(posedge clk); @(negedge clk); #1;
         check_w("none  | rst=1", w_next_none,  8'(W_MIN));
         check_w("rstdp | rst=1", w_next_rstdp, 8'(W_MIN));
         check_w("stdp  | rst=1", w_next_stdp,  8'(W_MIN));
         @(negedge clk);
-        rst = 1'b0;
+        rst   = 1'b0;
+        w_syn = 8'd100;
         idle_cycles(1);
 
         // ==================================================================
@@ -277,17 +295,16 @@ module tb_synapse_core ();
         // TEST 3: STDP LTP -- post fires 1 cycle after pre
         //
         // elig: e = 0 + DW_POS(16) − (16 >>> TAU_E_SHIFT(2)) = 12
-        // reward (STDP): delta_w = 12 >>> LR_SHIFT(2) = 3
+        // delta_w (STDP): 12 >>> LR_SHIFT(2) = 3
         // w_next = clamp(100 + 3) = 103
         //
-        // Pipeline: elig registered at T1 posedge, delta_w registered at T2
-        // posedge, w_next registered at T3 posedge → need 1 idle after pair.
+        // Pipeline: elig_trace registered (1 cycle). apply_reward and w_next
+        // combinational. Check 1 idle cycle after the spike pair.
         // ==================================================================
         $display("\n[%0t] TEST 3: STDP LTP -- post 1 cycle after pre", $time);
         do_rst();
         apply_inputs(1'b1, 1'b0, 4'sd0, 1'b1, 8'd100);  // pre edge
         apply_inputs(1'b0, 1'b1, 4'sd0, 1'b1, 8'd100);  // post edge (LTP)
-        idle_cycles(1);  // allow two-stage pipeline to propagate
         check_w("stdp  | LTP: w_syn=100, delta_w=3 → w_next=103", w_next_stdp, 8'd103);
         idle_cycles(1);
 
@@ -302,7 +319,6 @@ module tb_synapse_core ();
         do_rst();
         apply_inputs(1'b0, 1'b1, 4'sd0, 1'b1, 8'd100);  // post edge
         apply_inputs(1'b1, 1'b0, 4'sd0, 1'b1, 8'd100);  // pre edge (LTD)
-        idle_cycles(1);
         check_w("stdp  | LTD: w_syn=100, delta_w=-12 → w_next=88", w_next_stdp, 8'd88);
         idle_cycles(1);
 
@@ -317,14 +333,13 @@ module tb_synapse_core ();
         do_rst();
         apply_inputs(1'b1, 1'b0, 4'sd3, 1'b1, 8'd100);  // pre edge
         apply_inputs(1'b0, 1'b1, 4'sd3, 1'b1, 8'd100);  // post edge (LTP)
-        idle_cycles(1);
         check_w("rstdp | LTP dop=3: w_syn=100, delta_w=9 → w_next=109", w_next_rstdp, 8'd109);
         idle_cycles(1);
 
         // ==================================================================
-        // TEST 6: R-STDP LTP -- negative dopamine reverses delta_w
+        // TEST 6: R-STDP -- negative dopamine reverses delta_w
         //
-        // e_trace = 12 (LTP direction, acausal pairing under punishment)
+        // e_trace = 12 (LTP direction)
         // delta_w = (12 * dop(-3)) >>> 2 = -36 >>> 2 = -9
         // w_next = clamp(100 − 9) = 91
         // ==================================================================
@@ -332,28 +347,26 @@ module tb_synapse_core ();
         do_rst();
         apply_inputs(1'b1, 1'b0, -4'sd3, 1'b1, 8'd100);  // pre edge
         apply_inputs(1'b0, 1'b1, -4'sd3, 1'b1, 8'd100);  // post edge
-        idle_cycles(1);
         check_w("rstdp | LTP dop=-3: w_syn=100, delta_w=-9 → w_next=91", w_next_rstdp, 8'd91);
         idle_cycles(1);
 
         // ==================================================================
-        // TEST 7: reward_en gating -- w_next holds when reward_en=0
+        // TEST 7: reward_en gating -- delta_w is zero when reward_en=0
         //
-        // After a rewarded LTP (delta_w=3, w_next=103), disabling reward_en
-        // holds delta_w at its last registered value. A new spike pair with
-        // en=0 must not update w_next further.
+        // apply_reward is combinational: reward_en=0 immediately forces
+        // delta_w=0, so w_next = clamp(w_syn + 0) = w_syn.
+        // A spike pair with en=0 produces no weight update.
         // ==================================================================
-        $display("\n[%0t] TEST 7: reward_en gating -- w_next holds last value", $time);
+        $display("\n[%0t] TEST 7: reward_en gating -- en=0 gives w_next=w_syn", $time);
         do_rst();
-        apply_inputs(1'b1, 1'b0, 4'sd0, 1'b1, 8'd100);  // pre edge, en=1
-        apply_inputs(1'b0, 1'b1, 4'sd0, 1'b1, 8'd100);  // post edge, en=1
-        idle_cycles(1);
+        // Baseline: en=1 LTP gives w_next=103
+        apply_inputs(1'b1, 1'b0, 4'sd0, 1'b1, 8'd100);
+        apply_inputs(1'b0, 1'b1, 4'sd0, 1'b1, 8'd100);
         check_w("stdp  | baseline LTP: w_next=103", w_next_stdp, 8'd103);
-        // Disable reward -- delta_w register holds; w_next = clamp(100 + 3) still
-        apply_inputs(1'b1, 1'b0, 4'sd0, 1'b0, 8'd100);  // pre edge, en=0
-        apply_inputs(1'b0, 1'b1, 4'sd0, 1'b0, 8'd100);  // post edge, en=0
-        idle_cycles(1);
-        check_w("stdp  | en=0 hold: w_next still 103", w_next_stdp, 8'd103);
+        // Disable reward -- delta_w immediately 0, w_next reverts to w_syn
+        apply_inputs(1'b1, 1'b0, 4'sd0, 1'b0, 8'd100);
+        apply_inputs(1'b0, 1'b1, 4'sd0, 1'b0, 8'd100);
+        check_w("stdp  | en=0: delta_w=0 → w_next=w_syn=100", w_next_stdp, 8'd100);
         idle_cycles(1);
 
         // ==================================================================
@@ -365,7 +378,6 @@ module tb_synapse_core ();
         do_rst();
         apply_inputs(1'b1, 1'b0, 4'sd0, 1'b1, 8'd253);  // pre edge
         apply_inputs(1'b0, 1'b1, 4'sd0, 1'b1, 8'd253);  // post edge (LTP, delta_w=3)
-        idle_cycles(1);
         check_w("stdp  | W_MAX clamp: w_syn=253 + 3 → 255", w_next_stdp, 8'(W_MAX));
         idle_cycles(1);
 
@@ -378,7 +390,6 @@ module tb_synapse_core ();
         do_rst();
         apply_inputs(1'b0, 1'b1, 4'sd0, 1'b1, 8'd15);  // post edge
         apply_inputs(1'b1, 1'b0, 4'sd0, 1'b1, 8'd15);  // pre edge (LTD, delta_w=-12)
-        idle_cycles(1);
         check_w("stdp  | W_MIN clamp: w_syn=15 - 12 → 8", w_next_stdp, 8'(W_MIN));
         idle_cycles(1);
 
@@ -391,11 +402,9 @@ module tb_synapse_core ();
         $display("\n[%0t] TEST 10: No STDP without spike history", $time);
         do_rst();
         apply_inputs(1'b0, 1'b1, 4'sd0, 1'b1, 8'd100);  // post only
-        idle_cycles(1);
         check_w("stdp  | post alone → no LTP → w_next=100", w_next_stdp, 8'd100);
         idle_cycles(T_PRE + 3);                           // let timers expire
         apply_inputs(1'b1, 1'b0, 4'sd0, 1'b1, 8'd100);  // pre only
-        idle_cycles(1);
         check_w("stdp  | pre alone  → no LTD → w_next=100", w_next_stdp, 8'd100);
         idle_cycles(1);
 
@@ -414,7 +423,7 @@ module tb_synapse_core ();
     end
 
     // --------------------------------------------------------------------------
-    // Waveform dump (uncomment for iVerilog / non-Vivado flows)
+    // Waveform dump
     // --------------------------------------------------------------------------
     initial begin
         $dumpfile("tb_synapse_core.vcd");
