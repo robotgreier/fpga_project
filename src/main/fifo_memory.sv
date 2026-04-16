@@ -11,7 +11,7 @@ module fifo_memory #(
   input wire [BIT_WIDTH-1:0] data_in,
   output logic full,
   output logic empty,
-  output reg [BIT_WIDTH-1:0] data_out // Read data
+  output logic [BIT_WIDTH-1:0] data_out // Read data
 );
 
 reg [$clog2(ADDRESS_COUNT)-1:0] read_pointer;
@@ -23,9 +23,9 @@ reg [BIT_WIDTH-1:0] memory [0:ADDRESS_COUNT-1];
 assign full = (write_pointer + 1'b1) == read_pointer;
 assign empty = commit_pointer == read_pointer;
 
+assign data_out = memory[read_pointer];
 
 always @ (posedge clk or posedge soft_reset or posedge hard_reset) begin
-    data_out <= memory[read_pointer];
 
     if (hard_reset) begin
         read_pointer <= 0;

@@ -2,8 +2,26 @@ module main (
   input wire clk
 );
 
-wire rx, tx, rx_ready, tx_ready, rx_success, tx_success, reset, write, read, full, empty, check_in, check_out;
-wire [7:0] rx_data, tx_data, data_in, data_out, data, sum_1_in, sum_2_in, sum_1_out, sum_2_out;
+wire  master_reset, master_read; // Master signals
+
+wire  verifier_ready, // Verifier in signals
+      verifier_success,
+      verifier_write,
+      verifier_commit,
+      verifier_soft_reset,
+      verifier_hard_reset,
+      verifier_check;
+
+wire  fifo_full, fifo_empty; // Fifo in signals
+wire  [7:0] fifo_data;
+
+wire  [15:0] fletcher_sum; // Fletcher in signals
+
+wire  rx, rx_ready, rx_success; // RX signals
+wire  [7:0] rx_data;
+
+wire  tx, tx_ready, tx_success; // TX signals
+wire  [7:0] tx_data;
 
 uart_rx #(
   .CLOCK_BAUD_RATIO(400),
@@ -21,44 +39,55 @@ uart_tx #(
   .BIT_WIDTH(8)
 ) tx (
   .clk(clk),
-  .rx(rx), // RX line
+  .tx(tx), // TX line
   .ready(tx_ready), // Is high when data transaction is complete
   .success(tx_success), // Is high if transaction is considered successfull (when stop bit is high)
   .data(tx_data) // Data received
 );
 
-  fletcher #(
-      .BIT_WIDTH(8)
-  ) fletcher_in (
-      .reset(reset),
-      .check(check_in),
-      .data(data),
-      .sum_1(sum_1),
-      .sum_2(sum_2)
-  );
-
-  fletcher #(
-      .BIT_WIDTH(8)
-  ) fletcher_out (
-      .reset(reset),
-      .check(check_out),
-      .data(data),
-      .sum_1(sum_1),
-      .sum_2(sum_2)
-  );
+fletcher #(
+    .BIT_WIDTH(8)
+) fletch (
+    .reset(verifier_soft_reset),
+    .check(verifier_check),
+    .data(rx_data),
+    .sum(fletcher_sum)
+);
 
 fifo_memory #(
     .ADDRESS_COUNT(8),
     .BIT_WIDTH(8)
 ) fifo (
     .clk(clk),
-    .reset(reset),
-    .write(write),
-    .read(read),
-    .full(full),
-    .empty(empty),
-    .data_in(data_in),
-    .data_out(data_out)
+    .soft_reset(verifier_soft_reset),
+    .hard_reset(verifier_hard_reset),
+    .write(verifier_write),
+    .commit(verifier_commit),
+    .read(master_read),
+    .full(fifo_full),
+    .empty(fifo_empty),
+    .data_in(rx_data),
+    .data_out(fifo_data)
 );
+
+verifier #(
+    .BIT_WIDTH(8),
+    .LEN_MAX(16)
+) veri (
+    .clk(clk),
+    .rx_ready(rx_ready),
+    .rx_success(rx_success),
+    .master_reset(master_reset),
+    .fifo_full(fifo_full),
+    .rx_data(rx_data),
+    .fletcher_sum(fletcher_sum),
+    .ready(verifier_ready),
+    .success(verifier_success),
+    .write(verifier_write),
+    .commit(verifier_commit),
+    .check(verifier_check),
+    .soft_reset(verifier_soft_reset),
+    .hard_reset(verifier_hard_reset)
+    );
 
 endmodule

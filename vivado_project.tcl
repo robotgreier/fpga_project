@@ -32,6 +32,7 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/src/main/verifier.sv"]"\
  "[file normalize "$origin_dir/src/SNN_core/LIF_core/LIF_core.sv"]"\
  "[file normalize "$origin_dir/src/SNN_core/LIF_core/tb_LIF_core.sv"]"\
+ "[file normalize "$origin_dir/src/Arty-A7-100-Master.xdc"]"\
  "[file normalize "$origin_dir/sims/fifo.wcfg"]"\
  "[file normalize "$origin_dir/src/main/fifo_memory_tb.sv"]"\
  "[file normalize "$origin_dir/src/main/fletcher_tb.sv"]"\
@@ -164,7 +165,7 @@ set_property -name "simulator.xsim_version" -value "2025.2" -objects $obj
 set_property -name "simulator_language" -value "Mixed" -objects $obj
 set_property -name "sim_compile_state" -value "1" -objects $obj
 set_property -name "use_inline_hdl_ip" -value "1" -objects $obj
-set_property -name "webtalk.xsim_launch_sim" -value "246" -objects $obj
+set_property -name "webtalk.xsim_launch_sim" -value "295" -objects $obj
 
 # Create 'sources_1' fileset (if not found)
 if {[string equal [get_filesets -quiet sources_1] ""]} {
@@ -288,7 +289,13 @@ if {[string equal [get_filesets -quiet constrs_1] ""]} {
 # Set 'constrs_1' fileset object
 set obj [get_filesets constrs_1]
 
-# Empty (no sources present)
+# Add/Import constrs file and set constrs file properties
+set file "[file normalize "$origin_dir/src/Arty-A7-100-Master.xdc"]"
+set file_added [add_files -norecurse -fileset $obj [list $file]]
+set file "$origin_dir/src/Arty-A7-100-Master.xdc"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets constrs_1] [list "*$file"]]
+set_property -name "file_type" -value "XDC" -objects $file_obj
 
 # Set 'constrs_1' fileset properties
 set obj [get_filesets constrs_1]

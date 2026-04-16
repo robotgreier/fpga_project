@@ -38,10 +38,11 @@ module verifier#(
     parameter CHECK_1_WAIT = 4;
     parameter CHECK_2_WAIT = 5;
     parameter CHECK = 6;
+    parameter RESET = 7;
 
     parameter SOF = 8'b10101010;
 
-    reg [2:0] state;
+    reg [3:0] state;
     reg [$clog2(LEN_MAX)-1:0] n = 0;
     reg [$clog2(LEN_MAX)-1:0] i = 0;
 
@@ -75,6 +76,7 @@ module verifier#(
                         n <= 0;
                         i <= 0;
                     end
+                    else soft_reset <= 1;
                 end
 
                 CMD: begin
@@ -134,10 +136,14 @@ module verifier#(
                 end
 
                 CHECK: begin
-                    // soft_reset <= 1; // Reset fletcher
                     ready <= 1; // Tell master system is ready
                     success <= ({checksum_1, checksum_2} == fletcher_sum); // Tell master it was success
                     commit <= ({checksum_1, checksum_2} == fletcher_sum); // Commit to fifo
+                    // state <= RESET;
+                    state <= IDLE;
+                end
+
+                RESET: begin
                     state <= IDLE;
                 end
             endcase
