@@ -28,17 +28,20 @@ module master #(
         input wire clk, ready, success,
         input wire [DATA_BIT_WIDTH-1:0] data_in,
         output reg read, transmit,
-        output reg [DATA_BIT_WIDTH-1:0] data_out
+        output wire [DATA_BIT_WIDTH-1:0] data_out
     );
 
     reg [2:0] state;
 
     parameter IDLE = 0;
-    parameter CMD = 1;
-    parameter LEN = 2;
+    parameter SEND = 1;
+    parameter READ = 2;
+    parameter EMPT = 3;
 
     reg [$clog2(LEN_MAX)-1:0] n = 0;
     reg [$clog2(LEN_MAX)-1:0] i = 0;
+
+    assign data_out = data_in;
 
     always @(posedge clk) begin
         read <= 0;
@@ -47,15 +50,34 @@ module master #(
 
         case(state)
             IDLE: begin
-                if (ready & success) begin
+                if (ready & success) begin // Send CMD along next state
+                    transmit <= 1;
                     state <= SEND;
                 end
             end
 
-            CMD: begin
+            SEND: begin
+                state <= READ;
+                read <= 1;
+            end
+
+            READ: begin
+                n <= data_in;
+                i <= 0;
+                state <= EMPT;
+            end
+
+            EMPT: begin
+                if (i < n) begin
+                    i <= i + 1;
+                    transmit <= 1;
+                    state <= EMPT;
+                end
+                else begin
+                    state <= IDLE;
+                end
             end
         endcase
-
     end
 
 endmodule
