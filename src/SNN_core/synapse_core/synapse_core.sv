@@ -21,9 +21,9 @@ module synapse_core #(
   );
 
   // Internal signals
-  logic signed [8:0] elig_trace; // Eligibility trace (matches eligibility_updater output)
-  logic signed [7:0] delta_w;    // Weight change from reward application
-  logic signed [8:0] w_sum;      // Intermediate sum before clamping
+  logic signed [8:0]  elig_trace; // Eligibility trace (matches eligibility_updater output)
+  logic signed [7:0]  delta_w;    // Weight change from reward application
+  logic signed [9:0]  w_sum;      // Intermediate sum before clamping
 
   assign I_syn = (pre_spk) ? w_syn : 8'h00; // Output synaptic current based on pre-synaptic spike
 
@@ -39,7 +39,7 @@ module synapse_core #(
     .MIN_E_TRACE(-256)
   ) elig_upd (
     .clk       (clk),
-    .rst       (rst),        // was unconnected; now wired
+    .rst       (rst),
     .pre_spk   (pre_spk),
     .post_spk  (post_spk),
     .elig_trace(elig_trace)
@@ -51,24 +51,20 @@ module synapse_core #(
     .LEARNING_MODE(LEARNING_MODE)
   ) reward_app (
     .clk       (clk),
-    .rst       (rst),        // was unconnected; now wired
+    .rst       (rst),
     .dopamine  (dopamine),
     .elig_trace(elig_trace),
     .reward_en (reward_en),
     .delta_w   (delta_w)
   );
 
-  // Compute sum combinationally, then clamp and register
-  assign w_sum = $signed({1'b0, w_syn}) + delta_w;
+  // Compute sum combinationally, then clamp
+  assign w_sum = $signed(10'({1'b0, w_syn})) + $signed({{2{delta_w[7]}}, delta_w});
 
-  always_ff @(posedge clk) begin
-    if (rst) begin
-      w_next <= W_MIN[7:0]; // Reset to minimum valid weight
-    end else begin
-      if      (w_sum > signed'(W_MAX)) w_next <= W_MAX;
-      else if (w_sum < signed'(W_MIN)) w_next <= W_MIN;
-      else                             w_next <= w_sum[7:0];
-    end
+  always_comb begin
+    if      (w_sum > 10'sd255) w_next = 8'd255;
+    else if (w_sum < 10'sd8)   w_next = 8'd8;
+    else                       w_next = w_sum[7:0];
   end
 
 endmodule

@@ -13,11 +13,15 @@
 //              (None / R-STDP / STDP), reward_en gating, sign handling, and
 //              boundary values.
 //
+//              NOTE: apply_reward is purely combinational. rst and clk are
+//              kept as ports for interface consistency but have no effect on
+//              delta_w. Gating is via reward_en only.
+//
 // Dependencies: apply_reward.sv
 //
 // Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
+// Revision 0.02 - Updated for combinational apply_reward (removed registered
+//                 TEST 0 / TEST 10 hold assumptions)
 //
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -144,40 +148,34 @@ module tb_apply_reward ();
         reward_en  = 1'b0;
         rst        = 1'b1;
 
-        // Apply reset for 2 cycles then release
         idle_cycles(2);
         @(negedge clk);
         rst = 1'b0;
 
         // ==================================================================
-        // TEST 0: Reset -- delta_w must be zero while rst is asserted
-        // ==================================================================
-        $display("\n[%0t] TEST 0: Reset -- delta_w must be zero during rst", $time);
-        @(negedge clk);
-        rst        = 1'b1;
-        dopamine   = 4'sd7;
-        elig_trace = 9'sd200;
-        reward_en  = 1'b1;
-        @(posedge clk); #1;
-        check("none  | rst=1, elig=200, dop=7", delta_w_none,  8'sd0);
-        check("rstdp | rst=1, elig=200, dop=7", delta_w_rstdp, 8'sd0);
-        check("stdp  | rst=1, elig=200, dop=7", delta_w_stdp,  8'sd0);
-        @(negedge clk);
-        rst       = 1'b0;
-        reward_en = 1'b0;
-        idle_cycles(1);
-
-        // ==================================================================
-        // TEST 1: reward_en disabled -- delta_w must NOT change
+        // TEST 0: reward_en=0 -- delta_w must be zero regardless of inputs
         //
-        // Even with non-zero inputs, the register should hold its reset
-        // value (X -> 0 after power-on) when reward_en is deasserted.
+        // apply_reward is combinational: rst has no effect on delta_w.
+        // Gating is purely through reward_en.
         // ==================================================================
-        $display("\n[%0t] TEST 1: reward_en disabled -- output must not update", $time);
+        $display("\n[%0t] TEST 0: reward_en disabled -- output must be zero", $time);
         apply_inputs(4'sd5, 9'sd200, 1'b0);
         check("none  | en=0, elig=200, dop=5", delta_w_none,  8'sd0);
         check("rstdp | en=0, elig=200, dop=5", delta_w_rstdp, 8'sd0);
         check("stdp  | en=0, elig=200, dop=5", delta_w_stdp,  8'sd0);
+        idle_cycles(1);
+
+        // ==================================================================
+        // TEST 1: reward_en=1 then reward_en=0 -- output returns to zero
+        //
+        // Combinational: delta_w tracks reward_en with no memory.
+        // en=0 always produces 0, regardless of prior state.
+        // ==================================================================
+        $display("\n[%0t] TEST 1: reward_en gating -- en=0 gives zero, not hold", $time);
+        apply_inputs(4'sd0, 9'sd100, 1'b1);   // en=1 → stdp delta_w=25
+        check("stdp  | en=1, elig=100 : delta_w=25", delta_w_stdp, 8'sd25);
+        apply_inputs(4'sd0, 9'sd200, 1'b0);   // en=0 → delta_w returns to 0
+        check("stdp  | en=0, elig=200 : delta_w=0 (no hold)", delta_w_stdp, 8'sd0);
         idle_cycles(1);
 
         // ==================================================================
@@ -287,32 +285,21 @@ module tb_apply_reward ();
         idle_cycles(1);
 
         // ==================================================================
-        // TEST 10: reward_en gating -- disable mid-sequence
-        //
-        // A previously latched delta_w should hold when reward_en goes low.
-        // ==================================================================
-        $display("\n[%0t] TEST 10: reward_en gating -- hold last value", $time);
-        apply_inputs(4'sd0, 9'sd100, 1'b1);   // latch delta_w_stdp = 25
-        apply_inputs(4'sd0, 9'sd200, 1'b0);   // disable -- should stay 25
-        check("stdp  | hold after en=0", delta_w_stdp, 8'sd25);
-        idle_cycles(1);
-
-        // ==================================================================
-        // TEST 11: Boundary -- maximum positive eligibility trace (STDP)
+        // TEST 10: Boundary -- maximum positive eligibility trace (STDP)
         //
         // elig=255 -> 255 >>> 2 = 63 (no overflow within 8-bit signed range)
         // ==================================================================
-        $display("\n[%0t] TEST 11: STDP -- maximum positive elig_trace (255)", $time);
+        $display("\n[%0t] TEST 10: STDP -- maximum positive elig_trace (255)", $time);
         apply_inputs(4'sd0, 9'sd255, 1'b1);
         check("stdp  | elig=255, dop=0, en=1", delta_w_stdp, 8'sd63);
         idle_cycles(1);
 
         // ==================================================================
-        // TEST 12: Boundary -- maximum negative eligibility trace (STDP)
+        // TEST 11: Boundary -- maximum negative eligibility trace (STDP)
         //
         // elig=-256 -> -256 >>> 2 = -64
         // ==================================================================
-        $display("\n[%0t] TEST 12: STDP -- maximum negative elig_trace (-256)", $time);
+        $display("\n[%0t] TEST 11: STDP -- maximum negative elig_trace (-256)", $time);
         apply_inputs(4'sd0, -9'sd256, 1'b1);
         check("stdp  | elig=-256, dop=0, en=1", delta_w_stdp, -8'sd64);
         idle_cycles(1);
@@ -332,7 +319,7 @@ module tb_apply_reward ();
     end
 
     // --------------------------------------------------------------------------
-    // Waveform dump (uncomment for iVerilog / non-Vivado flows)
+    // Waveform dump
     // --------------------------------------------------------------------------
     initial begin
         $dumpfile("tb_apply_reward.vcd");
