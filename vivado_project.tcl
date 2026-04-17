@@ -51,6 +51,7 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/src/main/fifo_memory_tb.sv"]"\
  "[file normalize "$origin_dir/src/main/fletcher_tb.sv"]"\
  "[file normalize "$origin_dir/src/main/verifier_tb.sv"]"\
+ "[file normalize "$origin_dir/src/main/main_tb.sv"]"\
  "[file normalize "$origin_dir/src/main/verifier_fletcher_fifo_tb.sv"]"\
   ]
   foreach ifile $files {
@@ -349,6 +350,7 @@ set files [list \
  [file normalize "${origin_dir}/src/main/fifo_memory_tb.sv"] \
  [file normalize "${origin_dir}/src/main/fletcher_tb.sv"] \
  [file normalize "${origin_dir}/src/main/verifier_tb.sv"] \
+ [file normalize "${origin_dir}/src/main/main_tb.sv"] \
  [file normalize "${origin_dir}/src/main/verifier_fletcher_fifo_tb.sv"] \
 ]
 add_files -norecurse -fileset $obj $files
@@ -365,6 +367,11 @@ set file_obj [get_files -of_objects [get_filesets sim_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 
 set file "$origin_dir/src/main/verifier_tb.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sim_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
+set file "$origin_dir/src/main/main_tb.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sim_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
