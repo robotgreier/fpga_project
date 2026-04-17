@@ -51,8 +51,8 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/src/main/fifo_memory_tb.sv"]"\
  "[file normalize "$origin_dir/src/main/fletcher_tb.sv"]"\
  "[file normalize "$origin_dir/src/main/verifier_tb.sv"]"\
- "[file normalize "$origin_dir/src/main/main_tb.sv"]"\
  "[file normalize "$origin_dir/src/main/verifier_fletcher_fifo_tb.sv"]"\
+ "[file normalize "$origin_dir/src/main/main_tb.sv"]"\
   ]
   foreach ifile $files {
     if { ![file isfile $ifile] } {
@@ -180,7 +180,7 @@ set_property -name "simulator.xsim_version" -value "2025.2" -objects $obj
 set_property -name "simulator_language" -value "Mixed" -objects $obj
 set_property -name "sim_compile_state" -value "1" -objects $obj
 set_property -name "use_inline_hdl_ip" -value "1" -objects $obj
-set_property -name "webtalk.xsim_launch_sim" -value "300" -objects $obj
+set_property -name "webtalk.xsim_launch_sim" -value "325" -objects $obj
 
 # Create 'sources_1' fileset (if not found)
 if {[string equal [get_filesets -quiet sources_1] ""]} {
@@ -222,8 +222,6 @@ set file "$origin_dir/src/timer.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-set_property -name "used_in" -value "synthesis implementation" -objects $file_obj
-set_property -name "used_in_simulation" -value "0" -objects $file_obj
 
 set file "$origin_dir/src/main/verifier.sv"
 set file [file normalize $file]
@@ -350,8 +348,8 @@ set files [list \
  [file normalize "${origin_dir}/src/main/fifo_memory_tb.sv"] \
  [file normalize "${origin_dir}/src/main/fletcher_tb.sv"] \
  [file normalize "${origin_dir}/src/main/verifier_tb.sv"] \
- [file normalize "${origin_dir}/src/main/main_tb.sv"] \
  [file normalize "${origin_dir}/src/main/verifier_fletcher_fifo_tb.sv"] \
+ [file normalize "${origin_dir}/src/main/main_tb.sv"] \
 ]
 add_files -norecurse -fileset $obj $files
 
@@ -371,12 +369,12 @@ set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sim_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 
-set file "$origin_dir/src/main/main_tb.sv"
+set file "$origin_dir/src/main/verifier_fletcher_fifo_tb.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sim_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 
-set file "$origin_dir/src/main/verifier_fletcher_fifo_tb.sv"
+set file "$origin_dir/src/main/main_tb.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sim_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
@@ -388,7 +386,7 @@ set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 # Set 'sim_1' fileset properties
 set obj [get_filesets sim_1]
 set_property -name "sim_wrapper_top" -value "1" -objects $obj
-set_property -name "top" -value "verifier_fletcher_fifo_tb" -objects $obj
+set_property -name "top" -value "main_tb" -objects $obj
 set_property -name "top_auto_set" -value "0" -objects $obj
 set_property -name "top_lib" -value "xil_defaultlib" -objects $obj
 
@@ -438,6 +436,7 @@ if { $obj != "" } {
 
 }
 set obj [get_runs synth_1]
+set_property -name "needs_refresh" -value "1" -objects $obj
 set_property -name "part" -value "xc7a100tcsg324-2" -objects $obj
 set_property -name "incremental_checkpoint" -value "$proj_dir/vivado_project.srcs/utils_1/imports/synth_1/main.dcp" -objects $obj
 set_property -name "auto_incremental_checkpoint" -value "1" -objects $obj

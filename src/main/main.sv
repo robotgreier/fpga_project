@@ -1,10 +1,11 @@
 module main (
-  input wire clk
+  input logic clk, rx, reset,
+  output wire tx
 );
 
 parameter MAX_DATA = 16;
 
-wire  master_reset, master_read, master_transmit; // Master signals
+wire  master_read, master_transmit; // Master signals
 wire  [7:0] master_data;
 
 wire  verifier_ready, // Verifier in signals
@@ -20,10 +21,10 @@ wire  [7:0] fifo_data;
 
 wire  [15:0] fletcher_sum; // Fletcher in signals
 
-wire  rx, rx_ready, rx_success; // RX signals
+wire  rx_ready, rx_success; // RX signals
 wire  [7:0] rx_data;
 
-wire  tx, tx_ready; // TX signals
+wire  tx_ready; // TX signals
 
 master #(
   .BIT_WIDTH(8),
@@ -33,6 +34,7 @@ master #(
   .ready(verifier_ready),
   .success(verifier_success),
   .tx_ready(tx_ready),
+  .reset(reset),
   .data_in(fifo_data),
   .read(master_read),
   .transmit(master_transmit),
@@ -42,7 +44,7 @@ master #(
 uart_rx #(
   .CLOCK_BAUD_RATIO(400),
   .BIT_WIDTH(8)
-) rx (
+) uart_r (
   .clk(clk),
   .rx(rx), // RX line
   .ready(rx_ready), // Is high when data transaction is complete
@@ -53,12 +55,12 @@ uart_rx #(
 uart_tx #(
   .CLOCK_BAUD_RATIO(400),
   .BIT_WIDTH(8)
-) tx (
+) uart_t (
   .clk(clk),
   .tx(tx), // TX line
-  .transmit(master_transmit),
-  .ready(tx_ready), // Is high when data transaction is complete
-  .data(master_data) // Data received
+  .transmit(master_transmit), // Trigger to send data
+  .ready(tx_ready), // Is high when uart is available to transmit
+  .data(master_data) // Data to be sent
 );
 
 fletcher #(
@@ -93,7 +95,7 @@ verifier #(
     .clk(clk),
     .rx_ready(rx_ready),
     .rx_success(rx_success),
-    .master_reset(master_reset),
+    .reset(reset),
     .fifo_full(fifo_full),
     .rx_data(rx_data),
     .fletcher_sum(fletcher_sum),

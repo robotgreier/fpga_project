@@ -24,7 +24,7 @@ module master #(
         parameter BIT_WIDTH = 8,
         parameter LEN_MAX = 8
     )(
-        input wire clk, ready, success, tx_ready,
+        input wire clk, ready, success, tx_ready, reset,
         input wire [BIT_WIDTH-1:0] data_in,
         output reg read, transmit,
         output wire [BIT_WIDTH-1:0] data_out
@@ -43,11 +43,16 @@ module master #(
 
     assign data_out = data_in;
 
-    always @(posedge clk) begin
+    always @(posedge clk, posedge reset) begin
         state <= state;
         read <= 0;
         transmit <= 0;
 
+        if (reset) begin // Reset called
+            state <= IDLE;
+        end
+
+        else begin
         case(state)
             IDLE: begin
                 if (ready & success) begin // Wait for ready fifo
@@ -86,6 +91,7 @@ module master #(
 
             default: state <= IDLE;
         endcase
+        end
     end
 
 endmodule

@@ -24,7 +24,7 @@ module verifier#(
         parameter BIT_WIDTH = 8,
         parameter LEN_MAX = 256
     )(
-        input wire clk, rx_ready, rx_success, master_reset, fifo_full,
+        input wire clk, rx_ready, rx_success, reset, fifo_full,
         input wire [BIT_WIDTH-1:0] rx_data,
         input wire [(BIT_WIDTH*2)-1:0] fletcher_sum,
         output reg ready, success, write, commit, check, soft_reset, hard_reset
@@ -49,8 +49,8 @@ module verifier#(
     reg [7:0] checksum_1;
     reg [7:0] checksum_2;
 
-    always @(posedge clk, posedge master_reset) begin
-        if (master_reset) begin // Reset
+    always @(posedge clk, posedge reset) begin
+        if (reset) begin // Reset
             state <= IDLE;
             n <= 0;
             i <= 0;
