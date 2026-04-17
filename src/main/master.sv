@@ -21,22 +21,22 @@
 
 
 module master #(
-        parameter DATA_BIT_WIDTH = 8,
+        parameter BIT_WIDTH = 8,
         parameter LEN_MAX = 8
-        // parameter ADDR_BIT_WIDTH = 8
     )(
-        input wire clk, ready, success,
-        input wire [DATA_BIT_WIDTH-1:0] data_in,
+        input wire clk, ready, success, tx_ready,
+        input wire [BIT_WIDTH-1:0] data_in,
         output reg read, transmit,
-        output wire [DATA_BIT_WIDTH-1:0] data_out
+        output wire [BIT_WIDTH-1:0] data_out
     );
 
     reg [2:0] state;
 
     parameter IDLE = 0;
-    parameter SEND = 1;
-    parameter READ = 2;
-    parameter EMPT = 3;
+    parameter WAIT = 1;
+    parameter SEND = 2;
+    parameter READ = 3;
+    parameter EMPT = 4;
 
     reg [$clog2(LEN_MAX)-1:0] n = 0;
     reg [$clog2(LEN_MAX)-1:0] i = 0;
@@ -44,19 +44,25 @@ module master #(
     assign data_out = data_in;
 
     always @(posedge clk) begin
+        state <= state;
         read <= 0;
         transmit <= 0;
-        data_out <= 0;
 
         case(state)
             IDLE: begin
-                if (ready & success) begin // Send CMD along next state
+                if (ready & success) begin // Wait for ready fifo
+                    state <= WAIT;
+                end
+            end
+
+            WAIT: begin
+                if (tx_ready) begin // Wait until tx is ready for transmission
                     transmit <= 1;
                     state <= SEND;
                 end
             end
 
-            SEND: begin
+            SEND: begin // Pop fifo
                 state <= READ;
                 read <= 1;
             end
@@ -77,6 +83,8 @@ module master #(
                     state <= IDLE;
                 end
             end
+
+            default: state <= IDLE;
         endcase
     end
 

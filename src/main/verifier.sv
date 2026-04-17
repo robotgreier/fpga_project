@@ -49,7 +49,7 @@ module verifier#(
     reg [7:0] checksum_1;
     reg [7:0] checksum_2;
 
-    always @(posedge clk, master_reset) begin
+    always @(posedge clk, posedge master_reset) begin
         if (master_reset) begin // Reset
             state <= IDLE;
             n <= 0;

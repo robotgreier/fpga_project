@@ -23,8 +23,7 @@ wire  [15:0] fletcher_sum; // Fletcher in signals
 wire  rx, rx_ready, rx_success; // RX signals
 wire  [7:0] rx_data;
 
-wire  tx, tx_ready, tx_success; // TX signals
-wire  [7:0] tx_data;
+wire  tx, tx_ready; // TX signals
 
 master #(
   .BIT_WIDTH(8),
@@ -33,6 +32,7 @@ master #(
   .clk(clk),
   .ready(verifier_ready),
   .success(verifier_success),
+  .tx_ready(tx_ready),
   .data_in(fifo_data),
   .read(master_read),
   .transmit(master_transmit),
@@ -56,9 +56,9 @@ uart_tx #(
 ) tx (
   .clk(clk),
   .tx(tx), // TX line
+  .transmit(master_transmit),
   .ready(tx_ready), // Is high when data transaction is complete
-  .success(tx_success), // Is high if transaction is considered successfull (when stop bit is high)
-  .data(tx_data) // Data received
+  .data(master_data) // Data received
 );
 
 fletcher #(
