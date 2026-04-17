@@ -48,12 +48,15 @@ module verifier#(
 
     reg [7:0] checksum_1;
     reg [7:0] checksum_2;
+    reg temp_check;
+
 
     always @(posedge clk, posedge reset) begin
         if (reset) begin // Reset
             state <= IDLE;
             n <= 0;
             i <= 0;
+            temp_check <= 0;
             soft_reset <= 1;
             hard_reset <= 1;
         end
@@ -76,7 +79,7 @@ module verifier#(
                         n <= 0;
                         i <= 0;
                     end
-                    else soft_reset <= 1;
+                    // else soft_reset <= 1;
                 end
 
                 CMD: begin
@@ -136,16 +139,19 @@ module verifier#(
                 end
 
                 CHECK: begin
-                    ready <= 1; // Tell master system is ready
-                    success <= ({checksum_1, checksum_2} == fletcher_sum); // Tell master it was success
-                    commit <= ({checksum_1, checksum_2} == fletcher_sum); // Commit to fifo
-                    // state <= RESET;
-                    state <= IDLE;
+                    temp_check <= ({checksum_1, checksum_2} == fletcher_sum);
+                    soft_reset <= 1;
+                    state <= RESET;
                 end
 
                 RESET: begin
+                    success <= temp_check; // Signal success to master
+                    commit <= temp_check; // Signal commit to fifo
+                    ready <= 1; // Signal ready to master
                     state <= IDLE;
                 end
+
+                default: state <= IDLE;
             endcase
 
             if ((rx_ready & !rx_success) || fifo_full) begin
