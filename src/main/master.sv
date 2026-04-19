@@ -33,10 +33,11 @@ module master #(
     reg [2:0] state;
 
     parameter IDLE = 0;
-    parameter WAIT = 1;
-    parameter SEND = 2;
-    parameter READ = 3;
-    parameter EMPT = 4;
+    parameter TRAN = 1;
+    parameter READ = 2;
+    parameter WAIT_1 = 3;
+    parameter WAIT_2 = 4;
+    parameter EMPT = 5;
 
     reg [$clog2(LEN_MAX)-1:0] n = 0;
     reg [$clog2(LEN_MAX)-1:0] i = 0;
@@ -56,32 +57,36 @@ module master #(
         case(state)
             IDLE: begin
                 if (ready & success) begin // Wait for ready fifo
-                    state <= WAIT;
+                    state <= TRAN;
                 end
             end
 
-            WAIT: begin
+            TRAN: begin
                 if (tx_ready) begin // Wait until tx is ready for transmission
                     transmit <= 1;
-                    state <= SEND;
+                    state <= READ;
                 end
             end
 
-            SEND: begin // Pop fifo
-                state <= READ;
+            READ: begin // Pop fifo
+                state <= WAIT_1;
                 read <= 1;
             end
 
-            READ: begin
+            WAIT_1: begin
+                state <= WAIT_2;
+            end
+
+            WAIT_2: begin
                 n <= data_in;
                 i <= 0;
                 state <= EMPT;
             end
 
             EMPT: begin
-                if (i < n) begin
+                if (i <= n) begin
                     i <= i + 1;
-                    transmit <= 1;
+                    read <= 1;
                     state <= EMPT;
                 end
                 else begin

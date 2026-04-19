@@ -27,7 +27,7 @@ module verifier#(
         input wire clk, rx_ready, rx_success, reset, fifo_full,
         input wire [BIT_WIDTH-1:0] rx_data,
         input wire [(BIT_WIDTH*2)-1:0] fletcher_sum,
-        output reg ready, success, write, commit, check, soft_reset, hard_reset
+        output reg ready, success, write, commit, check, fifo_reset, fletcher_reset
     );
 
     // State parameters
@@ -57,8 +57,8 @@ module verifier#(
             n <= 0;
             i <= 0;
             temp_check <= 0;
-            soft_reset <= 1;
-            hard_reset <= 1;
+            fifo_reset <= 1;
+            fletcher_reset <= 1;
         end
 
         else begin // Clock
@@ -67,8 +67,8 @@ module verifier#(
             success <= 0;
             write <= 0;
             check <= 0;
-            soft_reset <= 0;
-            hard_reset <= 0;
+            fifo_reset <= 0;
+            fletcher_reset <= 0;
             commit <= 0;
 
             case (state)
@@ -140,7 +140,7 @@ module verifier#(
 
                 CHECK: begin
                     temp_check <= ({checksum_1, checksum_2} == fletcher_sum);
-                    soft_reset <= 1;
+                    fletcher_reset <= 1;
                     state <= RESET;
                 end
 
@@ -156,14 +156,21 @@ module verifier#(
 
             if ((rx_ready & !rx_success) || fifo_full) begin
                 state <= IDLE;
-                soft_reset <= 1;
                 ready <= 1;
                 success <= 0;
+                fletcher_reset <= 1;
+                fifo_reset <= 1;
             end
 
             if (rx_ready & rx_success & (rx_data == SOF) & (state != IDLE)) begin // Unexpected SOF
-                state <= IDLE; // Transition to IDLE
-                soft_reset <= 1;
+                // if (state == CMD) begin
+                //     state <= CMD;
+                // end
+                // else begin
+                    state <= IDLE; // Transition to IDLE
+                    fletcher_reset <= 1;
+                    fifo_reset <= 1;
+                // end
             end
         end
     end

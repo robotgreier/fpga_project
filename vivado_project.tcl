@@ -18,6 +18,7 @@
 proc checkRequiredFiles { origin_dir} {
   set status true
   set files [list \
+ "[file normalize "$origin_dir/vivado_project/main_tb_behav.wcfg"]"\
  "[file normalize "$origin_dir/vivado_project/vivado_project.srcs/utils_1/imports/synth_1/main.dcp"]"\
   ]
   foreach ifile $files {
@@ -180,7 +181,7 @@ set_property -name "simulator.xsim_version" -value "2025.2" -objects $obj
 set_property -name "simulator_language" -value "Mixed" -objects $obj
 set_property -name "sim_compile_state" -value "1" -objects $obj
 set_property -name "use_inline_hdl_ip" -value "1" -objects $obj
-set_property -name "webtalk.xsim_launch_sim" -value "347" -objects $obj
+set_property -name "webtalk.xsim_launch_sim" -value "380" -objects $obj
 
 # Create 'sources_1' fileset (if not found)
 if {[string equal [get_filesets -quiet sources_1] ""]} {
@@ -352,6 +353,12 @@ set files [list \
  [file normalize "${origin_dir}/src/main/main_tb.sv"] \
 ]
 add_files -norecurse -fileset $obj $files
+
+# Add local files from the original project (-no_copy_sources specified)
+set files [list \
+ [file normalize "${origin_dir}/vivado_project/main_tb_behav.wcfg" ]\
+]
+set added_files [add_files -fileset sim_1 $files]
 
 # Set 'sim_1' fileset file properties for remote files
 set file "$origin_dir/src/main/fifo_memory_tb.sv"

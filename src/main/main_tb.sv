@@ -84,7 +84,30 @@ module main_tb(
         send_byte(8'h74);
         send_byte(8'h41);
 
-        #(400*1000);
+        #(400*200);
+
+        send_byte(170);
+        send_byte(1);
+        send_byte(3);
+        send_byte(10);
+        send_byte(50);
+        send_byte(145);
+        send_byte(124);
+        send_byte(37);
+
+        #(400*200);
+        
+        send_byte(170);
+        send_byte(170);
+        send_byte(1);
+        send_byte(3);
+        send_byte(10);
+        send_byte(50);
+        send_byte(145);
+        send_byte(32);
+        send_byte(37);
+
+        #(400*200);
         $finish;
     end
 endmodule

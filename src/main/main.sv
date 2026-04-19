@@ -8,18 +8,20 @@ parameter MAX_DATA = 16;
 wire  master_read, master_transmit; // Master signals
 wire  [7:0] master_data;
 
-wire  verifier_ready, // Verifier in signals
+wire  verifier_ready, // Verifier signals
       verifier_success,
       verifier_write,
       verifier_commit,
-      verifier_soft_reset,
-      verifier_hard_reset,
+      verifier_fifo_reset,
+      verifier_fletcher_reset,
       verifier_check;
 
-wire  fifo_full, fifo_empty; // Fifo in signals
+wire  fifo_full, fifo_empty; // Fifo signals
 wire  [7:0] fifo_data;
 
-wire  [15:0] fletcher_sum; // Fletcher in signals
+
+wire  fletcher_reset; // Fletcher signals
+wire  [15:0] fletcher_sum;
 
 wire  rx_ready, rx_success; // RX signals
 wire  [7:0] rx_data;
@@ -66,7 +68,7 @@ uart_tx #(
 fletcher #(
     .BIT_WIDTH(8)
 ) fletch (
-    .reset(verifier_soft_reset),
+    .reset(verifier_fletcher_reset),
     .check(verifier_check),
     .data(rx_data),
     .sum(fletcher_sum)
@@ -77,8 +79,8 @@ fifo_memory #(
     .BIT_WIDTH(8)
 ) fifo (
     .clk(clk),
-    .soft_reset(verifier_soft_reset),
-    .hard_reset(verifier_hard_reset),
+    .soft_reset(verifier_fifo_reset),
+    .hard_reset(reset),
     .write(verifier_write),
     .commit(verifier_commit),
     .read(master_read),
@@ -104,8 +106,8 @@ verifier #(
     .write(verifier_write),
     .commit(verifier_commit),
     .check(verifier_check),
-    .soft_reset(verifier_soft_reset),
-    .hard_reset(verifier_hard_reset)
+    .fifo_reset(verifier_fifo_reset),
+    .fletcher_reset(verifier_fletcher_reset)
     );
 
 endmodule
