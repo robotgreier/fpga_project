@@ -71,6 +71,8 @@ wire  [7:0] rx_data;
 
 wire  tx_ready; // TX signals
 
+wire SNN_ready; // SNN signals
+
 master #(
   .BIT_WIDTH(8),
   .LEN_MAX(MAX_DATA)
