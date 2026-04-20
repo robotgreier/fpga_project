@@ -18,9 +18,35 @@ module main #(
     // Main parameters
     parameter int MAX_DATA     = 16
   )(
-  input logic clk, rx, reset,
-  output wire tx
+  input logic CLK100MHZ, uart_txd_in,
+  output wire uart_rxd_out
 );
+
+wire clk, rx, tx;
+reg reset;
+assign clk = CLK100MHZ;
+assign rx = uart_txd_in;
+assign tx = uart_rxd_out;
+
+reg reset_counter = 0;
+reg already_reset = 0;
+
+always @(posedge clk) begin
+  if (already_reset == 1'b0) begin  // Check if system is already delayed
+    if (reset_counter >= 60) begin // Check if counter is over 60 cycles
+      if (reset == 1'b1) begin // Check if reset signal is high
+        reset <= 1'b0;
+        already_reset <= 1'b1;
+      end
+      else begin
+        reset <= 1'b1;
+      end
+    end
+    else begin
+      reset_counter <= reset_counter + 1'b1;
+    end
+  end
+end
 
 wire  master_read, master_transmit; // Master signals
 wire  [7:0] master_data;
