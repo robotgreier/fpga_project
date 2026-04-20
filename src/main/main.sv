@@ -1,9 +1,25 @@
-module main (
+module main #(
+  // SNN parameters
+    parameter int DECAY        = 256,
+    parameter int THRESHOLD    = 1024,
+    parameter int RESET        = 0,
+    parameter int LR_SHIFT     = 2,
+    parameter int T_PRE        = 2,
+    parameter int T_POST       = 2,
+    parameter int TAU_E_SHIFT  = 2,
+    parameter int DW_POS       = 16,
+    parameter int DW_NEG       = 64,
+    parameter int W_MIN        = 8,
+    parameter int W_MAX        = 255,
+    parameter int LEARNING_MODE = 0,  // 0: None, 1: R-STDP, 2: STDP
+    parameter int N_INPUTS     = 31,
+    parameter int N_OUTPUTS    = 3,
+    // Main parameters
+    parameter int MAX_DATA     = 16
+  )(
   input logic clk, rx, reset,
   output wire tx
 );
-
-parameter MAX_DATA = 16;
 
 wire  master_read, master_transmit; // Master signals
 wire  [7:0] master_data;
