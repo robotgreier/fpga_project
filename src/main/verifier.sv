@@ -40,7 +40,7 @@ module verifier#(
     parameter CHECK = 6;
     parameter RESET = 7;
 
-    parameter SOF = 8'b10101010;
+    parameter SOF = 255;
 
     reg [3:0] state;
     reg [$clog2(LEN_MAX)-1:0] n = 0;
@@ -95,7 +95,7 @@ module verifier#(
 
                 LEN: begin
                     if (rx_ready & rx_success & (rx_data != SOF)) begin // LEN Packet received
-                        if (rx_data <= LEN_MAX) begin // Check if data is within bounds
+                        if (rx_data < LEN_MAX) begin // Check if data is within bounds
                             n <= rx_data; // Store LEN as n
                             write <= 1; // Write LEN to fifo
                             check <= 1; // Add LEN to fletcher
@@ -163,14 +163,14 @@ module verifier#(
             end
 
             if (rx_ready & rx_success & (rx_data == SOF) & (state != IDLE)) begin // Unexpected SOF
-                // if (state == CMD) begin
-                //     state <= CMD;
-                // end
-                // else begin
+                if (state == CMD)begin
+                    state <= CMD;
+                end
+                else begin
                     state <= IDLE; // Transition to IDLE
                     fletcher_reset <= 1;
                     fifo_reset <= 1;
-                // end
+                end
             end
         end
     end

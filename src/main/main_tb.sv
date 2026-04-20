@@ -71,41 +71,26 @@ module main_tb(
         reset = 1;
         #5
         reset = 0;
+
         #(400*10);
 
-        send_byte(8'hAA);
-        send_byte(8'h00);
-        send_byte(8'h05);
-        send_byte(8'd100);
-        send_byte(8'd150);
-        send_byte(8'd45);
-        send_byte(8'd89);
-        send_byte(8'd67);
-        send_byte(8'h74);
-        send_byte(8'h41);
-
-        #(400*200);
-
-        send_byte(170);
-        send_byte(1);
-        send_byte(3);
-        send_byte(10);
-        send_byte(50);
-        send_byte(145);
-        send_byte(124);
-        send_byte(37);
+        send_byte(255);
+        send_byte(0);
+        send_byte(2);
+        send_byte(78);
+        send_byte(29);
+        send_byte(109);
+        send_byte(191);
 
         #(400*200);
         
-        send_byte(170);
-        send_byte(170);
+        send_byte(255);
         send_byte(1);
-        send_byte(3);
-        send_byte(10);
-        send_byte(50);
-        send_byte(145);
-        send_byte(32);
-        send_byte(37);
+        send_byte(2);
+        send_byte(69);
+        send_byte(82);
+        send_byte(154);
+        send_byte(230);
 
         #(400*200);
         $finish;
