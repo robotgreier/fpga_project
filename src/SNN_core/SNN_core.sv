@@ -21,11 +21,9 @@ module SNN_core #(
     input  logic signed [3:0]                                       dopamine,
     input  logic                                                    reward_en,
     input  logic [7:0] w_syn  [N_OUTPUTS-1:0][(N_INPUTS+FEEDBACK)-1:0],  // Weight matrix in
-    input  logic                                                    master_enable,  // Run network when high
     output logic [N_OUTPUTS-1:0]                                    spk_out,
     output logic [$clog2(N_OUTPUTS)-1:0]                            winner_idx,
-    output logic [7:0] w_next [N_OUTPUTS-1:0][(N_INPUTS+FEEDBACK)-1:0],   // Updated weight matrix out
-    output logic                                                    SNN_ready   // High when SNN has produced an output
+    output logic [7:0] w_next [N_OUTPUTS-1:0][(N_INPUTS+FEEDBACK)-1:0]    // Updated weight matrix out
   );
 
   // ---------------------------------------------------------------------------
@@ -75,13 +73,13 @@ module SNN_core #(
 
       unique case (LEARNING_MODE)
         1:       reward_en_syn[j] = reward_en & (winner_idx == j);
-        2:       reward_en_syn[j] = |spk_out;
+        2:       reward_en_syn[j] = reward_en & |spk_out;
         default: reward_en_syn[j] = 1'b0;
       endcase
     end
 
   // ---------------------------------------------------------------------------
-  // Current accumulation: dot product of weights and gated input spikes
+  // Current accumulation: sum of synaptic currents for each neuron
   // ---------------------------------------------------------------------------
   always_comb
     for (int j = 0; j < N_OUTPUTS; j++) begin

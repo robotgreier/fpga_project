@@ -48,7 +48,7 @@ always @(posedge clk) begin
   end
 end
 
-wire  master_read, master_transmit, master_enable; // Master signals
+wire  master_read, master_transmit; // Master signals
 wire  [7:0] master_data;
 
 wire  verifier_ready, // Verifier signals
@@ -70,8 +70,6 @@ wire  rx_ready, rx_success; // RX signals
 wire  [7:0] rx_data;
 
 wire  tx_ready; // TX signals
-
-wire SNN_ready; // SNN signals
 
 master #(
   .BIT_WIDTH(8),
