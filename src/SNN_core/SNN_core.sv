@@ -12,7 +12,7 @@ module SNN_core #(
     parameter int W_MAX        = 255,
     parameter int LEARNING_MODE = 0,  // 0: None, 1: R-STDP, 2: STDP
     parameter int N_INPUTS     = 31,
-    parameter int N_OUTPUTS    = 3
+    parameter int N_OUTPUTS    = 4
   ) (
     input  logic                           clk,
     input  logic [N_INPUTS-1:0]           pre_spk,   // Pre-synaptic input spikes
