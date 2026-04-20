@@ -6,7 +6,7 @@ module synapse_core #(
     parameter int DW_POS       = 16,
     parameter int DW_NEG       = 64,
     parameter int W_MIN        = 8,
-    parameter int W_MAX        = 255,
+    parameter int W_MAX        = 254,
     parameter int LEARNING_MODE = 0
   ) (
     input logic clk,
@@ -62,8 +62,8 @@ module synapse_core #(
   assign w_sum = $signed(10'({1'b0, w_syn})) + $signed({{2{delta_w[7]}}, delta_w});
 
   always_comb begin
-    if      (w_sum > 10'sd255) w_next = 8'd255;
-    else if (w_sum < 10'sd8)   w_next = 8'd8;
+    if      (w_sum > W_MAX) w_next = W_MAX;
+    else if (w_sum < W_MIN)   w_next = W_MIN;
     else                       w_next = w_sum[7:0];
   end
 

@@ -10,10 +10,10 @@ module main #(
     parameter int DW_POS       = 16,
     parameter int DW_NEG       = 64,
     parameter int W_MIN        = 8,
-    parameter int W_MAX        = 255,
+    parameter int W_MAX        = 254,
     parameter int LEARNING_MODE = 0,  // 0: None, 1: R-STDP, 2: STDP
     parameter int N_INPUTS     = 31,
-    parameter int N_OUTPUTS    = 3,
+    parameter int N_OUTPUTS    = 4,
     // Main parameters
     parameter int MAX_DATA     = 16
   )(
