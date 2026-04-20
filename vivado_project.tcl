@@ -30,24 +30,24 @@ proc checkRequiredFiles { origin_dir} {
 
   set files [list \
  "[file normalize "$origin_dir/src/SNN_core/LIF_core/tb_LIF_core.sv"]"\
- "[file normalize "$origin_dir/src/timer.sv"]"\
- "[file normalize "$origin_dir/src/main/verifier.sv"]"\
  "[file normalize "$origin_dir/src/main/fletcher_tb.sv"]"\
  "[file normalize "$origin_dir/src/main/fifo_memory_tb.sv"]"\
- "[file normalize "$origin_dir/src/main/master.sv"]"\
- "[file normalize "$origin_dir/src/main/fifo_memory.sv"]"\
  "[file normalize "$origin_dir/src/main/verifier_tb.sv"]"\
- "[file normalize "$origin_dir/src/main/fletcher.sv"]"\
- "[file normalize "$origin_dir/src/main/main.sv"]"\
  "[file normalize "$origin_dir/src/main/verifier_fletcher_fifo_tb.sv"]"\
- "[file normalize "$origin_dir/src/main/uart_rx.sv"]"\
- "[file normalize "$origin_dir/src/main/uart_tx.sv"]"\
  "[file normalize "$origin_dir/src/SNN_core/LIF_core/LIF_core.sv"]"\
  "[file normalize "$origin_dir/src/SNN_core/WTA.sv"]"\
  "[file normalize "$origin_dir/src/SNN_core/synapse_core/apply_reward.sv"]"\
  "[file normalize "$origin_dir/src/SNN_core/synapse_core/eligibility_updater.sv"]"\
  "[file normalize "$origin_dir/src/SNN_core/synapse_core/synapse_core.sv"]"\
  "[file normalize "$origin_dir/src/SNN_core/SNN_core.sv"]"\
+ "[file normalize "$origin_dir/src/main/fifo_memory.sv"]"\
+ "[file normalize "$origin_dir/src/main/fletcher.sv"]"\
+ "[file normalize "$origin_dir/src/main/master.sv"]"\
+ "[file normalize "$origin_dir/src/timer.sv"]"\
+ "[file normalize "$origin_dir/src/main/uart_rx.sv"]"\
+ "[file normalize "$origin_dir/src/main/uart_tx.sv"]"\
+ "[file normalize "$origin_dir/src/main/verifier.sv"]"\
+ "[file normalize "$origin_dir/src/main/main.sv"]"\
  "[file normalize "$origin_dir/src/Arty-A7-100-Master.xdc"]"\
  "[file normalize "$origin_dir/src/main/fifo_memory_tb.sv"]"\
  "[file normalize "$origin_dir/src/main/fletcher_tb.sv"]"\
@@ -192,39 +192,29 @@ if {[string equal [get_filesets -quiet sources_1] ""]} {
 set obj [get_filesets sources_1]
 set files [list \
  [file normalize "${origin_dir}/src/SNN_core/LIF_core/tb_LIF_core.sv"] \
- [file normalize "${origin_dir}/src/timer.sv"] \
- [file normalize "${origin_dir}/src/main/verifier.sv"] \
  [file normalize "${origin_dir}/src/main/fletcher_tb.sv"] \
  [file normalize "${origin_dir}/src/main/fifo_memory_tb.sv"] \
- [file normalize "${origin_dir}/src/main/master.sv"] \
- [file normalize "${origin_dir}/src/main/fifo_memory.sv"] \
  [file normalize "${origin_dir}/src/main/verifier_tb.sv"] \
- [file normalize "${origin_dir}/src/main/fletcher.sv"] \
- [file normalize "${origin_dir}/src/main/main.sv"] \
  [file normalize "${origin_dir}/src/main/verifier_fletcher_fifo_tb.sv"] \
- [file normalize "${origin_dir}/src/main/uart_rx.sv"] \
- [file normalize "${origin_dir}/src/main/uart_tx.sv"] \
  [file normalize "${origin_dir}/src/SNN_core/LIF_core/LIF_core.sv"] \
  [file normalize "${origin_dir}/src/SNN_core/WTA.sv"] \
  [file normalize "${origin_dir}/src/SNN_core/synapse_core/apply_reward.sv"] \
  [file normalize "${origin_dir}/src/SNN_core/synapse_core/eligibility_updater.sv"] \
  [file normalize "${origin_dir}/src/SNN_core/synapse_core/synapse_core.sv"] \
  [file normalize "${origin_dir}/src/SNN_core/SNN_core.sv"] \
+ [file normalize "${origin_dir}/src/main/fifo_memory.sv"] \
+ [file normalize "${origin_dir}/src/main/fletcher.sv"] \
+ [file normalize "${origin_dir}/src/main/master.sv"] \
+ [file normalize "${origin_dir}/src/timer.sv"] \
+ [file normalize "${origin_dir}/src/main/uart_rx.sv"] \
+ [file normalize "${origin_dir}/src/main/uart_tx.sv"] \
+ [file normalize "${origin_dir}/src/main/verifier.sv"] \
+ [file normalize "${origin_dir}/src/main/main.sv"] \
 ]
 add_files -norecurse -fileset $obj $files
 
 # Set 'sources_1' fileset file properties for remote files
 set file "$origin_dir/src/SNN_core/LIF_core/tb_LIF_core.sv"
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file "$origin_dir/src/timer.sv"
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file "$origin_dir/src/main/verifier.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
@@ -239,42 +229,12 @@ set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 
-set file "$origin_dir/src/main/master.sv"
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file "$origin_dir/src/main/fifo_memory.sv"
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
 set file "$origin_dir/src/main/verifier_tb.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 
-set file "$origin_dir/src/main/fletcher.sv"
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file "$origin_dir/src/main/main.sv"
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
 set file "$origin_dir/src/main/verifier_fletcher_fifo_tb.sv"
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file "$origin_dir/src/main/uart_rx.sv"
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file "$origin_dir/src/main/uart_tx.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
@@ -309,6 +269,46 @@ set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 
+set file "$origin_dir/src/main/fifo_memory.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
+set file "$origin_dir/src/main/fletcher.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
+set file "$origin_dir/src/main/master.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
+set file "$origin_dir/src/timer.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
+set file "$origin_dir/src/main/uart_rx.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
+set file "$origin_dir/src/main/uart_tx.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
+set file "$origin_dir/src/main/verifier.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
+set file "$origin_dir/src/main/main.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
 
 # Set 'sources_1' fileset file properties for local files
 # None
@@ -316,7 +316,8 @@ set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 # Set 'sources_1' fileset properties
 set obj [get_filesets sources_1]
 set_property -name "dataflow_viewer_settings" -value "min_width=16" -objects $obj
-set_property -name "top" -value "SNN_core" -objects $obj
+set_property -name "top" -value "main" -objects $obj
+set_property -name "top_auto_set" -value "0" -objects $obj
 
 # Create 'constrs_1' fileset (if not found)
 if {[string equal [get_filesets -quiet constrs_1] ""]} {
@@ -443,7 +444,6 @@ if { $obj != "" } {
 
 }
 set obj [get_runs synth_1]
-set_property -name "needs_refresh" -value "1" -objects $obj
 set_property -name "part" -value "xc7a100tcsg324-2" -objects $obj
 set_property -name "incremental_checkpoint" -value "$proj_dir/vivado_project.srcs/utils_1/imports/synth_1/main.dcp" -objects $obj
 set_property -name "auto_incremental_checkpoint" -value "1" -objects $obj
