@@ -13,14 +13,17 @@ module SNN_core #(
     parameter int  LEARNING_MODE = 0,  // 0: None, 1: R-STDP, 2: STDP
     parameter int  N_INPUTS      = 31,
     parameter int  N_OUTPUTS     = 4,
-    parameter int  FEEDBACK      = 0   // 1: append NOR-feedback neuron as extra input
+    parameter int  FEEDBACK      = 1   // 1: append NOR-feedback neuron as extra input
   ) (
     input  logic                          clk,
+    input  logic                          rst,            // Reset
     input  logic [N_INPUTS-1:0]           pre_spk,
     input  logic signed [3:0]             dopamine,
     input  logic                          reward_en,
+    input  logic [7:0]                    w_syn,             // Synaptic weight
     output logic [N_OUTPUTS-1:0]          spk_out,
-    output logic [$clog2(N_OUTPUTS)-1:0]  winner_idx
+    output logic [$clog2(N_OUTPUTS)-1:0]  winner_idx,
+    output logic [7:0]                    w_next            // Updated synaptic weight
   );
 
   // ---------------------------------------------------------------------------
@@ -38,18 +41,9 @@ module SNN_core #(
   else          assign pre_spk_fb = pre_spk;
 
   // ---------------------------------------------------------------------------
-  // Weight storage: initialised to midpoint; written back after reward
-  // ---------------------------------------------------------------------------
-  logic [7:0] weights [N_OUTPUTS-1:0][N_IN_TOTAL-1:0];
-
-  initial
-    foreach (weights[j, ii])
-      weights[j][ii] = 8'((W_MIN + W_MAX) / 2);
-
-  // ---------------------------------------------------------------------------
   // Internal wires
   // ---------------------------------------------------------------------------
-  logic [7:0] I_syn_mat  [N_OUTPUTS-1:0][N_IN_TOTAL-1:0];  // unpacked: genvar access only
+  logic [7:0] I_syn_mat  [N_OUTPUTS-1:0][N_IN_TOTAL-1:0]; 
   logic [7:0] w_next_mat [N_OUTPUTS-1:0][N_IN_TOTAL-1:0];
 
   logic [N_OUTPUTS-1:0][15:0]           pre_reset_mem;
@@ -108,6 +102,7 @@ module SNN_core #(
       .clk(clk),
       .inhibit(inhibit[j]),
       .i_syn(i_sum[j]),
+      .rst(rst),
       .spk(spk_out[j]),
       .pre_reset_mem(pre_reset_mem[j])
     );
@@ -125,11 +120,12 @@ module SNN_core #(
         .LEARNING_MODE(LEARNING_MODE)
       ) syn_inst (
         .clk(clk),
+        .rst(rst),
         .pre_spk(pre_spk_gated[j][i]),
         .post_spk(post_spk_gated[j]),
         .dopamine(dopamine),
         .reward_en(reward_en_syn[j]),
-        .w_syn(weights[j][i]),
+        .w_syn(w_syn[j][i]),
         .w_next(w_next_mat[j][i]),
         .I_syn(I_syn_mat[j][i])
       );
@@ -141,8 +137,8 @@ module SNN_core #(
   // Weight writeback: w_next is registered inside synapse_core (1-cycle latency)
   // ---------------------------------------------------------------------------
   always_ff @(posedge clk)
-    foreach (weights[j, ii])
+    foreach (w_syn[j, ii])
       if (reward_en_syn[j])
-        weights[j][ii] <= w_next_mat[j][ii];
+        w_syn[j][ii] <= w_next_mat[j][ii];
 
 endmodule
