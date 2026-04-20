@@ -12,10 +12,10 @@ module synapse_core #(
     input logic clk,
     input logic rst,                     // Synchronous reset (active high)
     input logic pre_spk,                 // Pre-synaptic spike input
+    input logic post_spk,                // Post-synaptic spike input
     input logic signed [3:0] dopamine,   // Dopamine signal for reward-based learning
     input logic reward_en,               // Reward enable signal
     input logic [7:0] w_syn,             // Synaptic weight
-    input logic post_spk,                // Post-synaptic spike input
     output logic [7:0] w_next,           // Updated synaptic weight
     output logic [7:0] I_syn             // Synaptic current output
   );

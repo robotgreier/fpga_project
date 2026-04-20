@@ -14,6 +14,7 @@ module main #(
     parameter int LEARNING_MODE = 0,  // 0: None, 1: R-STDP, 2: STDP
     parameter int N_INPUTS     = 31,
     parameter int N_OUTPUTS    = 4,
+    parameter int FEEDBACK     = 1,   // 1: append NOR-feedback neuron as extra input
     // Main parameters
     parameter int MAX_DATA     = 16
   )(
