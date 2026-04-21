@@ -13,10 +13,10 @@ module weight_loader #(
 
   always_ff @(posedge clk)
   begin : get_weight
-    // Decode adr into matrix indices
-    [j][ii] : j = adr / (N_INPUTS+FEEDBACK), ii = adr % (N_INPUTS+FEEDBACK);
     if (w_en)
     begin
+      // Decode adr into matrix indices
+    [j][ii] : j = adr / (N_INPUTS+FEEDBACK), ii = adr % (N_INPUTS+FEEDBACK);
       w_temp[j][ii] <= data;
     end
   end

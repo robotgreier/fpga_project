@@ -12,7 +12,7 @@ module weight_dumper #(
     always_comb begin : parallelizer
         for (int i = 0; i < N_OUTPUTS; i++) begin
             for (int j = 0; j < (N_INPUTS + FEEDBACK); j++) begin
-                w_parallel_out[(i*COLS + j)*8 +: 8] = w_syn[i][j];
+                w_parallel_out[(i*(N_INPUTS + FEEDBACK) + j)*8 +: 8] = w_syn[i][j];
             end
         end
     end
