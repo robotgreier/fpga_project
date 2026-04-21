@@ -24,6 +24,8 @@ module packer_tb(
 
     );
 
+    localparam BIT_WIDTH = 8;
+
     reg clk, master_transmit, master_write, master_commit, master_reset; // Simulated master signals
     reg [BIT_WIDTH-1:0] master_data;
 
@@ -32,9 +34,9 @@ module packer_tb(
     wire [(BIT_WIDTH*2)-1:0] fletcher_sum; // Fletcher signals
 
     wire fifo_empty, fifo_full; // Fifo signals
-    wire [BIT-WIDTH-1:0] fifo_data;
+    wire [BIT_WIDTH-1:0] fifo_data;
 
-    wire packer_transmit, packer_check, packer_fifo_reset, packer_fletcher_reset, packer_read, // Packer signals
+    wire packer_transmit, packer_check, packer_fifo_reset, packer_fletcher_reset, packer_read; // Packer signals
     wire [BIT_WIDTH-1:0] packer_data;
 
     packer #(
@@ -98,7 +100,6 @@ module packer_tb(
         master_commit <= 0;
         master_reset <= 0;
         master_data <= 0;
-        tx_ready <= 1;
 
         repeat(10000) begin
             #5 clk = ~clk;
@@ -106,9 +107,9 @@ module packer_tb(
     end
 
     initial begin
-        #10
-        master_reset = 1;
         #5
+        master_reset = 1;
+        #10
         master_reset = 0;
 
         #10
@@ -122,6 +123,7 @@ module packer_tb(
         master_data <= 2;
         #10
         master_data <= 3;
+        #10
         master_write <= 0;
         master_commit <= 1;
         master_transmit <= 1;
