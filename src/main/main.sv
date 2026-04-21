@@ -11,6 +11,7 @@ module main #(
     parameter int DW_NEG       = 64,
     parameter int W_MIN        = 8,
     parameter int W_MAX        = 254,
+    parameter logic [7:0] W_INIT       = (W_MIN + W_MAX) / 2,
     parameter int LEARNING_MODE = 0,  // 0: None, 1: R-STDP, 2: STDP
     parameter int N_INPUTS     = 31,
     parameter int N_OUTPUTS    = 4,
@@ -152,5 +153,25 @@ verifier #(
     .fifo_reset(verifier_fifo_reset),
     .fletcher_reset(verifier_fletcher_reset)
     );
+
+
+// ----------------------- SNN things ------------------------------ //
+
+// Instantiate weight matrices
+logic [7:0] w_syn  [N_OUTPUTS-1:0][(N_INPUTS+FEEDBACK)-1:0];
+logic [7:0] w_next [N_OUTPUTS-1:0][(N_INPUTS+FEEDBACK)-1:0];
+
+// Initializing the weight matrix to default values at reset, otherwise w_next
+always_ff @(posedge clk) begin
+  if (reset)
+    foreach (w_syn[i,j]) w_syn[i][j] <= W_INIT;
+  else
+    w_syn <= w_next;
+end
+
+
+
+
+
 
 endmodule
