@@ -1,23 +1,23 @@
 module main #(
   // SNN parameters
-    parameter int DECAY        = 256,
-    parameter int THRESHOLD    = 1024,
-    parameter int RESET        = 0,
-    parameter int LR_SHIFT     = 2,
-    parameter int T_PRE        = 2,
-    parameter int T_POST       = 2,
-    parameter int TAU_E_SHIFT  = 2,
-    parameter int DW_POS       = 16,
-    parameter int DW_NEG       = 64,
-    parameter int W_MIN        = 8,
-    parameter int W_MAX        = 254,
-    parameter logic [7:0] W_INIT       = (W_MIN + W_MAX) / 2,
+    parameter int DECAY         = 256,
+    parameter int THRESHOLD     = 1024,
+    parameter int RESET         = 0,
+    parameter int LR_SHIFT      = 2,
+    parameter int T_PRE         = 2,
+    parameter int T_POST        = 2,
+    parameter int TAU_E_SHIFT   = 2,
+    parameter int DW_POS        = 16,
+    parameter int DW_NEG        = 64,
+    parameter int W_MIN         = 8,
+    parameter int W_MAX         = 254,
+    parameter logic [7:0] W_INIT = (W_MIN + W_MAX) / 2,
     parameter int LEARNING_MODE = 0,  // 0: None, 1: R-STDP, 2: STDP
-    parameter int N_INPUTS     = 31,
-    parameter int N_OUTPUTS    = 4,
-    parameter int FEEDBACK     = 1,   // 1: append NOR-feedback neuron as extra input
+    parameter int N_INPUTS      = 31,
+    parameter int N_OUTPUTS     = 4,
+    parameter int FEEDBACK      = 1,   // 1: append NOR-feedback neuron as extra input
     // Main parameters
-    parameter int MAX_DATA     = 16
+    parameter int MAX_DATA      = 16
   )(
   input logic CLK100MHZ, uart_txd_in,
   output wire uart_rxd_out
