@@ -17,7 +17,8 @@ module main #(
     parameter int N_OUTPUTS     = 4,
     parameter int FEEDBACK      = 1,   // 1: append NOR-feedback neuron as extra input
     // Main parameters
-    parameter int MAX_DATA      = 16
+    parameter int MAX_DATA      = 16,
+    parameter int BIT_WIDTH     = 8
   )(
   input logic CLK100MHZ, uart_txd_in,
   output wire uart_rxd_out
@@ -73,7 +74,7 @@ wire  [7:0] rx_data;
 wire  tx_ready; // TX signals
 
 master #(
-  .BIT_WIDTH(8),
+  .BIT_WIDTH(BIT_WIDTH),
   .LEN_MAX(MAX_DATA)
 ) mas (
   .clk(clk),
@@ -89,7 +90,7 @@ master #(
 
 uart_rx #(
   .CLOCK_BAUD_RATIO(400),
-  .BIT_WIDTH(8)
+  .BIT_WIDTH(BIT_WIDTH)
 ) uart_r (
   .clk(clk),
   .rx(rx), // RX line
@@ -100,7 +101,7 @@ uart_rx #(
 
 uart_tx #(
   .CLOCK_BAUD_RATIO(400),
-  .BIT_WIDTH(8)
+  .BIT_WIDTH(BIT_WIDTH)
 ) uart_t (
   .clk(clk),
   .tx(tx), // TX line
@@ -110,7 +111,7 @@ uart_tx #(
 );
 
 fletcher #(
-    .BIT_WIDTH(8)
+    .BIT_WIDTH(BIT_WIDTH)
 ) fletch (
     .reset(verifier_fletcher_reset),
     .check(verifier_check),
@@ -120,7 +121,7 @@ fletcher #(
 
 fifo_memory #(
     .ADDRESS_COUNT(MAX_DATA),
-    .BIT_WIDTH(8)
+    .BIT_WIDTH(BIT_WIDTH)
 ) fifo (
     .clk(clk),
     .soft_reset(verifier_fifo_reset),
@@ -135,7 +136,7 @@ fifo_memory #(
 );
 
 verifier #(
-    .BIT_WIDTH(8),
+    .BIT_WIDTH(BIT_WIDTH),
     .LEN_MAX(MAX_DATA)
 ) veri (
     .clk(clk),
