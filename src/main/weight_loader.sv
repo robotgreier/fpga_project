@@ -6,19 +6,21 @@ module weight_loader #(
     input logic clk, rst, w_en,
     input logic [7:0] data,
     input logic [15:0] adr,
-    output logic [7:0] w_next  [N_OUTPUTS-1:0][(N_INPUTS+FEEDBACK)-1:0]          
+    output logic [7:0] w_next  [N_OUTPUTS-1:0][(N_INPUTS+FEEDBACK)-1:0]
   );
 
   logic [7:0] w_temp  [N_OUTPUTS-1:0][(N_INPUTS+FEEDBACK)-1:0];
 
-    always_ff @(posedge clk) begin : get_weight
-        // Decode adr into matrix indices
-        [j][ii]: j = adr / (N_INPUTS+FEEDBACK), ii = adr % (N_INPUTS+FEEDBACK);
-        if (w_en) begin
-            w_temp[j][ii] <= data;
-        end
+  always_ff @(posedge clk)
+  begin : get_weight
+    // Decode adr into matrix indices
+    [j][ii] : j = adr / (N_INPUTS+FEEDBACK), ii = adr % (N_INPUTS+FEEDBACK);
+    if (w_en)
+    begin
+      w_temp[j][ii] <= data;
     end
+  end
 
-    assign w_next = w_temp;
+  assign w_next = w_temp;
 
 endmodule
