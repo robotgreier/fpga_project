@@ -5,7 +5,7 @@ module weight_loader #(
   ) (
     input logic clk, rst, w_en,
     input logic [7:0] data,
-    input logic [15:0] adr,
+    input logic [7:0] adr,
     output logic [7:0] w_next  [N_OUTPUTS-1:0][(N_INPUTS+FEEDBACK)-1:0]
   );
 

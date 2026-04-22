@@ -170,6 +170,95 @@ always_ff @(posedge clk) begin
     w_syn <= w_next;
 end
 
+// Load weights
+// Temp signals
+logic [7:0] master_address;
+logic w_en, d_en;
+
+weight_loader #(
+    .N_INPUTS(N_INPUTS),
+    .N_OUTPUTS(N_OUTPUTS),
+    .FEEDBACK(FEEDBACK)
+) w_loader (
+    .clk(clk),
+    .rst(reset),
+    .w_en(w_en),
+    .data(fifo_data),
+    .adr(master_address),  
+    .w_next(w_next)
+);
+
+
+// Dump weights
+
+logic [((N_INPUTS+FEEDBACK)*N_OUTPUTS*8)-1:0] w_parallel_out
+dump_weights #(
+    .N_INPUTS(N_INPUTS),
+    .N_OUTPUTS(N_OUTPUTS),
+    .FEEDBACK(FEEDBACK)
+) w_dumper (
+    .clk(clk),
+    .rst(reset),
+    .en(d_en),
+    .adr(master_address),
+    .w_syn(w_syn),
+    .data_out(w_parallel_out)
+);
+
+
+// Load spikes
+// Temp signals
+logic done;
+logic [(N_INPUTS + FEEDBACK) - 1:0] spiketrain; 
+
+spike_loader #(
+    .N_INPUTS(N_INPUTS),
+    .N_OUTPUTS(N_OUTPUTS)
+) s_loader (
+    .clk(clk),
+    .rst(reset),
+    .en(w_en),
+    .data(fifo_data),
+    .adr(master_address),  
+    .done(done),
+    .spiketrain(spiketrain)
+);
+
+
+// Instantiate SNN core
+logic [N_OUTPUTS-1:0] spk_out;
+logic [$clog2(N_OUTPUTS)-1:0] winner_idx;
+
+SNN_core #(
+    .DECAY(DECAY),
+    .THRESHOLD(THRESHOLD),
+    .RESET(RESET),
+    .LR_SHIFT(LR_SHIFT),
+    .T_PRE(T_PRE),
+    .T_POST(T_POST),
+    .TAU_E_SHIFT(TAU_E_SHIFT),
+    .DW_POS(DW_POS),
+    .DW_NEG(DW_NEG),
+    .W_MIN(W_MIN),
+    .W_MAX(W_MAX),
+    .W_INIT(W_INIT),
+    .LEARNING_MODE(LEARNING_MODE),
+    .N_INPUTS(N_INPUTS),
+    .N_OUTPUTS(N_OUTPUTS),
+    .FEEDBACK(FEEDBACK)
+) snn (
+    .clk(clk), 
+    .rst(reset),
+    .spk_in(spiketrain),
+    .dopamine(dopamine),
+    .reward_en(reward_en),
+    .w_syn(w_syn),
+    .spk_out(spk_out),
+    .winner_idx(winner_idx)
+    .w_next(w_next)
+);
+
+
 
 
 

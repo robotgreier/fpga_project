@@ -17,7 +17,7 @@ module SNN_core #(
   ) (
     input  logic                                                    clk,
     input  logic                                                    rst,
-    input  logic [N_INPUTS-1:0]                                     pre_spk,
+    input  logic [N_INPUTS-1:0]                                     spiketrain,
     input  logic signed [3:0]                                       dopamine,
     input  logic                                                    reward_en,
     input  logic [7:0] w_syn  [N_OUTPUTS-1:0][(N_INPUTS+FEEDBACK)-1:0],  // Weight matrix in
@@ -32,13 +32,13 @@ module SNN_core #(
   localparam int N_IN_TOTAL = N_INPUTS + FEEDBACK;
 
   logic                  feedback_reg;
-  logic [N_IN_TOTAL-1:0] pre_spk_fb;
+  logic [N_IN_TOTAL-1:0] spiketrain_fb;
 
   always_ff @(posedge clk)
     feedback_reg <= FEEDBACK ? ~|spk_out : 1'b0;
 
-  if (FEEDBACK) assign pre_spk_fb = {feedback_reg, pre_spk};
-  else          assign pre_spk_fb = pre_spk;
+  if (FEEDBACK) assign spiketrain_fb = {feedback_reg, spiketrain};
+  else          assign spiketrain_fb = spiketrain;
 
   // ---------------------------------------------------------------------------
   // Internal wires
@@ -67,7 +67,7 @@ module SNN_core #(
   always_comb
     for (int j = 0; j < N_OUTPUTS; j++) begin
       // STDP: only winner row sees real spikes; all others are suppressed
-      pre_spk_gated[j]  = (LEARNING_MODE == 2 && winner_idx != j) ? '0   : pre_spk_fb;
+      pre_spk_gated[j]  = (LEARNING_MODE == 2 && winner_idx != j) ? '0   : spiketrain_fb;
       post_spk_gated[j] = (LEARNING_MODE == 2 && winner_idx != j) ? 1'b0 : spk_out[j];
       inhibit[j]        = (LEARNING_MODE == 2) & (winner_idx != j) & |spk_out;
 

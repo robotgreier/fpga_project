@@ -1,16 +1,15 @@
 module weight_loader #(
     parameter int N_INPUTS  = 31,
-    parameter int N_OUTPUTS = 4,
-    parameter int FEEDBACK  = 1
+    parameter int N_OUTPUTS = 4
 ) (
     input  logic        clk, rst, en,
     input  logic [7:0]  data,
-    input  logic [15:0] adr,
+    input  logic [7:0] adr,
     input  logic        done,
-    output logic [(N_INPUTS + FEEDBACK) - 1:0] spiketrain
+    output logic [(N_INPUTS) - 1:0] spiketrain
 );
 
-    localparam int TOTAL_SPIKES = N_INPUTS + FEEDBACK;  // 32
+    localparam int TOTAL_SPIKES = N_INPUTS;  // 31
 
     logic [TOTAL_SPIKES-1:0] spiketrain_temp;
     logic [2:0]              spk_temp;
