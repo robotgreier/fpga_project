@@ -53,7 +53,7 @@ always @(posedge clk) begin
 end
 
 // ----------------------- Verification things ------------------------------ //
-wire  master_read, master_transmit; // Master signals
+wire  master_read, master_write, master_commit; // Master signals
 wire  [7:0] master_data;
 
 wire  verifier_ready, // Verifier signals
@@ -64,12 +64,24 @@ wire  verifier_ready, // Verifier signals
       verifier_fletcher_reset,
       verifier_check;
 
-wire  fifo_full, fifo_empty; // Fifo signals
-wire  [7:0] fifo_data;
+wire  packer_transmit, // Packer signals
+      packer_check,
+      packer_fifo_reset,
+      packer_fletcher_reset,
+      packer_read;
+wire  [7:0] packer_data;
 
+wire  fifo_in_full, fifo_in_empty; // fifo_in signals
+wire  [7:0] fifo_in_data;
 
-wire  fletcher_reset; // Fletcher signals
-wire  [15:0] fletcher_sum;
+wire  fifo_out_full, fifo_out_empty; // fifo_out signals
+wire  [7:0] fifo_out_data;
+
+wire  fletcher_in_reset; // fletcher_in signals
+wire  [15:0] fletcher_in_sum;
+
+wire  fletcher_out_reset; // fletcher_out signals
+wire  [15:0] fletcher_out_sum;
 
 wire  rx_ready, rx_success; // RX signals
 wire  [7:0] rx_data;
@@ -85,7 +97,7 @@ master #(
   .success(verifier_success),
   .tx_ready(tx_ready),
   .reset(reset),
-  .data_in(fifo_data),
+  .data_in(fifo_in_data),
   .read(master_read),
   .transmit(master_transmit),
   .data_out(master_data)
@@ -108,34 +120,34 @@ uart_tx #(
 ) uart_t (
   .clk(clk),
   .tx(tx), // TX line
-  .transmit(master_transmit), // Trigger to send data
+  .transmit(packer_transmit), // Trigger to send data
   .ready(tx_ready), // Is high when uart is available to transmit
-  .data(master_data) // Data to be sent
+  .data(packer_data) // Data to be sent
 );
 
 fletcher #(
     .BIT_WIDTH(BIT_WIDTH)
-) fletch (
+) fletcher_in (
     .reset(verifier_fletcher_reset),
     .check(verifier_check),
     .data(rx_data),
-    .sum(fletcher_sum)
+    .sum(fletcher_in_sum)
 );
 
 fifo_memory #(
     .ADDRESS_COUNT(MAX_DATA),
     .BIT_WIDTH(BIT_WIDTH)
-) fifo (
+) fifo_in (
     .clk(clk),
     .soft_reset(verifier_fifo_reset),
     .hard_reset(reset),
     .write(verifier_write),
     .commit(verifier_commit),
     .read(master_read),
-    .full(fifo_full),
-    .empty(fifo_empty),
+    .full(fifo_in_full),
+    .empty(fifo_in_empty),
     .data_in(rx_data),
-    .data_out(fifo_data)
+    .data_out(fifo_in_data)
 );
 
 verifier #(
@@ -146,9 +158,9 @@ verifier #(
     .rx_ready(rx_ready),
     .rx_success(rx_success),
     .reset(reset),
-    .fifo_full(fifo_full),
+    .fifo_full(fifo_in_full),
     .rx_data(rx_data),
-    .fletcher_sum(fletcher_sum),
+    .fletcher_sum(fletcher_in_sum),
     .ready(verifier_ready),
     .success(verifier_success),
     .write(verifier_write),
@@ -158,6 +170,36 @@ verifier #(
     .fletcher_reset(verifier_fletcher_reset)
     );
 
+fletcher #(
+    .BIT_WIDTH(BIT_WIDTH)
+) fletcher_out (
+    .reset(packer_fletcher_reset),
+    .check(packer_check),
+    .data(packer_data),
+    .sum(fletcher_out_sum)
+);
+
+fifo_memory #(
+    .ADDRESS_COUNT(MAX_DATA),
+    .BIT_WIDTH(BIT_WIDTH)
+) fifo_out (
+    .clk(clk),
+    .soft_reset(packer_fifo_reset),
+    .hard_reset(reset),
+    .write(master_write),
+    .commit(master_commit),
+    .read(packer_read),
+    .full(fifo_out_full),
+    .empty(fifo_out_empty),
+    .data_in(master_data),
+    .data_out(fifo_out_data)
+);
+
+packer #(
+
+) pack (
+
+);
 
 // ----------------------- SNN things ------------------------------ //
 
