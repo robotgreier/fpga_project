@@ -101,7 +101,7 @@ module packer_tb(
         master_reset <= 0;
         master_data <= 0;
 
-        repeat(10000) begin
+        repeat(100000) begin
             #5 clk = ~clk;
         end
     end
