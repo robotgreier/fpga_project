@@ -42,37 +42,31 @@ module tb_apply_reward ();
     logic              rst;
 
     // Output per learning-mode instance
-    logic signed [7:0] delta_w_none;   // LEARNING_MODE = 0
-    logic signed [7:0] delta_w_rstdp;  // LEARNING_MODE = 1
-    logic signed [7:0] delta_w_stdp;   // LEARNING_MODE = 2
+    logic signed [8:0] delta_w_none;   // LEARNING_MODE = 0
+    logic signed [8:0] delta_w_rstdp;  // LEARNING_MODE = 1
+    logic signed [8:0] delta_w_stdp;   // LEARNING_MODE = 2
 
     // --------------------------------------------------------------------------
     // DUT instantiation -- one per learning mode
     // --------------------------------------------------------------------------
     apply_reward #(.LR_SHIFT(LR_SHIFT), .LEARNING_MODE(0)) dut_none (
-        .clk        (clk),
         .dopamine   (dopamine),
         .elig_trace (elig_trace),
         .reward_en  (reward_en),
-        .rst        (rst),
         .delta_w    (delta_w_none)
     );
 
     apply_reward #(.LR_SHIFT(LR_SHIFT), .LEARNING_MODE(1)) dut_rstdp (
-        .clk        (clk),
         .dopamine   (dopamine),
         .elig_trace (elig_trace),
         .reward_en  (reward_en),
-        .rst        (rst),
         .delta_w    (delta_w_rstdp)
     );
 
     apply_reward #(.LR_SHIFT(LR_SHIFT), .LEARNING_MODE(2)) dut_stdp (
-        .clk        (clk),
         .dopamine   (dopamine),
         .elig_trace (elig_trace),
         .reward_en  (reward_en),
-        .rst        (rst),
         .delta_w    (delta_w_stdp)
     );
 
@@ -116,8 +110,8 @@ module tb_apply_reward ();
     // --------------------------------------------------------------------------
     task automatic check(
         input string             label,
-        input logic signed [7:0] got,
-        input logic signed [7:0] expected
+        input logic signed [8:0] got,
+        input logic signed [8:0] expected
     );
         if (got === expected) begin
             $display("  PASS  %s : delta_w = %0d", label, got);
