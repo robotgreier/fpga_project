@@ -24,12 +24,14 @@ module main #(
   output wire uart_rxd_out
 );
 
+// Connections
 wire clk, rx, tx;
 reg reset;
 assign clk = CLK100MHZ;
 assign rx = uart_txd_in;
 assign tx = uart_rxd_out;
 
+// Reset logic
 reg reset_counter = 0;
 reg already_reset = 0;
 
@@ -50,6 +52,7 @@ always @(posedge clk) begin
   end
 end
 
+// ----------------------- Verification things ------------------------------ //
 wire  master_read, master_transmit; // Master signals
 wire  [7:0] master_data;
 
