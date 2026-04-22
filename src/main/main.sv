@@ -53,7 +53,7 @@ always @(posedge clk) begin
 end
 
 // ----------------------- Verification things ------------------------------ //
-wire  master_read, master_write, master_commit; // Master signals
+wire  master_read, master_write, master_commit, master_transmit; // Master signals
 wire  [7:0] master_data;
 
 wire  verifier_ready, // Verifier signals
@@ -196,9 +196,21 @@ fifo_memory #(
 );
 
 packer #(
-
+    .BIT_WIDTH(8)
 ) pack (
-
+    .clk(clk),
+    .master_transmit(master_transmit),
+    .empty(fifo_out_empty),
+    .reset(reset),
+    .ready(tx_ready),
+    .fifo_data(fifo_out_data),
+    .fletcher_sum(fletcher_out_sum),
+    .transmit(packer_transmit),
+    .check(packer_check),
+    .fifo_reset(packer_fifo_reset),
+    .fletcher_reset(packer_fletcher_reset),
+    .read(packer_read),
+    .data(packer_data)
 );
 
 // ----------------------- SNN things ------------------------------ //
