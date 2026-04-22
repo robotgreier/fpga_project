@@ -241,7 +241,7 @@ weight_loader #(
     .clk(clk),
     .rst(reset),
     .w_en(w_en),
-    .data(fifo_data),
+    .data(fifo_in_data),
     .adr(master_address),  
     .w_next(w_next)
 );
@@ -275,7 +275,7 @@ spike_loader #(
     .clk(clk),
     .rst(reset),
     .en(s_en),
-    .data(fifo_data),
+    .data(fifo_in_data),
     .adr(master_address),  
     .done(done),
     .spiketrain(spiketrain)
