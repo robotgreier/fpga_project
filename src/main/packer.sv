@@ -146,7 +146,12 @@ module packer #(
                 state <= IDLE;
             end
 
+            default: state <= IDLE;
         endcase
+
+        if (empty & (state != IDLE)) begin
+            state <= IDLE;
+        end
         end
     end
 
