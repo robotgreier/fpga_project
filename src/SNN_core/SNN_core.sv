@@ -77,9 +77,10 @@ module SNN_core #(
   // ---------------------------------------------------------------------------
   always_comb
     for (int j = 0; j < N_OUTPUTS; j++) begin
-      // STDP: only winner row sees real spikes; all others are suppressed
-      pre_spk_gated[j]  = (LEARNING_MODE == 2 && (!winner_valid || winner_idx != j)) ? '0   : spiketrain_fb;
-      post_spk_gated[j] = (LEARNING_MODE == 2 && (!winner_valid || winner_idx != j)) ? 1'b0 : spk_out[j];
+      // STDP: only suppress losers when a spike is actually occurring;
+      // before the first spike, every neuron must see input or none can fire.
+      pre_spk_gated[j]  = (LEARNING_MODE == 2 && winner_valid && winner_idx != j) ? '0   : spiketrain_fb;
+      post_spk_gated[j] = (LEARNING_MODE == 2 && winner_valid && winner_idx != j) ? 1'b0 : spk_out[j];
       inhibit[j]        = (LEARNING_MODE == 2) & (winner_idx != j) & |spk_out;
 
       unique case (LEARNING_MODE)
