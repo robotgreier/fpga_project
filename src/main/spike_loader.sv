@@ -1,7 +1,6 @@
-module weight_loader #(
-    parameter int N_INPUTS  = 31,
-    parameter int N_OUTPUTS = 4
-) (
+module spike_loader #(
+    parameter int N_INPUTS  = 31
+    ) (
     input  logic        clk, rst, en,
     input  logic [7:0]  data,
     input  logic [7:0] adr,

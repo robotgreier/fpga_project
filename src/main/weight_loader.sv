@@ -2,6 +2,7 @@ module weight_loader #(
     parameter int N_INPUTS     = 31,
     parameter int N_OUTPUTS    = 4,
     parameter int FEEDBACK     = 1,
+    parameter int W_INIT       = 64
   ) (
     input logic clk, rst, w_en,
     input logic [7:0] data,
@@ -13,10 +14,12 @@ module weight_loader #(
 
   always_ff @(posedge clk)
   begin : get_weight
-    if (w_en)
+    if (rst)
+      foreach (w_temp[i,j]) w_temp[i][j] <= W_INIT[7:0];
+    else if (w_en)
     begin
       // Decode adr into matrix indices
-    [j][ii] : j = adr / (N_INPUTS+FEEDBACK), ii = adr % (N_INPUTS+FEEDBACK);
+      automatic int j = adr / (N_INPUTS+FEEDBACK); automatic int ii = adr % (N_INPUTS+FEEDBACK);
       w_temp[j][ii] <= data;
     end
   end

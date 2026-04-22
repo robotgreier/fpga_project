@@ -9,7 +9,6 @@ module WTA #(
 
   logic [15:0] max_mem;
 
-  // A winner exists only when at least one neuron spiked
   assign winner_valid = |spk;
 
   always_comb begin

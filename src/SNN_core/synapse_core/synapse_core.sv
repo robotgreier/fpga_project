@@ -22,7 +22,7 @@ module synapse_core #(
 
   // Internal signals
   logic signed [8:0]  elig_trace; // Eligibility trace (matches eligibility_updater output)
-  logic signed [7:0]  delta_w;    // Weight change from reward application
+  logic signed [8:0]  delta_w;    // Weight change from reward application
   logic signed [9:0]  w_sum;      // Intermediate sum before clamping
 
   assign I_syn = (pre_spk) ? w_syn : 8'h00; // Output synaptic current based on pre-synaptic spike
@@ -50,8 +50,6 @@ module synapse_core #(
     .LR_SHIFT(LR_SHIFT),
     .LEARNING_MODE(LEARNING_MODE)
   ) reward_app (
-    .clk       (clk),
-    .rst       (rst),
     .dopamine  (dopamine),
     .elig_trace(elig_trace),
     .reward_en (reward_en),
@@ -59,7 +57,7 @@ module synapse_core #(
   );
 
   // Compute sum combinationally, then clamp
-  assign w_sum = $signed(10'({1'b0, w_syn})) + $signed({{2{delta_w[7]}}, delta_w});
+  assign w_sum = $signed(10'({1'b0, w_syn})) + $signed({{1{delta_w[8]}}, delta_w});
 
   always_comb begin
     if      (w_sum > W_MAX) w_next = W_MAX;

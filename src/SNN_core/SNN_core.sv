@@ -45,21 +45,32 @@ module SNN_core #(
   // ---------------------------------------------------------------------------
   logic [7:0] I_syn_mat [N_OUTPUTS-1:0][N_IN_TOTAL-1:0];
 
-  logic [N_OUTPUTS-1:0][15:0]           pre_reset_mem;
-  logic [N_OUTPUTS-1:0][15:0]           i_sum;
+  logic [N_OUTPUTS-1:0]                 spk_raw;       // raw LIF spikes
+  logic signed [N_OUTPUTS-1:0][15:0]    pre_reset_mem;
+  logic signed [N_OUTPUTS-1:0][15:0]    i_sum;
   logic [N_OUTPUTS-1:0][N_IN_TOTAL-1:0] pre_spk_gated;
   logic [N_OUTPUTS-1:0]                 post_spk_gated;
   logic [N_OUTPUTS-1:0]                 reward_en_syn;
   logic [N_OUTPUTS-1:0]                 inhibit;
 
   // ---------------------------------------------------------------------------
-  // WTA: combinational from registered spk_out and pre_reset_mem
+  // WTA: picks winner from raw LIF spikes
   // ---------------------------------------------------------------------------
+  logic winner_valid;
+
   WTA #(.N_OUTPUTS(N_OUTPUTS)) wta_inst (
-    .spk(spk_out),
+    .spk          (spk_raw),
     .pre_reset_mem(pre_reset_mem),
-    .winner_idx(winner_idx)
+    .winner_idx   (winner_idx),
+    .winner_valid (winner_valid)
   );
+
+  // Build one-hot spk_out from winner_idx
+  always_comb begin
+    spk_out = '0;
+    if (winner_valid)
+      spk_out[winner_idx] = 1'b1;
+  end
 
   // ---------------------------------------------------------------------------
   // Spike gating, reward enable, lateral inhibition
@@ -67,8 +78,8 @@ module SNN_core #(
   always_comb
     for (int j = 0; j < N_OUTPUTS; j++) begin
       // STDP: only winner row sees real spikes; all others are suppressed
-      pre_spk_gated[j]  = (LEARNING_MODE == 2 && winner_idx != j) ? '0   : spiketrain_fb;
-      post_spk_gated[j] = (LEARNING_MODE == 2 && winner_idx != j) ? 1'b0 : spk_out[j];
+      pre_spk_gated[j]  = (LEARNING_MODE == 2 && (!winner_valid || winner_idx != j)) ? '0   : spiketrain_fb;
+      post_spk_gated[j] = (LEARNING_MODE == 2 && (!winner_valid || winner_idx != j)) ? 1'b0 : spk_out[j];
       inhibit[j]        = (LEARNING_MODE == 2) & (winner_idx != j) & |spk_out;
 
       unique case (LEARNING_MODE)
@@ -102,7 +113,7 @@ module SNN_core #(
       .rst(rst),
       .inhibit(inhibit[j]),
       .i_syn(i_sum[j]),
-      .spk(spk_out[j]),
+      .spk(spk_raw[j]),
       .pre_reset_mem(pre_reset_mem[j])
     );
 
