@@ -30,6 +30,11 @@ module master #(
         output wire [BIT_WIDTH-1:0] data_out
     );
 
+    // SNN data address map:
+    // 0-127: Weights (128 bytes)
+    // 199: Dopamine level (1 byte)
+    // 200-211: spike data (11 bytes) - each byte contains 3 spikes with 2 bits each, and 2 bits unused
+
     reg [2:0] state;
 
     parameter IDLE = 0;
