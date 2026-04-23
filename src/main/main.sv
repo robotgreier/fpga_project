@@ -320,7 +320,12 @@ SNN_core #(
 
 // ----------------------- Connections ------------------------------ //
 
+// Weight mux
+localparam WEIGHT_N = (N_INPUTS+FEEDBACK)*N_OUTPUTS*8;
+logic [7:0]   out;
+logic [$clog2(WEIGHT_N/8)-1:0] weight_select;
 
+assign weight_out = w_parallel_out[weight_select*8 +: 8];
 
 
 
