@@ -39,6 +39,7 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/src/SNN_core/synapse_core/tb_apply_reward.sv"]"\
  "[file normalize "$origin_dir/src/uart_tx.sv"]"\
  "[file normalize "$origin_dir/src/timer.sv"]"\
+ "[file normalize "$origin_dir/src/main/master.sv"]"\
  "[file normalize "$origin_dir/src/SNN_core/LIF_core/LIF_core.sv"]"\
  "[file normalize "$origin_dir/src/SNN_core/SNN_core.sv"]"\
  "[file normalize "$origin_dir/src/SNN_core/WTA.sv"]"\
@@ -46,7 +47,6 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/src/SNN_core/synapse_core/eligibility_updater.sv"]"\
  "[file normalize "$origin_dir/src/main/fifo_memory.sv"]"\
  "[file normalize "$origin_dir/src/main/fletcher.sv"]"\
- "[file normalize "$origin_dir/src/main/master.sv"]"\
  "[file normalize "$origin_dir/src/main/packer.sv"]"\
  "[file normalize "$origin_dir/src/main/spike_loader.sv"]"\
  "[file normalize "$origin_dir/src/SNN_core/synapse_core/synapse_core.sv"]"\
@@ -243,6 +243,7 @@ set files [list \
  [file normalize "${origin_dir}/src/SNN_core/synapse_core/tb_apply_reward.sv"] \
  [file normalize "${origin_dir}/src/uart_tx.sv"] \
  [file normalize "${origin_dir}/src/timer.sv"] \
+ [file normalize "${origin_dir}/src/main/master.sv"] \
  [file normalize "${origin_dir}/src/SNN_core/LIF_core/LIF_core.sv"] \
  [file normalize "${origin_dir}/src/SNN_core/SNN_core.sv"] \
  [file normalize "${origin_dir}/src/SNN_core/WTA.sv"] \
@@ -250,7 +251,6 @@ set files [list \
  [file normalize "${origin_dir}/src/SNN_core/synapse_core/eligibility_updater.sv"] \
  [file normalize "${origin_dir}/src/main/fifo_memory.sv"] \
  [file normalize "${origin_dir}/src/main/fletcher.sv"] \
- [file normalize "${origin_dir}/src/main/master.sv"] \
  [file normalize "${origin_dir}/src/main/packer.sv"] \
  [file normalize "${origin_dir}/src/main/spike_loader.sv"] \
  [file normalize "${origin_dir}/src/SNN_core/synapse_core/synapse_core.sv"] \
@@ -385,6 +385,11 @@ set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 set_property -name "used_in" -value "synthesis implementation" -objects $file_obj
 set_property -name "used_in_simulation" -value "0" -objects $file_obj
 
+set file "$origin_dir/src/main/master.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
 set file "$origin_dir/src/SNN_core/LIF_core/LIF_core.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
@@ -418,11 +423,6 @@ set_property -name "used_in" -value "synthesis implementation" -objects $file_ob
 set_property -name "used_in_simulation" -value "0" -objects $file_obj
 
 set file "$origin_dir/src/main/fletcher.sv"
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file "$origin_dir/src/main/master.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj

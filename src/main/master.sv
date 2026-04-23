@@ -23,7 +23,6 @@
 module master #(
         parameter BIT_WIDTH = 8,
         parameter LEN_MAX = 8,
-        parameter WEIGHT_MAX = 128
     )(
         input wire clk, ready, success, tx_ready, reset,
         input wire [BIT_WIDTH-1:0] data_in,
