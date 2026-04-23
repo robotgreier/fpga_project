@@ -18,7 +18,6 @@
 proc checkRequiredFiles { origin_dir} {
   set status true
   set files [list \
-<<<<<<< HEAD
  "[file normalize "$origin_dir/src/SNN_core/synapse_core/weight_updater.sv"]"\
  "[file normalize "$origin_dir/src/uart_rx.sv"]"\
  "[file normalize "$origin_dir/src/main/fifo_memory_tb.sv"]"\
@@ -39,35 +38,7 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/src/SNN_core/tb_WTA.sv"]"\
  "[file normalize "$origin_dir/src/SNN_core/synapse_core/tb_apply_reward.sv"]"\
  "[file normalize "$origin_dir/src/uart_tx.sv"]"\
-=======
- "[file normalize "$origin_dir/vivado_project/main_tb_behav.wcfg"]"\
- "[file normalize "$origin_dir/vivado_project/vivado_project.srcs/utils_1/imports/synth_1/main.dcp"]"\
-  ]
-  foreach ifile $files {
-    if { ![file isfile $ifile] } {
-      puts " Could not find local file $ifile "
-      set status false
-    }
-  }
-
-  set files [list \
- "[file normalize "$origin_dir/src/SNN_core/synapse_core/tb_synapse_core.sv"]"\
- "[file normalize "$origin_dir/src/SNN_core/synapse_core/tb_apply_reward.sv"]"\
- "[file normalize "$origin_dir/src/SNN_core/synapse_core/tb_eligibility_updater.sv"]"\
- "[file normalize "$origin_dir/src/SNN_core/LIF_core/tb_LIF_core.sv"]"\
- "[file normalize "$origin_dir/src/main/tb_weight_loader.sv"]"\
- "[file normalize "$origin_dir/src/main/main_tb.sv"]"\
- "[file normalize "$origin_dir/src/main/tb_spike_loader.sv"]"\
- "[file normalize "$origin_dir/src/main/fletcher_tb.sv"]"\
- "[file normalize "$origin_dir/src/main/fifo_memory_tb.sv"]"\
- "[file normalize "$origin_dir/src/main/tb_weight_dumper.sv"]"\
- "[file normalize "$origin_dir/src/main/verifier_fletcher_fifo_tb.sv"]"\
- "[file normalize "$origin_dir/src/main/packer_tb.sv"]"\
- "[file normalize "$origin_dir/src/main/uart_tx_tb.sv"]"\
- "[file normalize "$origin_dir/src/main/verifier_tb.sv"]"\
- "[file normalize "$origin_dir/src/SNN_core/tb_WTA.sv"]"\
- "[file normalize "$origin_dir/src/SNN_core/tb_SNN_core.sv"]"\
->>>>>>> a2bc8312331d2435be1d0569dd06b059eff4cca9
+ "[file normalize "$origin_dir/src/timer.sv"]"\
  "[file normalize "$origin_dir/src/SNN_core/LIF_core/LIF_core.sv"]"\
  "[file normalize "$origin_dir/src/SNN_core/SNN_core.sv"]"\
  "[file normalize "$origin_dir/src/SNN_core/WTA.sv"]"\
@@ -79,7 +50,6 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/src/main/packer.sv"]"\
  "[file normalize "$origin_dir/src/main/spike_loader.sv"]"\
  "[file normalize "$origin_dir/src/SNN_core/synapse_core/synapse_core.sv"]"\
- "[file normalize "$origin_dir/src/main/timer.sv"]"\
  "[file normalize "$origin_dir/src/main/uart_rx.sv"]"\
  "[file normalize "$origin_dir/src/main/uart_tx.sv"]"\
  "[file normalize "$origin_dir/src/main/verifier.sv"]"\
@@ -87,7 +57,6 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/src/main/weight_loader.sv"]"\
  "[file normalize "$origin_dir/src/main/main.sv"]"\
  "[file normalize "$origin_dir/src/Arty-A7-100-Master.xdc"]"\
-<<<<<<< HEAD
  "[file normalize "$origin_dir/src/main/verifier.sv"]"\
  "[file normalize "$origin_dir/src/main/verifier_fletcher_fifo_tb.sv"]"\
  "[file normalize "$origin_dir/src/main/fifo_memory_tb.sv"]"\
@@ -115,8 +84,6 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/src/SNN_core/synapse_core/eligibility_updater.sv"]"\
  "[file normalize "$origin_dir/src/SNN_core/synapse_core/synapse_core.sv"]"\
  "[file normalize "$origin_dir/src/SNN_core/tb_SNN_core.sv"]"\
-=======
->>>>>>> a2bc8312331d2435be1d0569dd06b059eff4cca9
   ]
   foreach ifile $files {
     if { ![file isfile $ifile] } {
@@ -244,7 +211,7 @@ set_property -name "simulator.xsim_version" -value "2025.2" -objects $obj
 set_property -name "simulator_language" -value "Mixed" -objects $obj
 set_property -name "sim_compile_state" -value "1" -objects $obj
 set_property -name "use_inline_hdl_ip" -value "1" -objects $obj
-set_property -name "webtalk.xsim_launch_sim" -value "456" -objects $obj
+set_property -name "webtalk.xsim_launch_sim" -value "457" -objects $obj
 
 # Create 'sources_1' fileset (if not found)
 if {[string equal [get_filesets -quiet sources_1] ""]} {
@@ -254,7 +221,6 @@ if {[string equal [get_filesets -quiet sources_1] ""]} {
 # Set 'sources_1' fileset object
 set obj [get_filesets sources_1]
 set files [list \
-<<<<<<< HEAD
  [file normalize "${origin_dir}/src/SNN_core/synapse_core/weight_updater.sv"] \
  [file normalize "${origin_dir}/src/uart_rx.sv"] \
  [file normalize "${origin_dir}/src/main/fifo_memory_tb.sv"] \
@@ -275,24 +241,7 @@ set files [list \
  [file normalize "${origin_dir}/src/SNN_core/tb_WTA.sv"] \
  [file normalize "${origin_dir}/src/SNN_core/synapse_core/tb_apply_reward.sv"] \
  [file normalize "${origin_dir}/src/uart_tx.sv"] \
-=======
- [file normalize "${origin_dir}/src/SNN_core/synapse_core/tb_synapse_core.sv"] \
- [file normalize "${origin_dir}/src/SNN_core/synapse_core/tb_apply_reward.sv"] \
- [file normalize "${origin_dir}/src/SNN_core/synapse_core/tb_eligibility_updater.sv"] \
- [file normalize "${origin_dir}/src/SNN_core/LIF_core/tb_LIF_core.sv"] \
- [file normalize "${origin_dir}/src/main/tb_weight_loader.sv"] \
- [file normalize "${origin_dir}/src/main/main_tb.sv"] \
- [file normalize "${origin_dir}/src/main/tb_spike_loader.sv"] \
- [file normalize "${origin_dir}/src/main/fletcher_tb.sv"] \
- [file normalize "${origin_dir}/src/main/fifo_memory_tb.sv"] \
- [file normalize "${origin_dir}/src/main/tb_weight_dumper.sv"] \
- [file normalize "${origin_dir}/src/main/verifier_fletcher_fifo_tb.sv"] \
- [file normalize "${origin_dir}/src/main/packer_tb.sv"] \
- [file normalize "${origin_dir}/src/main/uart_tx_tb.sv"] \
- [file normalize "${origin_dir}/src/main/verifier_tb.sv"] \
- [file normalize "${origin_dir}/src/SNN_core/tb_WTA.sv"] \
- [file normalize "${origin_dir}/src/SNN_core/tb_SNN_core.sv"] \
->>>>>>> a2bc8312331d2435be1d0569dd06b059eff4cca9
+ [file normalize "${origin_dir}/src/timer.sv"] \
  [file normalize "${origin_dir}/src/SNN_core/LIF_core/LIF_core.sv"] \
  [file normalize "${origin_dir}/src/SNN_core/SNN_core.sv"] \
  [file normalize "${origin_dir}/src/SNN_core/WTA.sv"] \
@@ -304,7 +253,6 @@ set files [list \
  [file normalize "${origin_dir}/src/main/packer.sv"] \
  [file normalize "${origin_dir}/src/main/spike_loader.sv"] \
  [file normalize "${origin_dir}/src/SNN_core/synapse_core/synapse_core.sv"] \
- [file normalize "${origin_dir}/src/main/timer.sv"] \
  [file normalize "${origin_dir}/src/main/uart_rx.sv"] \
  [file normalize "${origin_dir}/src/main/uart_tx.sv"] \
  [file normalize "${origin_dir}/src/main/verifier.sv"] \
@@ -315,58 +263,10 @@ set files [list \
 add_files -norecurse -fileset $obj $files
 
 # Set 'sources_1' fileset file properties for remote files
-<<<<<<< HEAD
 set file "$origin_dir/src/SNN_core/synapse_core/weight_updater.sv"
-=======
-set file "$origin_dir/src/SNN_core/synapse_core/tb_synapse_core.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-set_property -name "used_in" -value "implementation simulation" -objects $file_obj
-set_property -name "used_in_synthesis" -value "0" -objects $file_obj
-
-set file "$origin_dir/src/SNN_core/synapse_core/tb_apply_reward.sv"
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-set_property -name "used_in" -value "implementation simulation" -objects $file_obj
-set_property -name "used_in_synthesis" -value "0" -objects $file_obj
-
-set file "$origin_dir/src/SNN_core/synapse_core/tb_eligibility_updater.sv"
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-set_property -name "used_in" -value "implementation simulation" -objects $file_obj
-set_property -name "used_in_synthesis" -value "0" -objects $file_obj
-
-set file "$origin_dir/src/SNN_core/LIF_core/tb_LIF_core.sv"
->>>>>>> a2bc8312331d2435be1d0569dd06b059eff4cca9
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-set_property -name "used_in" -value "implementation simulation" -objects $file_obj
-set_property -name "used_in_synthesis" -value "0" -objects $file_obj
-
-set file "$origin_dir/src/main/tb_weight_loader.sv"
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-set_property -name "used_in" -value "implementation simulation" -objects $file_obj
-set_property -name "used_in_synthesis" -value "0" -objects $file_obj
-
-set file "$origin_dir/src/main/main_tb.sv"
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-set_property -name "used_in" -value "implementation simulation" -objects $file_obj
-set_property -name "used_in_synthesis" -value "0" -objects $file_obj
-
-set file "$origin_dir/src/main/tb_spike_loader.sv"
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-set_property -name "used_in" -value "implementation simulation" -objects $file_obj
-set_property -name "used_in_synthesis" -value "0" -objects $file_obj
 
 set file "$origin_dir/src/uart_rx.sv"
 set file [file normalize $file]
@@ -380,16 +280,6 @@ set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 set_property -name "used_in" -value "implementation simulation" -objects $file_obj
 set_property -name "used_in_synthesis" -value "0" -objects $file_obj
 
-<<<<<<< HEAD
-=======
-set file "$origin_dir/src/main/tb_weight_dumper.sv"
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-set_property -name "used_in" -value "implementation simulation" -objects $file_obj
-set_property -name "used_in_synthesis" -value "0" -objects $file_obj
-
->>>>>>> a2bc8312331d2435be1d0569dd06b059eff4cca9
 set file "$origin_dir/src/main/verifier_fletcher_fifo_tb.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
@@ -397,7 +287,6 @@ set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 set_property -name "used_in" -value "implementation simulation" -objects $file_obj
 set_property -name "used_in_synthesis" -value "0" -objects $file_obj
 
-<<<<<<< HEAD
 set file "$origin_dir/src/main/verifier_tb.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
@@ -435,16 +324,12 @@ set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 
 set file "$origin_dir/src/main/main_tb.sv"
-=======
-set file "$origin_dir/src/main/packer_tb.sv"
->>>>>>> a2bc8312331d2435be1d0569dd06b059eff4cca9
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 set_property -name "used_in" -value "implementation simulation" -objects $file_obj
 set_property -name "used_in_synthesis" -value "0" -objects $file_obj
 
-<<<<<<< HEAD
 set file "$origin_dir/src/SNN_core/synapse_core/tb_eligibility_updater.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
@@ -456,28 +341,11 @@ set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 
 set file "$origin_dir/src/SNN_core/tb_SNN_core.sv"
-=======
-set file "$origin_dir/src/main/uart_tx_tb.sv"
->>>>>>> a2bc8312331d2435be1d0569dd06b059eff4cca9
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 
-set file "$origin_dir/src/main/verifier_tb.sv"
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-set_property -name "used_in" -value "implementation simulation" -objects $file_obj
-set_property -name "used_in_synthesis" -value "0" -objects $file_obj
-
-set file "$origin_dir/src/SNN_core/tb_WTA.sv"
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-set_property -name "used_in" -value "implementation simulation" -objects $file_obj
-set_property -name "used_in_synthesis" -value "0" -objects $file_obj
-
-set file "$origin_dir/src/SNN_core/tb_SNN_core.sv"
+set file "$origin_dir/src/main/packer_tb.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
@@ -508,6 +376,13 @@ set file "$origin_dir/src/uart_tx.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
+set file "$origin_dir/src/timer.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+set_property -name "used_in" -value "synthesis implementation" -objects $file_obj
+set_property -name "used_in_simulation" -value "0" -objects $file_obj
 
 set file "$origin_dir/src/SNN_core/LIF_core/LIF_core.sv"
 set file [file normalize $file]
@@ -566,11 +441,6 @@ set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 
-set file "$origin_dir/src/main/timer.sv"
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
 set file "$origin_dir/src/main/uart_rx.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
@@ -602,6 +472,8 @@ set file "$origin_dir/src/main/main.sv"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+set_property -name "used_in" -value "synthesis implementation" -objects $file_obj
+set_property -name "used_in_simulation" -value "0" -objects $file_obj
 
 
 # Set 'sources_1' fileset file properties for local files
@@ -640,7 +512,6 @@ if {[string equal [get_filesets -quiet sim_1] ""]} {
 
 # Set 'sim_1' fileset object
 set obj [get_filesets sim_1]
-<<<<<<< HEAD
 set files [list \
  [file normalize "${origin_dir}/src/main/verifier.sv"] \
  [file normalize "${origin_dir}/src/main/verifier_fletcher_fifo_tb.sv"] \
@@ -808,16 +679,6 @@ set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sim_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 
-=======
-# Add local files from the original project (-no_copy_sources specified)
-set files [list \
- [file normalize "${origin_dir}/vivado_project/main_tb_behav.wcfg" ]\
-]
-set added_files [add_files -fileset sim_1 $files]
-
-# Set 'sim_1' fileset file properties for remote files
-# None
->>>>>>> a2bc8312331d2435be1d0569dd06b059eff4cca9
 
 # Set 'sim_1' fileset file properties for local files
 # None
@@ -825,12 +686,8 @@ set added_files [add_files -fileset sim_1 $files]
 # Set 'sim_1' fileset properties
 set obj [get_filesets sim_1]
 set_property -name "sim_wrapper_top" -value "1" -objects $obj
-<<<<<<< HEAD
-set_property -name "top" -value "tb_spike_loader" -objects $obj
+set_property -name "top" -value "tb_weight_loader" -objects $obj
 set_property -name "top_auto_set" -value "0" -objects $obj
-=======
-set_property -name "top" -value "packer_tb" -objects $obj
->>>>>>> a2bc8312331d2435be1d0569dd06b059eff4cca9
 set_property -name "top_lib" -value "xil_defaultlib" -objects $obj
 set_property -name "xsim.simulate.runtime" -value "5000ns" -objects $obj
 
