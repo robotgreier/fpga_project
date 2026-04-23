@@ -54,7 +54,7 @@ end
 
 // ----------------------- Verification things ------------------------------ //
 wire  master_read, master_write, master_commit, master_transmit; // Master signals
-wire  [7:0] master_data;
+wire  [7:0] master_data, master_address;
 
 wire  verifier_ready, // Verifier signals
       verifier_success,
@@ -229,7 +229,7 @@ end
 
 // Load weights
 // Temp signals
-logic [7:0] master_address;
+// logic [7:0] master_address; // Placed by master signals
 logic w_en, d_en;
 
 weight_loader #(
@@ -320,7 +320,12 @@ SNN_core #(
 
 // ----------------------- Connections ------------------------------ //
 
+// Weight mux
+localparam WEIGHT_N = (N_INPUTS+FEEDBACK)*N_OUTPUTS*8;
+logic [7:0]   out;
+logic [$clog2(WEIGHT_N/8)-1:0] weight_select;
 
+assign weight_out = w_parallel_out[weight_select*8 +: 8];
 
 
 
