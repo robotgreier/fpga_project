@@ -33,7 +33,7 @@ module master #(
     // SNN data address map:
     // 0-127: Weights (128 bytes)
     // 199: Dopamine level (1 byte)
-    // 200-211: spike data (11 bytes) - each byte contains 3 spikes with 2 bits each, and 2 bits unused
+    // 200-211: spike data (11 bytes - 32/3 ~ 11) - each byte contains 3 spikes with 2 bits each, and 2 bits unused
 
     reg [2:0] state;
 
