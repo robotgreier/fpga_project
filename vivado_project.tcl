@@ -84,6 +84,7 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/src/SNN_core/synapse_core/eligibility_updater.sv"]"\
  "[file normalize "$origin_dir/src/SNN_core/synapse_core/synapse_core.sv"]"\
  "[file normalize "$origin_dir/src/SNN_core/tb_SNN_core.sv"]"\
+ "[file normalize "$origin_dir/src/main/tb_weight_loader.sv"]"\
   ]
   foreach ifile $files {
     if { ![file isfile $ifile] } {
@@ -211,7 +212,7 @@ set_property -name "simulator.xsim_version" -value "2025.2" -objects $obj
 set_property -name "simulator_language" -value "Mixed" -objects $obj
 set_property -name "sim_compile_state" -value "1" -objects $obj
 set_property -name "use_inline_hdl_ip" -value "1" -objects $obj
-set_property -name "webtalk.xsim_launch_sim" -value "457" -objects $obj
+set_property -name "webtalk.xsim_launch_sim" -value "459" -objects $obj
 
 # Create 'sources_1' fileset (if not found)
 if {[string equal [get_filesets -quiet sources_1] ""]} {
@@ -540,6 +541,7 @@ set files [list \
  [file normalize "${origin_dir}/src/SNN_core/synapse_core/eligibility_updater.sv"] \
  [file normalize "${origin_dir}/src/SNN_core/synapse_core/synapse_core.sv"] \
  [file normalize "${origin_dir}/src/SNN_core/tb_SNN_core.sv"] \
+ [file normalize "${origin_dir}/src/main/tb_weight_loader.sv"] \
 ]
 add_files -norecurse -fileset $obj $files
 
@@ -679,6 +681,11 @@ set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sim_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 
+set file "$origin_dir/src/main/tb_weight_loader.sv"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sim_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
 
 # Set 'sim_1' fileset file properties for local files
 # None
@@ -686,7 +693,7 @@ set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 # Set 'sim_1' fileset properties
 set obj [get_filesets sim_1]
 set_property -name "sim_wrapper_top" -value "1" -objects $obj
-set_property -name "top" -value "tb_weight_loader" -objects $obj
+set_property -name "top" -value "tb_weight_dumper" -objects $obj
 set_property -name "top_auto_set" -value "0" -objects $obj
 set_property -name "top_lib" -value "xil_defaultlib" -objects $obj
 set_property -name "xsim.simulate.runtime" -value "5000ns" -objects $obj
