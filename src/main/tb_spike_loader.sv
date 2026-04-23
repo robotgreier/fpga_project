@@ -20,7 +20,7 @@ module tb_spike_loader ();
 
     always #5 clk = ~clk;
 
-    spike_loader #(.N_INPUTS(N_INPUTS)) dut (
+    spike_loader #(.N_INPUTS(N_INPUTS), .ADR_OFFSET(200)) dut (
         .clk(clk), .rst(rst), .en(en),
         .data(data), .adr(adr), .done(done),
         .spiketrain(spiketrain)
@@ -70,7 +70,7 @@ module tb_spike_loader ();
         //   spiketrain[30:28] should become 3'b111 after done
         // ==================================================================
         $display("\n[%0t] TEST 2: load 3 spikes into top chunk", $time);
-        load(8'b00_11_11_11, 8'd0);
+        load(8'b00_11_11_11, 8'd200);
         pulse_done();
         check("spiketrain[30:28] == 3'b111", spiketrain[30:28] === 3'b111);
         check("other bits still 0",          spiketrain[27:0]  === 28'd0);
@@ -82,7 +82,7 @@ module tb_spike_loader ();
         //   spiketrain[27:25] should become 3'b101
         // ==================================================================
         $display("\n[%0t] TEST 3: load spikes 3'b101 into chunk 1", $time);
-        load(8'b00_11_00_11, 8'd1);
+        load(8'b00_11_00_11, 8'd201);
         pulse_done();
         check("spiketrain[27:25] == 3'b101", spiketrain[27:25] === 3'b101);
         check("top chunk preserved",         spiketrain[30:28] === 3'b111);
@@ -91,7 +91,7 @@ module tb_spike_loader ();
         // TEST 4: Invalid pair (not 00 / 11) → ignored (pair_valid = 0)
         // ==================================================================
         $display("\n[%0t] TEST 4: invalid pair is ignored", $time);
-        load(8'b00_01_00_00, 8'd2);  // pair 01 invalid
+        load(8'b00_01_00_00, 8'd202);  // pair 01 invalid
         pulse_done();
         check("spiketrain[24:22] still 0", spiketrain[24:22] === 3'b000);
 
