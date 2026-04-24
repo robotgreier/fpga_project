@@ -281,14 +281,26 @@ spike_loader #(
     .spiketrain(spiketrain)
 );
 
+// Temp signals
+logic signed [3:0] dopamine;
+logic reward_en;
+
+dopamine_loader #(
+    .N_OUTPUTS(N_OUTPUTS)
+) d_loader (
+    .clk(clk),
+    .rst(reset),
+    .en(d_en),
+    .data(fifo_in_data),
+    .adr(master_address),  
+    .dopamine(dopamine),
+    .reward_en(reward_en)
+);
+
 
 // Instantiate SNN core
 logic [N_OUTPUTS-1:0] spk_out;
 logic [$clog2(N_OUTPUTS)-1:0] winner_idx;
-
-// Temp signals
-logic signed [7:0] dopamine;
-logic reward_en;
 
 SNN_core #(
     .DECAY(DECAY),
