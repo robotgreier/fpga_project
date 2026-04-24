@@ -1,8 +1,9 @@
 module weight_loader #(
-    parameter int N_INPUTS     = 31,
-    parameter int N_OUTPUTS    = 4,
-    parameter int FEEDBACK     = 1,
-    parameter int W_INIT       = 64
+    parameter int N_INPUTS      = 31,
+    parameter int N_OUTPUTS     = 4,
+    parameter int FEEDBACK      = 1,
+    parameter int W_INIT        = 131,
+    parameter bit RESET_WEIGHTS = 0   // 1: rst wipes w_temp to W_INIT, 0: w_temp survives rst
   ) (
     input logic clk, rst, w_en,
     input logic [7:0] data,
@@ -15,9 +16,11 @@ module weight_loader #(
 
   logic [7:0] w_temp  [N_OUTPUTS-1:0][(N_INPUTS+FEEDBACK)-1:0];
 
+  initial foreach (w_temp[i,j]) w_temp[i][j] = W_INIT[7:0];
+
   always_ff @(posedge clk)
   begin : get_weight
-    if (rst)
+    if (RESET_WEIGHTS && rst)
       foreach (w_temp[i,j]) w_temp[i][j] <= W_INIT[7:0];
     else if (w_en && adr >= ADR_MIN && adr <= ADR_MAX)
     begin

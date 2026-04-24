@@ -12,6 +12,7 @@ module main #(
     parameter int W_MIN         = 8,
     parameter int W_MAX         = 254,
     parameter logic [7:0] W_INIT = (W_MIN + W_MAX) / 2,
+    parameter bit RESET_WEIGHTS = 0,  // 1: reset wipes weights to W_INIT, 0: weights survive reset
     parameter int LEARNING_MODE = 0,  // 0: None, 1: R-STDP, 2: STDP
     parameter int N_INPUTS      = 31,
     parameter int N_OUTPUTS     = 4,
@@ -231,9 +232,12 @@ packer #(
 logic [7:0] w_syn  [N_OUTPUTS-1:0][(N_INPUTS+FEEDBACK)-1:0];
 logic [7:0] w_next [N_OUTPUTS-1:0][(N_INPUTS+FEEDBACK)-1:0];
 
-// Initializing the weight matrix to default values at reset, otherwise w_next
+// Power-on init so weights start at W_INIT after FPGA configuration even when
+// RESET_WEIGHTS=0 and reset never wipes them.
+initial foreach (w_syn[i,j]) w_syn[i][j] = W_INIT;
+
 always_ff @(posedge clk) begin
-  if (reset)
+  if (RESET_WEIGHTS && reset)
     foreach (w_syn[i,j]) w_syn[i][j] <= W_INIT;
   else
     w_syn <= w_next;
@@ -248,7 +252,8 @@ weight_loader #(
     .N_INPUTS(N_INPUTS),
     .N_OUTPUTS(N_OUTPUTS),
     .FEEDBACK(FEEDBACK),
-    .W_INIT(W_INIT)
+    .W_INIT(W_INIT),
+    .RESET_WEIGHTS(RESET_WEIGHTS)
 ) w_loader (
     .clk(clk),
     .rst(reset),
