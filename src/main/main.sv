@@ -18,18 +18,19 @@ module main #(
     parameter int FEEDBACK      = 1,   // 1: append NOR-feedback neuron as extra input
     // Main parameters
     parameter int MAX_DATA      = 16,
-    parameter int BIT_WIDTH     = 8
+    parameter int BIT_WIDTH     = 8 // Must be over N_OUTPUTS
   )(
   input logic CLK100MHZ, uart_txd_in,
   output wire uart_rxd_out
 );
 
 // Connections
-wire clk, rx, tx;
-reg reset;
+wire clk, rx, tx, reset;
+reg start_reset;
 assign clk = CLK100MHZ;
 assign rx = uart_txd_in;
 assign tx = uart_rxd_out;
+assign reset = start_reset | master_reset;
 
 // Reset logic
 reg reset_counter = 0;
@@ -38,12 +39,12 @@ reg already_reset = 0;
 always @(posedge clk) begin
   if (already_reset == 1'b0) begin  // Check if system is already delayed
     if (reset_counter >= 60) begin // Check if counter is over 60 cycles
-      if (reset == 1'b1) begin // Check if reset signal is high
-        reset <= 1'b0;
+      if (start_reset == 1'b1) begin // Check if reset signal is high
+        start_reset <= 1'b0;
         already_reset <= 1'b1;
       end
       else begin
-        reset <= 1'b1;
+        start_reset <= 1'b1;
       end
     end
     else begin
@@ -53,8 +54,10 @@ always @(posedge clk) begin
 end
 
 // ----------------------- Verification things ------------------------------ //
-wire  master_read, master_write, master_commit, master_transmit; // Master signals
+wire  master_read, master_write, master_commit, master_reset; // Master signals
 wire  [7:0] master_data, master_address;
+wire [$clog2(WEIGHT_N)-1:0] master_weight_select;
+wire [$clog2(DATA_N)-1:0] master_data_select;
 
 wire  verifier_ready, // Verifier signals
       verifier_success,
@@ -68,7 +71,8 @@ wire  packer_transmit, // Packer signals
       packer_check,
       packer_fifo_reset,
       packer_fletcher_reset,
-      packer_read;
+      packer_read,
+      packer_err_empty;
 wire  [7:0] packer_data;
 
 wire  fifo_in_full, fifo_in_empty; // fifo_in signals
@@ -90,17 +94,24 @@ wire  tx_ready; // TX signals
 
 master #(
   .BIT_WIDTH(BIT_WIDTH),
-  .LEN_MAX(MAX_DATA)
+  .LEN_MAX(MAX_DATA),
+  .WEIGHT_SELECT(WEIGHT_N),
+  .DATA_SELECT(DATA_N)
 ) mas (
   .clk(clk),
   .ready(verifier_ready),
   .success(verifier_success),
-  .tx_ready(tx_ready),
   .reset(reset),
+  .empty(fifo_in_empty),
+  .err_empty(packer_err_empty),
   .data_in(fifo_in_data),
   .read(master_read),
-  .transmit(master_transmit),
-  .data_out(master_data)
+  .write(master_write),
+  .commit(master_commit),
+  .master_reset(master_reset),
+  .data_out(master_data),
+  .weight_select(master_weight_select),
+  .data_select(master_data_select)
 );
 
 uart_rx #(
@@ -191,7 +202,7 @@ fifo_memory #(
     .read(packer_read),
     .full(fifo_out_full),
     .empty(fifo_out_empty),
-    .data_in(master_data),
+    .data_in(data_out),
     .data_out(fifo_out_data)
 );
 
@@ -210,7 +221,8 @@ packer #(
     .fifo_reset(packer_fifo_reset),
     .fletcher_reset(packer_fletcher_reset),
     .read(packer_read),
-    .data(packer_data)
+    .data(packer_data),
+    .err_empty(packer_err_empty)
 );
 
 // ----------------------- SNN things ------------------------------ //
@@ -321,12 +333,27 @@ SNN_core #(
 // ----------------------- Connections ------------------------------ //
 
 // Weight mux
-localparam WEIGHT_N = (N_INPUTS+FEEDBACK)*N_OUTPUTS*8;
-logic [7:0]   out;
-logic [$clog2(WEIGHT_N/8)-1:0] weight_select;
+localparam WEIGHT_N = (N_INPUTS+FEEDBACK)*N_OUTPUTS;
+logic [BIT_WIDTH-1:0] weight_out;
+logic [$clog2(WEIGHT_N)-1:0] master_weight_select;
 
 assign weight_out = w_parallel_out[weight_select*8 +: 8];
 
+// Data mux
+localparam DATA_N = 3;
+localparam WEIGHT_DATA = 0;
+localparam SPIKE_DATA = 1;
+localparam MASTER_DATA = 2;
+logic [$clog2(DATA_N)-1:0] master_data_select;
+logic [BIT_WIDTH-1:0] data_out;
 
+always_comb begin
+    unique case (data_select)
+        WEIGHT_DATA: data_out = weight_out;
+        SPIKE_DATA: data_out = {{BIT_WIDTH-N_OUTPUTS{1'b0}}, spk_out};
+        MASTER_DATA: data_out = master_data;
+        default: data_out = 0;
+    endcase
+end
 
 endmodule

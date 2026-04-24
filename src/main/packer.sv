@@ -23,10 +23,10 @@
 module packer #(
         parameter BIT_WIDTH = 8
     )(
-        input wire clk, master_transmit, empty, reset, ready,
+        input wire clk empty, reset, ready,
         input wire [BIT_WIDTH-1:0] fifo_data,
         input wire [(BIT_WIDTH*2)-1:0] fletcher_sum,
-        output reg transmit, check, fifo_reset, fletcher_reset, read,
+        output reg transmit, check, fifo_reset, fletcher_reset, read, err_empty,
         output reg [BIT_WIDTH-1:0] data
     );
 
@@ -66,11 +66,12 @@ module packer #(
         fifo_reset <= 0;
         fletcher_reset <= 0;
         read <= 0;
+        err_empty <= 0;
 
         case(state)
             IDLE: begin
                 fletcher_reset <= 1;
-                if (master_transmit) state <= START_WAIT_1;
+                if (!empty) state <= START_WAIT_1;
             end
 
             START_WAIT_1: state <= START_WAIT_2;
@@ -151,6 +152,8 @@ module packer #(
 
         if (empty & (state != IDLE)) begin
             state <= IDLE;
+            err_empty <= 1;
+
         end
         end
     end

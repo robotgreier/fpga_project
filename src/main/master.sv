@@ -23,11 +23,15 @@
 module master #(
         parameter BIT_WIDTH = 8,
         parameter LEN_MAX = 8,
+        parameter WEIGHT_SELECT = 128,
+        parameter DATA_SELECT = 3
     )(
-        input wire clk, ready, success, tx_ready, reset,
+        input wire clk, ready, success, reset, empty, err_empty,
         input wire [BIT_WIDTH-1:0] data_in,
-        output reg read, transmit,
-        output wire [BIT_WIDTH-1:0] data_out
+        output reg read, write, commit, master_reset,
+        output wire [BIT_WIDTH-1:0] data_out,
+        output wire [$clog2(WEIGHT_SELECT)-1:0] weight_select,
+        output wire [$clog2(DATA_SELECT)-1:0] data_select
     );
 
     // SNN data address map:
