@@ -23,7 +23,7 @@
 module packer #(
         parameter BIT_WIDTH = 8
     )(
-        input wire clk empty, reset, ready,
+        input wire clk empty, reset, ready, master_transmit,
         input wire [BIT_WIDTH-1:0] fifo_data,
         input wire [(BIT_WIDTH*2)-1:0] fletcher_sum,
         output reg transmit, check, fifo_reset, fletcher_reset, read, err_empty,
