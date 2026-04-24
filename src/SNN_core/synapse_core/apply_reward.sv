@@ -12,18 +12,19 @@ module apply_reward #(
 
   always_comb begin
     delta_w = '0;
-    if (reward_en) begin
-      if (LEARNING_MODE == 1) begin
+    product = '0;
+    if (LEARNING_MODE == 1) begin
+      if (reward_en) begin
         product = (elig_trace * dopamine) >>> LR_SHIFT;
         if      (product > 255)  delta_w =  255;
         else if (product < -255) delta_w = -255;
         else                     delta_w = product[8:0];
-      end else if (LEARNING_MODE == 2) begin
-        product = elig_trace >>> LR_SHIFT;
-        delta_w = product[8:0]; // safe: elig_trace[-256..255] >> 2 always fits in signed [8:0]
       end
-      // LEARNING_MODE == 0: delta_w stays 0
+    end else if (LEARNING_MODE == 2) begin
+      product = elig_trace >>> LR_SHIFT;
+      delta_w = product[8:0]; // safe: elig_trace[-256..255] >> 2 always fits in signed [8:0]
     end
+    // LEARNING_MODE == 0: delta_w stays 0
   end
 
 endmodule
