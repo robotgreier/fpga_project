@@ -10,13 +10,16 @@ module weight_loader #(
     output logic [7:0] w_next  [N_OUTPUTS-1:0][(N_INPUTS+FEEDBACK)-1:0]
   );
 
+  localparam int ADR_MIN = 0;
+  localparam int ADR_MAX = 198;
+
   logic [7:0] w_temp  [N_OUTPUTS-1:0][(N_INPUTS+FEEDBACK)-1:0];
 
   always_ff @(posedge clk)
   begin : get_weight
     if (rst)
       foreach (w_temp[i,j]) w_temp[i][j] <= W_INIT[7:0];
-    else if (w_en)
+    else if (w_en && adr >= ADR_MIN && adr <= ADR_MAX)
     begin
       // Decode adr into matrix indices
       automatic int j = adr / (N_INPUTS+FEEDBACK); automatic int ii = adr % (N_INPUTS+FEEDBACK);
