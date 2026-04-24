@@ -20,7 +20,7 @@ module tb_spike_loader ();
 
     always #5 clk = ~clk;
 
-    spike_loader #(.N_INPUTS(N_INPUTS), .ADR_OFFSET(200)) dut (
+    spike_loader #(.N_INPUTS(N_INPUTS)) dut (
         .clk(clk), .rst(rst), .en(en),
         .data(data), .adr(adr), .done(done),
         .spiketrain(spiketrain)
