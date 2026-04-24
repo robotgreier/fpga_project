@@ -22,7 +22,7 @@ module apply_reward #(
       end
     end else if (LEARNING_MODE == 2) begin
       product = elig_trace >>> LR_SHIFT;
-      delta_w = product[8:0]; // safe: elig_trace[-256..255] >> 2 always fits in signed [8:0]
+      delta_w = product[8:0];
     end
     // LEARNING_MODE == 0: delta_w stays 0
   end
