@@ -100,8 +100,6 @@ master #(
   .DATA_SELECT(DATA_N)
 ) mas (
   .clk(clk),
-  .ready(verifier_ready),
-  .success(verifier_success),
   .reset(reset),
   .empty(fifo_in_empty),
   .err_empty(packer_err_empty),

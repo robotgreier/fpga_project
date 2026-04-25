@@ -26,7 +26,7 @@ module master #(
         parameter WEIGHT_SELECT = 128,
         parameter DATA_SELECT = 3
     )(
-        input wire clk, ready, success, reset, empty, err_empty,
+        input wire clk, reset, empty, err_empty,
         input wire [BIT_WIDTH-1:0] data_in,
         output reg read, write, commit, master_reset,
         output wire [BIT_WIDTH-1:0] data_out,
@@ -39,68 +39,53 @@ module master #(
     // 199: Dopamine level (1 byte)
     // 200-211: spike data (11 bytes - 32/3 ~ 11) - each byte contains 3 spikes with 2 bits each, and 2 bits unused
 
-    reg [2:0] state;
+    reg [7:0] state;
 
-    parameter IDLE = 0;
-    parameter TRAN = 1;
-    parameter READ = 2;
-    parameter WAIT_1 = 3;
-    parameter WAIT_2 = 4;
-    parameter EMPT = 5;
+    localparam IDLE = 0;
+    localparam CMD = 1;
+    localparam INIT = 2;
+    localparam INIT_LOOP = 3;
+    localparam INIT_ERROR = 4;
+    localparam SPIKE = 5;
+    localparam SPIKE_LOOP = 6;
+    localparam SPIKE_WRITE = 7;
+    localparam SPIKE_SEND = 8;
+    localparam DOPAMINE = 9;
+    localparam STOP = 10;
+    localparam STOP_SEND = 11;
+    localparam STOP_LOOP = 12;
+    localparam STOP_COMMIT = 13;
+    localparam RESET = 14;
+    localparam ERROR = 15;
+    localparam ERROR_FIX = 16;
+    localparam WRITE_ERROR_1 = 17;
+    localparam WRITE_ERROR_2 = 18;
+    localparam WRITE_ERROR_3 = 19;
 
     reg [$clog2(LEN_MAX)-1:0] n = 0;
     reg [$clog2(LEN_MAX)-1:0] i = 0;
 
-    assign data_out = data_in;
-
-    always @(posedge clk, posedge reset) begin
+    always @(posedge clk, posedge reset, posedge err_empty) begin
         state <= state;
         read <= 0;
-        transmit <= 0;
+        write <= 0;
+        commit <= 0;
+        master_reset <= 0;
+        data_out <= 0;
 
         if (reset) begin // Reset called
             state <= IDLE;
+            weight_select <= 0;
+            data_select <= 0;
         end
+
+        else if (err_empty) master_reset <= 1;
 
         else begin
         case(state)
             IDLE: begin
-                if (ready & success) begin // Wait for ready fifo
-                    state <= TRAN;
-                end
-            end
+                if (!empty) state <= CMD;
 
-            TRAN: begin
-                if (tx_ready) begin // Wait until tx is ready for transmission
-                    transmit <= 1;
-                    state <= READ;
-                end
-            end
-
-            READ: begin // Pop fifo
-                state <= WAIT_1;
-                read <= 1;
-            end
-
-            WAIT_1: begin
-                state <= WAIT_2;
-            end
-
-            WAIT_2: begin
-                n <= data_in;
-                i <= 0;
-                state <= EMPT;
-            end
-
-            EMPT: begin
-                if (i <= n) begin
-                    i <= i + 1;
-                    read <= 1;
-                    state <= EMPT;
-                end
-                else begin
-                    state <= IDLE;
-                end
             end
 
             default: state <= IDLE;
