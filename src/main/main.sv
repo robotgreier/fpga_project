@@ -331,7 +331,6 @@ dopamine_loader #(
 ) d_loader (
     .clk(clk),
     .rst(reset),
-    .en(d_en),
     .data(fifo_in_data),
     .adr(master_address),  
     .dopamine(dopamine),
