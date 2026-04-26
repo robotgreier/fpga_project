@@ -30,6 +30,7 @@ module master #(
         input wire [BIT_WIDTH-1:0] data_in,
         output reg read, write, commit, master_reset,
         output wire [BIT_WIDTH-1:0] data_out,
+        output wire [BIT_WIDTH-1:0] address_out,
         output wire [$clog2(WEIGHT_SELECT)-1:0] weight_select,
         output wire [$clog2(DATA_SELECT)-1:0] data_select
     );
@@ -40,27 +41,59 @@ module master #(
     // 200-211: spike data (11 bytes - 32/3 ~ 11) - each byte contains 3 spikes with 2 bits each, and 2 bits unused
 
     reg [7:0] state;
+    reg [7:0] err;
 
+    // Constants
+    localparam WEIGHT_START = 0;
+    localparam WEIGHT_STOP = 127;
+    localparam DOPAMINE_START = 199;
+    localparam DOPAMINE_STOP = 199;
+    localparam SPIKE_START = 200;
+    localparam SPIKE_STOP = 211;
+    localparam NO_ADDRESS = 255;
+
+    // State parameters
     localparam IDLE = 0;
     localparam CMD = 1;
     localparam INIT = 2;
     localparam INIT_LOOP = 3;
-    localparam INIT_ERROR = 4;
-    localparam SPIKE = 5;
-    localparam SPIKE_LOOP = 6;
-    localparam SPIKE_WRITE = 7;
-    localparam SPIKE_SEND = 8;
+    localparam SPIKE = 4;
+    localparam SPIKE_LOOP = 5;
+    localparam SPIKE_WRITE = 6;
+    localparam SPIKE_SEND = 7;
+    localparam SPIKE_COMMIT = 8;
     localparam DOPAMINE = 9;
-    localparam STOP = 10;
-    localparam STOP_SEND = 11;
-    localparam STOP_LOOP = 12;
-    localparam STOP_COMMIT = 13;
-    localparam RESET = 14;
-    localparam ERROR = 15;
-    localparam ERROR_FIX = 16;
-    localparam WRITE_ERROR_1 = 17;
-    localparam WRITE_ERROR_2 = 18;
-    localparam WRITE_ERROR_3 = 19;
+    localparam DOPAMINE_WRITE = 10;
+    localparam STOP = 11;
+    localparam STOP_SEND = 12;
+    localparam STOP_LOOP = 13;
+    localparam STOP_COMMIT = 14;
+    localparam RESET = 15;
+    localparam ERROR = 16;
+    localparam ERROR_PASS = 17;
+    localparam ERROR_FIX = 18;
+    localparam WRITE_ERROR_1 = 19;
+    localparam WRITE_ERROR_2 = 20;
+    localparam WRITE_ERROR_3 = 21;
+    localparam CMD_ERROR = 22;
+
+    // Command parameters
+    localparam CMD_INIT = 0;
+    localparam CMD_SPIKE = 1;
+    localparam CMD_DOPAMINE = 2;
+    localparam CMD_STOP = 3;
+    localparam CMD_RESET = 4;
+    localparam CMD_ERR = 5;
+
+    // Error parameters
+    localparam ERR_CMD = 0;
+    localparam ERR_SHORT = 1;
+    localparam ERR_EMPTY = 2;
+
+    // MUX select parameters
+    localparam WEIGHT_DATA = 0;
+    localparam SPIKE_DATA = 1;
+    localparam MASTER_DATA = 2;
 
     reg [$clog2(LEN_MAX)-1:0] n = 0;
     reg [$clog2(LEN_MAX)-1:0] i = 0;
@@ -77,19 +110,155 @@ module master #(
             state <= IDLE;
             weight_select <= 0;
             data_select <= 0;
+            err <= 0;
+            address_out <= 255;
         end
 
         else if (err_empty) master_reset <= 1;
 
         else begin
         case(state)
-            IDLE: begin
-                if (!empty) state <= CMD;
+            IDLE: if (!empty) state <= CMD;
 
+            CMD: begin 
+                read <= 1;
+                case(data_in)
+                    CMD_INIT: state <= INIT;
+                    CMD_SPIKE: state <= SPIKE;
+                    CMD_DOPAMINE: state <= DOPAMINE;
+                    CMD_STOP: state <= STOP;
+                    CMD_RESET: state <= RESET;
+                    CMD_ERR: state <= ERROR;
+                    default: begin
+                        state <= WRITE_ERROR_1;
+                        err <= 0;
+                    end
+                endcase                n <= 211;
             end
+
+            INIT: begin
+                read <= 1;
+                i <= WEIGHT_START;
+                state <= INIT_LOOP;
+            end
+
+            INIT_LOOP: begin
+                i = i + 1;
+                address_out <= i;
+                read <= 1;
+
+                state <= state;
+                if (i >= WEIGHT_STOP) state <= IDLE;
+                else if (empty) begin
+                    state <= WRITE_ERROR_1;
+                    err <= 1;
+                end
+            end
+
+            SPIKE: begin
+                i <= SPIKE_START;
+                read <= 1;
+                state <= SPIKE_LOOP;
+            end
+
+            SPIKE_LOOP: begin
+                i = i + 1;
+                address_out <= i;
+                read <= 1;
+
+                state <= state;
+                if (i >= SPIKE_STOP) state <= SPIKE_WRITE;
+                else if (empty) begin
+                    state <= WRITE_ERROR_1;
+                    err <= 1;
+                end
+            end
+
+            SPIKE_WRITE: begin
+                data_select <= MASTER_DATA;
+                data_out <= 0;
+                write <= 1;
+                state <= SPIKE_SEND;
+            end
+
+            SPIKE_SEND: begin
+                write <= 1;
+                data <= 1;
+                state <= SPIKE_COMMIT;
+            end
+
+            SPIKE_COMMIT: begin
+                data_select <= SPIKE_DATA;
+                write <= 1;
+                commit <= 1;
+                state <= IDLE;
+            end
+
+            DOPAMINE: begin
+                read <= 1;
+                state <= DOPAMINE_WRITE;
+            end
+
+            DOPAMINE_WRITE: begin
+                address_out <= DOPAMINE_START;
+                read <= 1;
+                state <= IDLE;
+            end
+
+            STOP: begin
+                data_select <= MASTER_DATA;
+                data_out <= 1;
+                write <= 1;
+                state <= STOP_SEND;
+            end
+
+            STOP_SEND: begin
+                data <= (WEIGHT_STOP - WEIGHT_START) + 1;
+                write <= 1;
+                i <= WEIGHT_START;
+                state <= STOP_LOOP;
+            end
+
+            STOP_LOOP: begin
+                i = i + 1;
+                data_select <= WEIGHT_DATA;
+                weight_select <= i;
+                write <= 1;
+
+                state <= state;
+                if (i >= WEIGHT_STOP) state <= STOP_COMMIT;
+            end
+
+            STOP_COMMIT: begin
+                commit <= 1;
+                state <= IDLE;
+            end
+
+            RESET: begin
+                state <= IDLE;
+                reset <= 1;
+            end
+
+            ERROR: begin
+                // read <= 1;
+                state <= RESET;
+            end
+
+            // ERROR_PASS: begin
+            //     read <= 1;
+            //     state <= ERROR_FIX;
+            // end
+
+            // ERROR_FIX: begin
+            //     read <= 1;
+            //     if (data == ERR_SHORT) state <= SPIKE;
+
+            // end
 
             default: state <= IDLE;
         endcase
+
+        if (err_empty) reset <= 1;
         end
     end
 
