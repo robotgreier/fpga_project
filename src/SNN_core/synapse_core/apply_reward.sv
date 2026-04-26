@@ -8,23 +8,26 @@ module apply_reward #(
     output logic signed [8:0] delta_w
   );
 
-  logic signed [12:0] product;
-
-  always_comb begin
-    delta_w = '0;
-    product = '0;
-    if (LEARNING_MODE == 1) begin
+  if (LEARNING_MODE == 1) begin : g_rstdp
+    logic signed [12:0] product;
+    always_comb begin
+      product = '0;
+      delta_w = '0;
       if (reward_en) begin
         product = (elig_trace * dopamine) >>> LR_SHIFT;
         if      (product > 255)  delta_w =  255;
         else if (product < -255) delta_w = -255;
         else                     delta_w = product[8:0];
       end
-    end else if (LEARNING_MODE == 2) begin
+    end
+  end else if (LEARNING_MODE == 2) begin : g_stdp
+    logic signed [12:0] product;
+    always_comb begin
       product = elig_trace >>> LR_SHIFT;
       delta_w = product[8:0];
     end
-    // LEARNING_MODE == 0: delta_w stays 0
+  end else begin : g_off
+    assign delta_w = '0;
   end
 
 endmodule
