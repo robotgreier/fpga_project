@@ -87,8 +87,8 @@ module master #(
 
     // Error parameters
     localparam ERR_CMD = 0;
-    localparam ERR_SHORT = 1;
-    localparam ERR_EMPTY = 2;
+    localparam ERR_SPIKE = 1;
+    localparam ERR_WEIGHT = 2;
 
     // MUX select parameters
     localparam WEIGHT_DATA = 0;
@@ -240,20 +240,24 @@ module master #(
             end
 
             ERROR: begin
-                // read <= 1;
+                read <= 1;
                 state <= RESET;
             end
 
-            // ERROR_PASS: begin
-            //     read <= 1;
-            //     state <= ERROR_FIX;
-            // end
+            ERROR_PASS: begin
+                read <= 1;
+                state <= ERROR_FIX;
+            end
 
-            // ERROR_FIX: begin
-            //     read <= 1;
-            //     if (data == ERR_SHORT) state <= SPIKE;
-
-            // end
+            ERROR_FIX: begin
+                read <= 1;
+                
+                case (data_in)
+                    ERR_SPIKE: state <= SPIKE;
+                    ERR_WEIGHT: state <= STOP;
+                    default: state <= IDLE;
+                endcase
+            end
 
             default: state <= IDLE;
         endcase
