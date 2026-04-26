@@ -25,40 +25,14 @@ module main #(
   output wire uart_rxd_out
 );
 
-// Connections
-wire clk, rx, tx, reset;
-reg start_reset;
-assign clk = CLK100MHZ;
-assign rx = uart_txd_in;
-assign tx = uart_rxd_out;
-assign reset = start_reset | master_reset;
+localparam WEIGHT_N = (N_INPUTS+FEEDBACK)*N_OUTPUTS;
 
-// Reset logic
-reg reset_counter = 0;
-reg already_reset = 0;
-
-always @(posedge clk) begin
-  if (already_reset == 1'b0) begin  // Check if system is already delayed
-    if (reset_counter >= 60) begin // Check if counter is over 60 cycles
-      if (start_reset == 1'b1) begin // Check if reset signal is high
-        start_reset <= 1'b0;
-        already_reset <= 1'b1;
-      end
-      else begin
-        start_reset <= 1'b1;
-      end
-    end
-    else begin
-      reset_counter <= reset_counter + 1'b1;
-    end
-  end
-end
-
-// ----------------------- Verification things ------------------------------ //
+// ----------------------- Wires ------------------------------ //
 wire  master_read, master_write, master_commit, master_reset; // Master signals
 wire  [7:0] master_data, master_address;
 wire [$clog2(WEIGHT_N)-1:0] master_weight_select;
-wire [$clog2(DATA_N)-1:0] master_data_select;
+logic [BIT_WIDTH-1:0] data_out;
+logic [$clog2(DATA_N)-1:0] master_data_select;
 
 wire  verifier_ready, // Verifier signals
       verifier_success,
@@ -92,6 +66,59 @@ wire  rx_ready, rx_success; // RX signals
 wire  [7:0] rx_data;
 
 wire  tx_ready; // TX signals
+
+// ----------------------- Connections ------------------------------ //
+
+wire clk, rx, tx, reset;
+reg start_reset;
+assign clk = CLK100MHZ;
+assign rx = uart_txd_in;
+assign tx = uart_rxd_out;
+assign reset = start_reset | master_reset;
+
+// Weight mux
+logic [BIT_WIDTH-1:0] weight_out;
+logic [((N_INPUTS+FEEDBACK)*N_OUTPUTS*8)-1:0] w_parallel_out;
+assign weight_out = w_parallel_out[master_weight_select*8 +: 8];
+
+// Data mux
+localparam DATA_N = 3;
+localparam WEIGHT_DATA = 0;
+localparam SPIKE_DATA = 1;
+localparam MASTER_DATA = 2;
+logic [N_OUTPUTS-1:0] spk_out;
+
+always_comb begin
+    unique case (master_data_select)
+        WEIGHT_DATA: data_out = weight_out;
+        SPIKE_DATA: data_out = {{BIT_WIDTH-N_OUTPUTS{1'b0}}, spk_out};
+        MASTER_DATA: data_out = master_data;
+        default: data_out = 0;
+    endcase
+end
+
+// Reset logic
+reg reset_counter = 0;
+reg already_reset = 0;
+
+always @(posedge clk) begin
+  if (already_reset == 1'b0) begin  // Check if system is already delayed
+    if (reset_counter >= 60) begin // Check if counter is over 60 cycles
+      if (start_reset == 1'b1) begin // Check if reset signal is high
+        start_reset <= 1'b0;
+        already_reset <= 1'b1;
+      end
+      else begin
+        start_reset <= 1'b1;
+      end
+    end
+    else begin
+      reset_counter <= reset_counter + 1'b1;
+    end
+  end
+end
+
+// ----------------------- Verification things ------------------------------ //
 
 master #(
   .BIT_WIDTH(BIT_WIDTH),
@@ -209,7 +236,6 @@ packer #(
     .BIT_WIDTH(8)
 ) pack (
     .clk(clk),
-    .master_transmit(master_transmit),
     .empty(fifo_out_empty),
     .reset(reset),
     .ready(tx_ready),
@@ -264,7 +290,7 @@ weight_loader #(
 
 // Dump weights
 
-logic [((N_INPUTS+FEEDBACK)*N_OUTPUTS*8)-1:0] w_parallel_out;
+// w_parallel_out moved to connections section
 weight_dumper #(
     .N_INPUTS(N_INPUTS),
     .N_OUTPUTS(N_OUTPUTS),
@@ -275,7 +301,7 @@ weight_dumper #(
     .en(d_en),
     .adr(master_address),
     .w_syn(w_syn),
-    .data_out(w_parallel_out)
+    .w_parallel_out(w_parallel_out)
 );
 
 
@@ -301,7 +327,7 @@ logic signed [3:0] dopamine;
 logic reward_en;
 
 dopamine_loader #(
-    .N_OUTPUTS(N_OUTPUTS)
+    // .N_OUTPUTS(N_OUTPUTS) Does not exist
 ) d_loader (
     .clk(clk),
     .rst(reset),
@@ -314,8 +340,8 @@ dopamine_loader #(
 
 
 // Instantiate SNN core
-logic [N_OUTPUTS-1:0] spk_out;
 logic [$clog2(N_OUTPUTS)-1:0] winner_idx;
+// spk_out moved to connections
 
 SNN_core #(
     .DECAY(DECAY),
@@ -345,30 +371,5 @@ SNN_core #(
     .w_next(w_next)
 );
 
-// ----------------------- Connections ------------------------------ //
-
-// Weight mux
-localparam WEIGHT_N = (N_INPUTS+FEEDBACK)*N_OUTPUTS;
-logic [BIT_WIDTH-1:0] weight_out;
-logic [$clog2(WEIGHT_N)-1:0] master_weight_select;
-
-assign weight_out = w_parallel_out[weight_select*8 +: 8];
-
-// Data mux
-localparam DATA_N = 3;
-localparam WEIGHT_DATA = 0;
-localparam SPIKE_DATA = 1;
-localparam MASTER_DATA = 2;
-logic [$clog2(DATA_N)-1:0] master_data_select;
-logic [BIT_WIDTH-1:0] data_out;
-
-always_comb begin
-    unique case (data_select)
-        WEIGHT_DATA: data_out = weight_out;
-        SPIKE_DATA: data_out = {{BIT_WIDTH-N_OUTPUTS{1'b0}}, spk_out};
-        MASTER_DATA: data_out = master_data;
-        default: data_out = 0;
-    endcase
-end
 
 endmodule

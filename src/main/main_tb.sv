@@ -74,23 +74,29 @@ module main_tb(
 
         #(400*10);
 
-        send_byte(255);
-        send_byte(0);
-        send_byte(2);
-        send_byte(78);
-        send_byte(29);
-        send_byte(109);
-        send_byte(191);
+        send_byte(255); // SOF
+        send_byte(0); // CMD = INIT
+        send_byte(128); // N = 128
+
+        repeat(128) begin // DATA
+            send_byte(0);
+        end
+
+        send_byte(128); // CHECKSUM 1
+        send_byte(192); // CHECKSUM 2
 
         #(400*200);
         
-        send_byte(255);
-        send_byte(1);
-        send_byte(2);
-        send_byte(69);
-        send_byte(82);
-        send_byte(154);
-        send_byte(230);
+        send_byte(255); // SOF
+        send_byte(1); // CMD = SPIKE
+        send_byte(11); // N = 11
+
+        repeat(11) begin // DATA
+            send_byte(0);
+        end
+
+        send_byte(12); // CHECKSUM 1
+        send_byte(145); // CHECKSUM 2
 
         #(400*200);
         $finish;

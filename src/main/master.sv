@@ -29,16 +29,16 @@ module master #(
         input wire clk, reset, empty, err_empty,
         input wire [BIT_WIDTH-1:0] data_in,
         output reg read, write, commit, master_reset,
-        output wire [BIT_WIDTH-1:0] data_out,
-        output wire [BIT_WIDTH-1:0] address_out,
-        output wire [$clog2(WEIGHT_SELECT)-1:0] weight_select,
-        output wire [$clog2(DATA_SELECT)-1:0] data_select
+        output reg [BIT_WIDTH-1:0] data_out,
+        output reg [BIT_WIDTH-1:0] address_out,
+        output reg [$clog2(WEIGHT_SELECT)-1:0] weight_select,
+        output reg [$clog2(DATA_SELECT)-1:0] data_select
     );
 
     // SNN data address map:
     // 0-127: Weights (128 bytes)
     // 199: Dopamine level (1 byte)
-    // 200-211: spike data (11 bytes - 32/3 ~ 11) - each byte contains 3 spikes with 2 bits each, and 2 bits unused
+    // 200-210: spike data (11 bytes - 32/3 ~ 11) - each byte contains 3 spikes with 2 bits each, and 2 bits unused
 
     reg [7:0] state;
     reg [7:0] err;
@@ -49,7 +49,7 @@ module master #(
     localparam DOPAMINE_START = 199;
     localparam DOPAMINE_STOP = 199;
     localparam SPIKE_START = 200;
-    localparam SPIKE_STOP = 211;
+    localparam SPIKE_STOP = 210;
     localparam NO_ADDRESS = 255;
 
     // State parameters
@@ -95,8 +95,8 @@ module master #(
     localparam SPIKE_DATA = 1;
     localparam MASTER_DATA = 2;
 
-    reg [$clog2(LEN_MAX)-1:0] n = 0;
-    reg [$clog2(LEN_MAX)-1:0] i = 0;
+    reg [$clog2(LEN_MAX)-1:0] n;
+    reg [$clog2(LEN_MAX)-1:0] i;
 
     always @(posedge clk, posedge reset, posedge err_empty) begin
         state <= state;
@@ -112,6 +112,8 @@ module master #(
             data_select <= 0;
             err <= 0;
             address_out <= 255;
+            n <= 0;
+            i <= 0;
         end
 
         else if (err_empty) master_reset <= 1;
@@ -183,7 +185,7 @@ module master #(
 
             SPIKE_SEND: begin
                 write <= 1;
-                data <= 1;
+                data_out <= 1;
                 state <= SPIKE_COMMIT;
             end
 
@@ -213,7 +215,7 @@ module master #(
             end
 
             STOP_SEND: begin
-                data <= (WEIGHT_STOP - WEIGHT_START) + 1;
+                data_out <= (WEIGHT_STOP - WEIGHT_START) + 1;
                 write <= 1;
                 i <= WEIGHT_START;
                 state <= STOP_LOOP;
@@ -236,7 +238,7 @@ module master #(
 
             RESET: begin
                 state <= IDLE;
-                reset <= 1;
+                master_reset <= 1;
             end
 
             ERROR: begin
@@ -262,7 +264,7 @@ module master #(
             default: state <= IDLE;
         endcase
 
-        if (err_empty) reset <= 1;
+        if (err_empty) master_reset <= 1;
         end
     end
 
