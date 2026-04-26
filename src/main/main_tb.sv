@@ -28,10 +28,10 @@ module main_tb(
     wire tx;
 
     main #() mains (
-        .clk(clk),
-        .rx(rx),
-        .reset(reset),
-        .tx(tx)
+        .CLK100MHZ(clk),
+        .uart_txd_in(rx),
+        .uart_rxd_out(tx),
+        .btn_reset(reset)
     );
 
     //--------------------------------
@@ -39,7 +39,7 @@ module main_tb(
     //--------------------------------
     initial begin
         clk = 0;
-        repeat (500000) #5 clk = ~clk;
+        repeat (5000000) #5 clk = ~clk;
     end
 
     //--------------------------------

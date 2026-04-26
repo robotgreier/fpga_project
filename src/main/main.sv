@@ -18,10 +18,10 @@ module main #(
     parameter int N_OUTPUTS     = 4,
     parameter int FEEDBACK      = 1,   // 1: append NOR-feedback neuron as extra input
     // Main parameters
-    parameter int MAX_DATA      = 16,
+    parameter int MAX_DATA      = 256,
     parameter int BIT_WIDTH     = 8 // Must be over N_OUTPUTS
   )(
-  input logic CLK100MHZ, uart_txd_in,
+  input logic CLK100MHZ, uart_txd_in, btn_reset,
   output wire uart_rxd_out
 );
 
@@ -74,7 +74,7 @@ reg start_reset;
 assign clk = CLK100MHZ;
 assign rx = uart_txd_in;
 assign tx = uart_rxd_out;
-assign reset = start_reset | master_reset;
+assign reset = start_reset | master_reset | btn_reset;
 
 // Weight mux
 logic [BIT_WIDTH-1:0] weight_out;
