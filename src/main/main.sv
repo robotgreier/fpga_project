@@ -302,17 +302,16 @@ weight_dumper #(
 
 // Load spikes
 // Temp signals
-logic done, s_en;
-logic [(N_INPUTS) - 1:0] spiketrain; 
+logic done;
+logic [(N_INPUTS) - 1:0] spiketrain;
 
 spike_loader #(
     .N_INPUTS(N_INPUTS)
 ) s_loader (
     .clk(clk),
     .rst(reset),
-    .en(s_en),
     .data(fifo_in_data),
-    .adr(master_address),  
+    .adr(master_address),
     .done(done),
     .spiketrain(spiketrain)
 );

@@ -1,7 +1,7 @@
 module spike_loader #(
     parameter int N_INPUTS   = 31
     ) (
-    input  logic        clk, rst, en,
+    input  logic        clk, rst,
     input  logic [7:0]  data,
     input  logic [7:0] adr,
     input  logic        done,
@@ -35,7 +35,7 @@ module spike_loader #(
         if (rst) begin
             spiketrain_temp <= '0;
             spiketrain      <= '0;
-        end else if (en && pair_valid && adr >= ADR_MIN && adr <= ADR_MAX) begin
+        end else if (pair_valid && adr >= ADR_MIN && adr <= ADR_MAX) begin
             // Write 3 decoded spikes into the correct chunk
             spiketrain_temp[TOTAL_SPIKES-1 - 3*(adr - ADR_MIN) -: 3] <= spk_temp;
         end else if (done) begin

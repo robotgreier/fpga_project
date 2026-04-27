@@ -2,7 +2,8 @@
 //////////////////////////////////////////////////////////////////////////////////
 // Module Name: tb_spike_loader
 // Description: Simple testbench for spike_loader.
-//   Loads 3-bit spike chunks via (data, adr, en), latches full spiketrain on done.
+//   Loads 3-bit spike chunks via (data, adr) when adr in [200,254], latches
+//   full spiketrain on done.
 //   Each byte encodes 3 spikes in bit-pairs: 2'b11 = 1, 2'b00 = 0, else invalid.
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -12,7 +13,6 @@ module tb_spike_loader ();
 
     logic                  clk = 0;
     logic                  rst;
-    logic                  en;
     logic [7:0]            data;
     logic [7:0]            adr;
     logic                  done;
@@ -21,7 +21,7 @@ module tb_spike_loader ();
     always #5 clk = ~clk;
 
     spike_loader #(.N_INPUTS(N_INPUTS)) dut (
-        .clk(clk), .rst(rst), .en(en),
+        .clk(clk), .rst(rst),
         .data(data), .adr(adr), .done(done),
         .spiketrain(spiketrain)
     );
@@ -33,13 +33,13 @@ module tb_spike_loader ();
         else       begin $display("  FAIL  %s", label); fail_count++; end
     endtask
 
-    // Drive (data, adr) with en=1 for one cycle
+    // Drive (data, adr) for one cycle, then park adr out of range
     task automatic load(input logic [7:0] d, input logic [7:0] a);
         @(negedge clk);
-        en = 1'b1; data = d; adr = a;
+        data = d; adr = a;
         @(posedge clk); #1;
         @(negedge clk);
-        en = 1'b0;
+        adr = 8'hFF;
     endtask
 
     // Pulse done for one cycle to latch spiketrain
@@ -52,7 +52,7 @@ module tb_spike_loader ();
     endtask
 
     initial begin
-        rst = 1'b1; en = 1'b0; done = 1'b0; data = 8'd0; adr = 8'd0;
+        rst = 1'b1; done = 1'b0; data = 8'd0; adr = 8'hFF;
 
         // Reset for 2 cycles
         @(posedge clk); @(posedge clk); #1;
