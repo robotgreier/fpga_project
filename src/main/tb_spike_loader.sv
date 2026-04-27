@@ -2,27 +2,29 @@
 //////////////////////////////////////////////////////////////////////////////////
 // Module Name: tb_spike_loader
 // Description: Simple testbench for spike_loader.
-//   Loads 3-bit spike chunks via (data, adr) when adr in [200,254], latches
-//   full spiketrain on done.
+//   Loads 3-bit spike chunks via (data, adr) when adr in [ADR_MIN, ADR_MAX].
+//   spiketrain auto-commits one cycle after the last chunk (LAST_CHUNK) is written.
 //   Each byte encodes 3 spikes in bit-pairs: 2'b11 = 1, 2'b00 = 0, else invalid.
 //////////////////////////////////////////////////////////////////////////////////
 
 module tb_spike_loader ();
 
-    localparam int N_INPUTS = 31;
+    localparam int N_INPUTS  = 31;
+    localparam int ADR_MIN   = 200;
+    localparam int N_CHUNKS  = (N_INPUTS + 2) / 3;       // 11
+    localparam int ADR_MAX   = ADR_MIN + N_CHUNKS - 1;   // 210
 
     logic                  clk = 0;
     logic                  rst;
     logic [7:0]            data;
     logic [7:0]            adr;
-    logic                  done;
     logic [N_INPUTS-1:0]   spiketrain;
 
     always #5 clk = ~clk;
 
     spike_loader #(.N_INPUTS(N_INPUTS)) dut (
         .clk(clk), .rst(rst),
-        .data(data), .adr(adr), .done(done),
+        .data(data), .adr(adr),
         .spiketrain(spiketrain)
     );
 
@@ -42,17 +44,18 @@ module tb_spike_loader ();
         adr = 8'hFF;
     endtask
 
-    // Pulse done for one cycle to latch spiketrain
-    task automatic pulse_done();
-        @(negedge clk);
-        done = 1'b1;
+    // Stream a full frame: byte k goes to address ADR_MIN+k.
+    // After the last chunk write, spiketrain commits one cycle later.
+    task automatic load_frame(input logic [7:0] bytes [N_CHUNKS]);
+        for (int k = 0; k < N_CHUNKS; k++)
+            load(bytes[k], 8'(ADR_MIN + k));
+        // Wait one extra cycle for the commit register to update spiketrain
         @(posedge clk); #1;
-        @(negedge clk);
-        done = 1'b0;
     endtask
 
     initial begin
-        rst = 1'b1; done = 1'b0; data = 8'd0; adr = 8'hFF;
+        logic [7:0] frame [N_CHUNKS];
+        rst = 1'b1; data = 8'd0; adr = 8'hFF;
 
         // Reset for 2 cycles
         @(posedge clk); @(posedge clk); #1;
@@ -65,35 +68,49 @@ module tb_spike_loader ();
         check("spiketrain==0", spiketrain === {N_INPUTS{1'b0}});
 
         // ==================================================================
-        // TEST 2: Load one chunk (adr=0) with all three spikes = 1
-        //   data = 8'b00_11_11_11 → 3 ones in top chunk
-        //   spiketrain[30:28] should become 3'b111 after done
+        // TEST 2: Partial frame does NOT commit
+        //   Write only the first chunk; spiketrain should remain 0.
         // ==================================================================
-        $display("\n[%0t] TEST 2: load 3 spikes into top chunk", $time);
+        $display("\n[%0t] TEST 2: partial frame does not commit", $time);
         load(8'b00_11_11_11, 8'd200);
-        pulse_done();
+        @(posedge clk); #1;
+        check("spiketrain still 0 after 1 chunk", spiketrain === {N_INPUTS{1'b0}});
+
+        // ==================================================================
+        // TEST 3: Full frame commits on last chunk
+        //   chunk 0 = all ones (3'b111) → spiketrain[30:28]
+        //   chunk 1 = 3'b101            → spiketrain[27:25]
+        //   chunks 2..LAST = all zeros
+        // ==================================================================
+        $display("\n[%0t] TEST 3: full frame → spiketrain commits", $time);
+        @(negedge clk); rst = 1'b1;
+        @(posedge clk); #1;
+        @(negedge clk); rst = 1'b0;
+
+        frame[0] = 8'b00_11_11_11;   // 3'b111
+        frame[1] = 8'b00_11_00_11;   // 3'b101
+        for (int k = 2; k < N_CHUNKS; k++) frame[k] = 8'b00_00_00_00;
+        load_frame(frame);
+
         check("spiketrain[30:28] == 3'b111", spiketrain[30:28] === 3'b111);
-        check("other bits still 0",          spiketrain[27:0]  === 28'd0);
-
-        // ==================================================================
-        // TEST 3: Load second chunk (adr=1) with spike pattern 3'b101
-        //   bit0 pair = 11 → 1, bit1 pair = 00 → 0, bit2 pair = 11 → 1
-        //   data = 8'b00_11_00_11  → spk_temp = 3'b101
-        //   spiketrain[27:25] should become 3'b101
-        // ==================================================================
-        $display("\n[%0t] TEST 3: load spikes 3'b101 into chunk 1", $time);
-        load(8'b00_11_00_11, 8'd201);
-        pulse_done();
         check("spiketrain[27:25] == 3'b101", spiketrain[27:25] === 3'b101);
-        check("top chunk preserved",         spiketrain[30:28] === 3'b111);
+        check("spiketrain[24:0]  == 0",       spiketrain[24:0]  === 25'd0);
 
         // ==================================================================
-        // TEST 4: Invalid pair (not 00 / 11) → ignored (pair_valid = 0)
+        // TEST 4: Invalid pair → that chunk is dropped (rest of frame still commits)
         // ==================================================================
         $display("\n[%0t] TEST 4: invalid pair is ignored", $time);
-        load(8'b00_01_00_00, 8'd202);  // pair 01 invalid
-        pulse_done();
-        check("spiketrain[24:22] still 0", spiketrain[24:22] === 3'b000);
+        @(negedge clk); rst = 1'b1;
+        @(posedge clk); #1;
+        @(negedge clk); rst = 1'b0;
+
+        frame[0] = 8'b00_11_11_11;   // valid: 3'b111
+        frame[1] = 8'b00_01_00_00;   // invalid pair → write skipped
+        for (int k = 2; k < N_CHUNKS; k++) frame[k] = 8'b00_00_00_00;
+        load_frame(frame);
+
+        check("spiketrain[30:28] == 3'b111 (valid)", spiketrain[30:28] === 3'b111);
+        check("spiketrain[27:25] == 0 (invalid skipped)", spiketrain[27:25] === 3'b000);
 
         // ==================================================================
         // TEST 5: Reset clears spiketrain

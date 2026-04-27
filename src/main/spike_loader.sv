@@ -4,13 +4,14 @@ module spike_loader #(
     input  logic        clk, rst,
     input  logic [7:0]  data,
     input  logic [7:0] adr,
-    input  logic        done,
     output logic [(N_INPUTS) - 1:0] spiketrain
 );
 
     localparam int ADR_MIN      = 200;
-    localparam int ADR_MAX      = 254;
-    localparam int TOTAL_SPIKES = N_INPUTS;  // 31
+    localparam int N_CHUNKS     = (N_INPUTS + 2) / 3;  // bytes needed to cover all spikes
+    localparam int ADR_MAX      = ADR_MIN + N_CHUNKS - 1;
+    localparam int LAST_CHUNK   = N_CHUNKS - 1;
+    localparam int TOTAL_SPIKES = N_INPUTS;
 
     logic [TOTAL_SPIKES-1:0] spiketrain_temp;
     logic [2:0]              spk_temp;
@@ -29,17 +30,25 @@ module spike_loader #(
     end
 
     // adr selects which 3-bit chunk of spiketrain to write (MSB-first)
-    // adr=0 → bits[TOTAL_SPIKES-1 : TOTAL_SPIKES-3]
-    // adr=1 → bits[TOTAL_SPIKES-4 : TOTAL_SPIKES-6], etc.
+    // adr=ADR_MIN+0 → bits[TOTAL_SPIKES-1 : TOTAL_SPIKES-3]
+    // adr=ADR_MIN+1 → bits[TOTAL_SPIKES-4 : TOTAL_SPIKES-6], etc.
+    // After the final chunk is written, spiketrain_temp is committed to spiketrain.
+    logic commit;
+
     always_ff @(posedge clk) begin : get_spike
         if (rst) begin
             spiketrain_temp <= '0;
             spiketrain      <= '0;
-        end else if (pair_valid && adr >= ADR_MIN && adr <= ADR_MAX) begin
-            // Write 3 decoded spikes into the correct chunk
-            spiketrain_temp[TOTAL_SPIKES-1 - 3*(adr - ADR_MIN) -: 3] <= spk_temp;
-        end else if (done) begin
-            spiketrain <= spiketrain_temp;
+            commit          <= '0;
+        end else begin
+            commit <= '0; 
+            if (pair_valid && adr >= ADR_MIN && adr <= ADR_MAX) begin
+                spiketrain_temp[TOTAL_SPIKES-1 - 3*(adr - ADR_MIN) -: 3] <= spk_temp;
+                if ((adr - ADR_MIN) == LAST_CHUNK)
+                    commit <= 1'b1;
+            end
+            if (commit)
+                spiketrain <= spiketrain_temp;
         end
     end
 
