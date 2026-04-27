@@ -44,12 +44,12 @@ module master #(
     reg [7:0] err;
 
     // Constants
-    localparam WEIGHT_START = 0;
-    localparam WEIGHT_STOP = 127;
-    localparam DOPAMINE_START = 199;
-    localparam DOPAMINE_STOP = 199;
-    localparam SPIKE_START = 200;
-    localparam SPIKE_STOP = 210;
+    localparam WEIGHT_OFFSET = 0;
+    localparam WEIGHT_N = 128;
+    localparam DOPAMINE_OFFSET = 199;
+    localparam DOPAMINE_N = 1;
+    localparam SPIKE_OFFSET = 200;
+    localparam SPIKE_N = 11;
     localparam NO_ADDRESS = 255;
 
     // State parameters
@@ -57,13 +57,16 @@ module master #(
     localparam CMD = 1;
     localparam INIT = 2;
     localparam INIT_LOOP = 3;
+    localparam INIT_WAIT = 23;
     localparam SPIKE = 4;
     localparam SPIKE_LOOP = 5;
     localparam SPIKE_WRITE = 6;
     localparam SPIKE_SEND = 7;
+    localparam SPIKE_SELECT = 24;
     localparam SPIKE_COMMIT = 8;
     localparam DOPAMINE = 9;
     localparam DOPAMINE_WRITE = 10;
+    localparam DOPAMINE_WAIT = 25;
     localparam STOP = 11;
     localparam STOP_SEND = 12;
     localparam STOP_LOOP = 13;
@@ -95,7 +98,7 @@ module master #(
     localparam SPIKE_DATA = 1;
     localparam MASTER_DATA = 2;
 
-    reg [$clog2(LEN_MAX)-1:0] n;
+    // reg [$clog2(LEN_MAX)-1:0] n;
     reg [$clog2(LEN_MAX)-1:0] i;
 
     always @(posedge clk, posedge reset, posedge err_empty) begin
@@ -105,14 +108,15 @@ module master #(
         commit <= 0;
         master_reset <= 0;
         data_out <= 0;
+        address_out <= NO_ADDRESS;
 
         if (reset) begin // Reset called
             state <= IDLE;
             weight_select <= 0;
             data_select <= 0;
             err <= 0;
-            address_out <= 255;
-            n <= 0;
+            address_out <= NO_ADDRESS;
+            // n <= 0;
             i <= 0;
         end
 
@@ -135,45 +139,49 @@ module master #(
                         state <= WRITE_ERROR_1;
                         err <= 0;
                     end
-                endcase                n <= 211;
+                endcase
             end
 
             INIT: begin
                 read <= 1;
-                i <= WEIGHT_START;
+                i <= 0;
                 state <= INIT_LOOP;
             end
 
             INIT_LOOP: begin
-                i = i + 1;
-                address_out <= i;
+                address_out <= i + WEIGHT_OFFSET;
                 read <= 1;
 
-                state <= state;
-                if (i >= WEIGHT_STOP) state <= IDLE;
-                else if (empty) begin
-                    state <= WRITE_ERROR_1;
-                    err <= 1;
+                if (i < WEIGHT_N - 1) begin
+                    state <= INIT_LOOP;
+                    i <= i +1;
+                    if (empty) begin
+                        state <= WRITE_ERROR_1;
+                        err <= 1;
+                    end
                 end
+                else state <= INIT_WAIT;
             end
 
+            INIT_WAIT: state <= IDLE;
+
             SPIKE: begin
-                i <= SPIKE_START;
+                i <= 0;
                 read <= 1;
                 state <= SPIKE_LOOP;
             end
 
             SPIKE_LOOP: begin
-                i = i + 1;
-                address_out <= i;
+                address_out <= i + SPIKE_OFFSET;
                 read <= 1;
 
                 state <= state;
-                if (i >= SPIKE_STOP) state <= SPIKE_WRITE;
+                if (i >= SPIKE_N - 1) state <= SPIKE_WRITE;
                 else if (empty) begin
                     state <= WRITE_ERROR_1;
                     err <= 1;
                 end
+                else i = i + 1;
             end
 
             SPIKE_WRITE: begin
@@ -186,12 +194,16 @@ module master #(
             SPIKE_SEND: begin
                 write <= 1;
                 data_out <= 1;
+                state <= SPIKE_SELECT;
+            end
+
+            SPIKE_SELECT: begin
+                data_select <= SPIKE_DATA;
+                write <= 1;
                 state <= SPIKE_COMMIT;
             end
 
             SPIKE_COMMIT: begin
-                data_select <= SPIKE_DATA;
-                write <= 1;
                 commit <= 1;
                 state <= IDLE;
             end
@@ -202,10 +214,12 @@ module master #(
             end
 
             DOPAMINE_WRITE: begin
-                address_out <= DOPAMINE_START;
+                address_out <= DOPAMINE_OFFSET;
                 read <= 1;
-                state <= IDLE;
+                state <= DOPAMINE_WAIT;
             end
+
+            DOPAMINE_WAIT: state <= IDLE;
 
             STOP: begin
                 data_select <= MASTER_DATA;
@@ -215,20 +229,20 @@ module master #(
             end
 
             STOP_SEND: begin
-                data_out <= (WEIGHT_STOP - WEIGHT_START) + 1;
+                data_out <= WEIGHT_N;
                 write <= 1;
-                i <= WEIGHT_START;
+                i <= 0;
                 state <= STOP_LOOP;
             end
 
             STOP_LOOP: begin
                 i = i + 1;
                 data_select <= WEIGHT_DATA;
-                weight_select <= i;
+                weight_select <= i + WEIGHT_OFFSET;
                 write <= 1;
 
                 state <= state;
-                if (i >= WEIGHT_STOP) state <= STOP_COMMIT;
+                if (i >= WEIGHT_N) state <= STOP_COMMIT;
             end
 
             STOP_COMMIT: begin
@@ -260,6 +274,8 @@ module master #(
                     default: state <= IDLE;
                 endcase
             end
+
+
 
             default: state <= IDLE;
         endcase

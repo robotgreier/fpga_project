@@ -92,11 +92,17 @@ module packer #(
             CMD_WAIT_2: if (ready) state <= CMD;
 
             CMD: begin
-                data <= fifo_data;
-                transmit <= 1;
-                state <= LEN_WAIT_1;
-                read <= 1;
-                check <= 1;
+                if (empty) begin
+                    state <= IDLE;
+                    err_empty <= 1;
+                end
+                else begin
+                    data <= fifo_data;
+                    transmit <= 1;
+                    state <= LEN_WAIT_1;
+                    read <= 1;
+                    check <= 1;
+                end
             end
 
             LEN_WAIT_1: state <= LEN_WAIT_2;
@@ -104,13 +110,19 @@ module packer #(
             LEN_WAIT_2: if (ready) state <= LEN;
 
             LEN: begin
-                len <= fifo_data;
-                data <= fifo_data;
-                i <= 0;
-                transmit <= 1;
-                state <= DATA_WAIT_1;
-                read <= 1;
-                check <= 1;
+                if (empty) begin
+                    state <= IDLE;
+                    err_empty <= 1;
+                end
+                else begin
+                    len <= fifo_data;
+                    data <= fifo_data;
+                    i <= 0;
+                    transmit <= 1;
+                    state <= DATA_WAIT_1;
+                    read <= 1;
+                    check <= 1;
+                end
             end
 
             DATA_WAIT_1: state <= DATA_WAIT_2;
@@ -118,13 +130,19 @@ module packer #(
             DATA_WAIT_2: if (ready) state <= DATA;
 
             DATA: begin
-                i <= i + 1;
-                data <= fifo_data;
-                transmit <= 1;
-                read <= 1;
-                check <= 1;
-                if (i < len - 1) state <= DATA_WAIT_1;
-                else state <= CHECK_1_WAIT_1;
+                if (empty) begin
+                    state <= IDLE;
+                    err_empty <= 1;
+                end
+                else begin
+                    i <= i + 1;
+                    data <= fifo_data;
+                    transmit <= 1;
+                    read <= 1;
+                    check <= 1;
+                    if (i < len - 1) state <= DATA_WAIT_1;
+                    else state <= CHECK_1_WAIT_1;
+                end
             end
 
             CHECK_1_WAIT_1: state <= CHECK_1_WAIT_2;
@@ -149,12 +167,6 @@ module packer #(
 
             default: state <= IDLE;
         endcase
-
-        if (empty & (state != IDLE)) begin
-            state <= IDLE;
-            err_empty <= 1;
-
-        end
         end
     end
 

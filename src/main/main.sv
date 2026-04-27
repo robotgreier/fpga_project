@@ -25,7 +25,13 @@ module main #(
   output wire uart_rxd_out
 );
 
+// Params
 localparam WEIGHT_N = (N_INPUTS+FEEDBACK)*N_OUTPUTS;
+localparam DATA_N = 3;
+localparam WEIGHT_DATA = 0;
+localparam SPIKE_DATA = 1;
+localparam MASTER_DATA = 2;
+logic [N_OUTPUTS-1:0] spk_out;
 
 // ----------------------- Wires ------------------------------ //
 wire  master_read, master_write, master_commit, master_reset; // Master signals
@@ -81,12 +87,6 @@ logic [BIT_WIDTH-1:0] weight_out;
 logic [((N_INPUTS+FEEDBACK)*N_OUTPUTS*8)-1:0] w_parallel_out;
 assign weight_out = w_parallel_out[master_weight_select*8 +: 8];
 
-// Data mux
-localparam DATA_N = 3;
-localparam WEIGHT_DATA = 0;
-localparam SPIKE_DATA = 1;
-localparam MASTER_DATA = 2;
-logic [N_OUTPUTS-1:0] spk_out;
 
 always_comb begin
     unique case (master_data_select)
@@ -98,7 +98,7 @@ always_comb begin
 end
 
 // Reset logic
-reg reset_counter = 0;
+reg [7:0] reset_counter = 0;
 reg already_reset = 0;
 
 always @(posedge clk) begin
