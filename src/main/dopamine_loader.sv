@@ -1,5 +1,4 @@
 module dopamine_loader (
-    input logic clk, rst,
     input logic [7:0] data,
     input logic [7:0] adr,
     output logic signed [3:0] dopamine,

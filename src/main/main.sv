@@ -271,7 +271,6 @@ end
 // Load weights
 // Temp signals
 // logic [7:0] master_address; // Placed by master signals
-logic w_en, d_en;
 
 weight_loader #(
     .N_INPUTS(N_INPUTS),
@@ -282,9 +281,8 @@ weight_loader #(
 ) w_loader (
     .clk(clk),
     .rst(reset),
-    .w_en(w_en),
     .data(fifo_in_data),
-    .adr(master_address),  
+    .adr(master_address),
     .w_next(w_next)
 );
 
@@ -297,10 +295,6 @@ weight_dumper #(
     .N_OUTPUTS(N_OUTPUTS),
     .FEEDBACK(FEEDBACK)
 ) w_dumper (
-    .clk(clk),
-    .rst(reset),
-    .en(d_en),
-    .adr(master_address),
     .w_syn(w_syn),
     .w_parallel_out(w_parallel_out)
 );
@@ -330,10 +324,8 @@ logic reward_en;
 dopamine_loader #(
     // .N_OUTPUTS(N_OUTPUTS) Does not exist
 ) d_loader (
-    .clk(clk),
-    .rst(reset),
     .data(fifo_in_data),
-    .adr(master_address),  
+    .adr(master_address),
     .dopamine(dopamine),
     .reward_en(reward_en)
 );

@@ -16,7 +16,6 @@ module tb_weight_loader ();
 
     logic       clk = 0;
     logic       rst;
-    logic       w_en;
     logic [7:0] data;
     logic [7:0] adr;
     logic [7:0] w_next [N_OUTPUTS-1:0][ROW_LEN-1:0];
@@ -27,7 +26,7 @@ module tb_weight_loader ();
         .N_INPUTS(N_INPUTS), .N_OUTPUTS(N_OUTPUTS),
         .FEEDBACK(FEEDBACK), .W_INIT(W_INIT)
     ) dut (
-        .clk(clk), .rst(rst), .w_en(w_en),
+        .clk(clk), .rst(rst),
         .data(data), .adr(adr), .w_next(w_next)
     );
 
@@ -40,14 +39,14 @@ module tb_weight_loader ();
 
     task automatic write_w(input logic [7:0] d, input logic [7:0] a);
         @(negedge clk);
-        w_en = 1'b1; data = d; adr = a;
+        data = d; adr = a;
         @(posedge clk); #1;
         @(negedge clk);
-        w_en = 1'b0;
+        adr = 8'hFF;
     endtask
 
     initial begin
-        rst = 1'b1; w_en = 1'b0; data = 8'd0; adr = 8'd0;
+        rst = 1'b1; data = 8'd0; adr = 8'hFF;
 
         // Reset for 2 cycles
         @(posedge clk); @(posedge clk); #1;
@@ -92,11 +91,11 @@ module tb_weight_loader ();
         check("w_next[1][0] preserved (200)", w_next[1][0] === 8'd200);
 
         // ==================================================================
-        // TEST 5: w_en low → no write
+        // TEST 5: out-of-range adr → no write
         // ==================================================================
-        $display("\n[%0t] TEST 5: w_en=0 → no update", $time);
+        $display("\n[%0t] TEST 5: adr out of range → no update", $time);
         @(negedge clk);
-        w_en = 1'b0; data = 8'd99; adr = 8'd0;
+        data = 8'd99; adr = 8'd255;
         @(posedge clk); #1;
         check("w_next[0][0] unchanged (still 123)", w_next[0][0] === 8'd123);
 

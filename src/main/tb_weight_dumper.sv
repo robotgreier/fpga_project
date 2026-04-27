@@ -16,9 +16,6 @@ module tb_weight_dumper ();
     localparam int TOTAL     = ROW_LEN * N_OUTPUTS;   // 8 bytes
 
     logic       clk = 0;
-    logic       rst;
-    logic       en;
-    logic [7:0] adr;
     logic [7:0] w_syn [N_OUTPUTS-1:0][ROW_LEN-1:0];
     logic [TOTAL*8-1:0] w_parallel_out;
 
@@ -27,7 +24,6 @@ module tb_weight_dumper ();
     weight_dumper #(
         .N_INPUTS(N_INPUTS), .N_OUTPUTS(N_OUTPUTS), .FEEDBACK(FEEDBACK)
     ) dut (
-        .clk(clk), .rst(rst), .en(en), .adr(adr),
         .w_syn(w_syn), .w_parallel_out(w_parallel_out)
     );
 
@@ -46,8 +42,6 @@ module tb_weight_dumper ();
     endfunction
 
     initial begin
-        rst = 1'b0; en = 1'b0; adr = 8'd0;
-
         // Initialise matrix to zeros
         for (int j = 0; j < N_OUTPUTS; j++)
             for (int i = 0; i < ROW_LEN; i++)
