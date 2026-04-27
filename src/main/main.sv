@@ -137,7 +137,8 @@ master #(
   .master_reset(master_reset),
   .data_out(master_data),
   .weight_select(master_weight_select),
-  .data_select(master_data_select)
+  .data_select(master_data_select),
+  .address_out(master_address)
 );
 
 uart_rx #(

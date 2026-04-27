@@ -96,6 +96,8 @@ module main_tb(
         send_byte(67); // CHECKSUM 1
         send_byte(110); // CHECKSUM 2
 
+        #(400*200)
+
         // STOP
         send_byte(255); // SOF
         send_byte(3); // CMD = STOP
@@ -112,7 +114,17 @@ module main_tb(
         // send_byte(218); // CHECKSUM 2
 
 
-        #(400*2000);
+        #(400*200);
+
+        // RESET
+        send_byte(255); // SOF
+        send_byte(4); // CMD = RESET
+        send_byte(0); // N = 0
+        send_byte(4); // CHECKSUM 1
+        send_byte(8); // CHECKSUM 2
+
+
+        #(400*3000);
         $finish;
     end
 endmodule
