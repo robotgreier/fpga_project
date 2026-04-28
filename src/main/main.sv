@@ -34,7 +34,7 @@ localparam MASTER_DATA = 2;
 logic [N_OUTPUTS-1:0] spk_out;
 
 // ----------------------- Wires ------------------------------ //
-wire  master_read, master_write, master_commit, master_reset; // Master signals
+wire  master_read, master_write, master_commit, master_reset, master_fifo_reset; // Master signals
 wire  [7:0] master_data, master_address;
 wire [$clog2(WEIGHT_N)-1:0] master_weight_select;
 logic [BIT_WIDTH-1:0] data_out;
@@ -50,7 +50,6 @@ wire  verifier_ready, // Verifier signals
 
 wire  packer_transmit, // Packer signals
       packer_check,
-      packer_fifo_reset,
       packer_fletcher_reset,
       packer_read,
       packer_err_empty;
@@ -138,7 +137,8 @@ master #(
   .data_out(master_data),
   .weight_select(master_weight_select),
   .data_select(master_data_select),
-  .address_out(master_address)
+  .address_out(master_address),
+  .fifo_reset(master_fifo_reset)
 );
 
 uart_rx #(
@@ -222,7 +222,7 @@ fifo_memory #(
     .BIT_WIDTH(BIT_WIDTH)
 ) fifo_out (
     .clk(clk),
-    .soft_reset(packer_fifo_reset),
+    .soft_reset(master_fifo_reset),
     .hard_reset(reset),
     .write(master_write),
     .commit(master_commit),
@@ -244,7 +244,6 @@ packer #(
     .fletcher_sum(fletcher_out_sum),
     .transmit(packer_transmit),
     .check(packer_check),
-    .fifo_reset(packer_fifo_reset),
     .fletcher_reset(packer_fletcher_reset),
     .read(packer_read),
     .data(packer_data),

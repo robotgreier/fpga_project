@@ -98,6 +98,16 @@ module main_tb(
 
         #(400*200)
 
+        // ERROR
+        send_byte(255); // SOF
+        send_byte(5); // CMD = ERR
+        send_byte(1); // N = 1
+        send_byte(1); // Spike error
+        send_byte(7); // CHECKSUM 1
+        send_byte(18); // CHECKSUM 2
+
+        #(400*200)
+
         // STOP
         send_byte(255); // SOF
         send_byte(3); // CMD = STOP
@@ -114,17 +124,16 @@ module main_tb(
         // send_byte(218); // CHECKSUM 2
 
 
-        #(400*200);
+        // #(400*200);
 
-        // RESET
-        send_byte(255); // SOF
-        send_byte(4); // CMD = RESET
-        send_byte(0); // N = 0
-        send_byte(4); // CHECKSUM 1
-        send_byte(8); // CHECKSUM 2
+        // // RESET
+        // send_byte(255); // SOF
+        // send_byte(4); // CMD = RESET
+        // send_byte(0); // N = 0
+        // send_byte(4); // CHECKSUM 1
+        // send_byte(8); // CHECKSUM 2
 
-
-        #(400*3000);
+        #(400*15000);
         $finish;
     end
 endmodule

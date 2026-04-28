@@ -28,7 +28,7 @@ module master #(
     )(
         input wire clk, reset, empty, err_empty,
         input wire [BIT_WIDTH-1:0] data_in,
-        output reg read, write, commit, master_reset,
+        output reg read, write, commit, master_reset, fifo_reset,
         output reg [BIT_WIDTH-1:0] data_out,
         output reg [BIT_WIDTH-1:0] address_out,
         output reg [$clog2(WEIGHT_SELECT)-1:0] weight_select,
@@ -57,28 +57,29 @@ module master #(
     localparam CMD = 1;
     localparam INIT = 2;
     localparam INIT_LOOP = 3;
-    localparam INIT_WAIT = 23;
-    localparam SPIKE = 4;
-    localparam SPIKE_LOOP = 5;
-    localparam SPIKE_WRITE = 6;
-    localparam SPIKE_SEND = 7;
-    localparam SPIKE_SELECT = 24;
-    localparam SPIKE_COMMIT = 8;
-    localparam DOPAMINE = 9;
-    localparam DOPAMINE_WRITE = 10;
-    localparam DOPAMINE_WAIT = 25;
-    localparam STOP = 11;
-    localparam STOP_SEND = 12;
-    localparam STOP_LOOP = 13;
-    localparam STOP_COMMIT = 14;
-    localparam RESET = 15;
-    localparam ERROR = 16;
-    localparam ERROR_PASS = 17;
-    localparam ERROR_FIX = 18;
-    localparam WRITE_ERROR_1 = 19;
-    localparam WRITE_ERROR_2 = 20;
-    localparam WRITE_ERROR_3 = 21;
-    localparam CMD_ERROR = 22;
+    localparam INIT_WAIT = 4;
+    localparam SPIKE = 5;
+    localparam SPIKE_LOOP = 6;
+    localparam SPIKE_WRITE = 7;
+    localparam SPIKE_SEND = 8;
+    localparam SPIKE_SELECT = 9;
+    localparam SPIKE_COMMIT = 10;
+    localparam DOPAMINE = 11;
+    localparam DOPAMINE_WRITE = 12;
+    localparam DOPAMINE_WAIT = 13;
+    localparam STOP = 14;
+    localparam STOP_SEND = 15;
+    localparam STOP_LOOP = 16;
+    localparam STOP_COMMIT = 17;
+    localparam RESET = 18;
+    localparam ERROR = 19;
+    localparam ERROR_PASS = 20;
+    localparam ERROR_FIX = 21;
+    localparam WRITE_ERROR_1 = 22;
+    localparam WRITE_ERROR_2 = 23;
+    localparam WRITE_ERROR_3 = 24;
+    localparam WRITE_ERROR_4 = 25;
+    localparam CMD_ERROR = 26;
 
     // Command parameters
     localparam CMD_INIT = 0;
@@ -109,6 +110,7 @@ module master #(
         master_reset <= 0;
         data_out <= 0;
         address_out <= NO_ADDRESS;
+        fifo_reset <= 0;
 
         if (reset) begin // Reset called
             state <= IDLE;
@@ -137,7 +139,7 @@ module master #(
                     CMD_ERR: state <= ERROR;
                     default: begin
                         state <= WRITE_ERROR_1;
-                        err <= 0;
+                        err <= ERR_CMD;
                     end
                 endcase
             end
@@ -157,7 +159,7 @@ module master #(
                     i <= i +1;
                     if (empty) begin
                         state <= WRITE_ERROR_1;
-                        err <= 1;
+                        err <= ERR_WEIGHT;
                     end
                 end
                 else state <= INIT_WAIT;
@@ -179,7 +181,7 @@ module master #(
                 if (i >= SPIKE_N - 1) state <= SPIKE_WRITE;
                 else if (empty) begin
                     state <= WRITE_ERROR_1;
-                    err <= 1;
+                    err <= ERR_SPIKE;
                 end
                 else i = i + 1;
             end
@@ -225,6 +227,7 @@ module master #(
                 data_select <= MASTER_DATA;
                 data_out <= 1;
                 write <= 1;
+                read <= 1;
                 state <= STOP_SEND;
             end
 
@@ -239,10 +242,10 @@ module master #(
                 i = i + 1;
                 data_select <= WEIGHT_DATA;
                 weight_select <= i + WEIGHT_OFFSET;
-                write <= 1;
 
                 state <= state;
                 if (i >= WEIGHT_N) state <= STOP_COMMIT;
+                else write <= 1;
             end
 
             STOP_COMMIT: begin
@@ -257,7 +260,7 @@ module master #(
 
             ERROR: begin
                 read <= 1;
-                state <= RESET;
+                state <= ERROR_PASS;
             end
 
             ERROR_PASS: begin
@@ -269,13 +272,36 @@ module master #(
                 read <= 1;
                 
                 case (data_in)
-                    ERR_SPIKE: state <= SPIKE;
+                    ERR_SPIKE: state <= SPIKE_WRITE;
                     ERR_WEIGHT: state <= STOP;
                     default: state <= IDLE;
                 endcase
             end
 
+            WRITE_ERROR_1: begin
+                fifo_reset <= 1;
+                data_select <= MASTER_DATA;
+                state <= WRITE_ERROR_2;
+            end
 
+            WRITE_ERROR_2: begin
+                data_out <= 2;
+                write <= 1;
+                state <= WRITE_ERROR_3;
+            end
+
+            WRITE_ERROR_3: begin
+                data_out <= 1;
+                write <= 1;
+                state <= WRITE_ERROR_4;
+            end
+
+            WRITE_ERROR_4: begin
+                data_out <= err;
+                write <= 1;
+                commit <= 1;
+                state <= IDLE;
+            end
 
             default: state <= IDLE;
         endcase

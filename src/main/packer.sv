@@ -26,7 +26,7 @@ module packer #(
         input wire clk, empty, reset, ready,
         input wire [BIT_WIDTH-1:0] fifo_data,
         input wire [(BIT_WIDTH*2)-1:0] fletcher_sum,
-        output reg transmit, check, fifo_reset, fletcher_reset, read, err_empty,
+        output reg transmit, check, fletcher_reset, read, err_empty,
         output reg [BIT_WIDTH-1:0] data
     );
 
@@ -63,7 +63,6 @@ module packer #(
         else begin // Clk
         transmit <= 0;
         check <= 0;
-        fifo_reset <= 0;
         fletcher_reset <= 0;
         read <= 0;
         err_empty <= 0;
