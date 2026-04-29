@@ -22,6 +22,9 @@ module tb_SNN_core ();
     logic clk = 1'b0;
     always #5 clk = ~clk;
 
+    // run=1 for all DUTs: these are neural-behavior unit tests, not gating tests
+    logic run = 1'b1;
+
     // =========================================================================
     // Pass / fail bookkeeping
     // =========================================================================
@@ -54,7 +57,7 @@ module tb_SNN_core ();
         .N_INPUTS(D0_NI), .N_OUTPUTS(D0_NO), .FEEDBACK(D0_FB),
         .THRESHOLD(512), .DECAY(64), .RESET(0), .LEARNING_MODE(0)
     ) dut0 (
-        .clk(clk), .rst(d0_rst), .spiketrain(d0_pre), .dopamine(d0_dop),
+        .clk(clk), .run(run), .rst(d0_rst), .spiketrain(d0_pre), .dopamine(d0_dop),
         .reward_en(d0_ren), .w_syn(d0_wsyn),
         .spk_out(d0_spk), .winner_idx(d0_widx), .w_next(d0_wnxt)
     );
@@ -102,7 +105,7 @@ module tb_SNN_core ();
         .DW_POS(16), .T_PRE(4), .T_POST(4), .LR_SHIFT(2),
         .W_MIN(8), .W_MAX(200), .LEARNING_MODE(2)
     ) dut1 (
-        .clk(clk), .rst(d1_rst), .spiketrain(d1_pre), .dopamine(d1_dop),
+        .clk(clk), .run(run), .rst(d1_rst), .spiketrain(d1_pre), .dopamine(d1_dop),
         .reward_en(d1_ren), .w_syn(d1_wsyn),
         .spk_out(d1_spk), .winner_idx(d1_widx), .w_next(d1_wnxt)
     );
@@ -123,7 +126,7 @@ module tb_SNN_core ();
         .DW_POS(16), .T_PRE(4), .T_POST(4), .LR_SHIFT(2),
         .W_MIN(8), .W_MAX(200), .LEARNING_MODE(1)
     ) dut2 (
-        .clk(clk), .rst(d2_rst), .spiketrain(d2_pre), .dopamine(d2_dop),
+        .clk(clk), .run(run), .rst(d2_rst), .spiketrain(d2_pre), .dopamine(d2_dop),
         .reward_en(d2_ren), .w_syn(d2_wsyn),
         .spk_out(d2_spk), .winner_idx(d2_widx), .w_next(d2_wnxt)
     );

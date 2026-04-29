@@ -52,6 +52,7 @@ module tb_synapse_core ();
     // --------------------------------------------------------------------------
     logic              clk;
     logic              rst;
+    logic              run  = 1'b1;  // always enabled: unit test, not gating
     logic              pre_spk;
     logic              post_spk;
     logic signed [3:0] dopamine;
@@ -81,6 +82,7 @@ module tb_synapse_core ();
         .LEARNING_MODE(0)
     ) dut_none (
         .clk       (clk),
+        .run       (run),
         .rst       (rst),
         .pre_spk   (pre_spk),
         .post_spk  (post_spk),
@@ -103,6 +105,7 @@ module tb_synapse_core ();
         .LEARNING_MODE(1)
     ) dut_rstdp (
         .clk       (clk),
+        .run       (run),
         .rst       (rst),
         .pre_spk   (pre_spk),
         .post_spk  (post_spk),
@@ -125,6 +128,7 @@ module tb_synapse_core ();
         .LEARNING_MODE(2)
     ) dut_stdp (
         .clk       (clk),
+        .run       (run),
         .rst       (rst),
         .pre_spk   (pre_spk),
         .post_spk  (post_spk),

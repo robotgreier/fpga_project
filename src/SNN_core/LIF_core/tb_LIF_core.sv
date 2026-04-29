@@ -34,6 +34,7 @@ module tb_LIF_core ();
     // --------------------------------------------------------------------------
     logic        clk;
     logic        rst;
+    logic        run  = 1'b1;  // always enabled: unit test, not gating
     logic        inhibit;
     logic [15:0] i_syn;
     logic        spk;
@@ -48,6 +49,7 @@ module tb_LIF_core ();
         .RESET    (RESET)
     ) dut (
         .clk          (clk),
+        .run          (run),
         .rst          (rst),
         .inhibit      (inhibit),
         .i_syn        (i_syn),

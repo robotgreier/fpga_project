@@ -38,6 +38,7 @@ module tb_eligibility_updater ();
     // --------------------------------------------------------------------------
     logic clk;
     logic rst;
+    logic run  = 1'b1;  // always enabled: unit test, not gating
     logic pre_spk;
     logic post_spk;
 
@@ -53,6 +54,7 @@ module tb_eligibility_updater ();
         .LEARNING_MODE(0)
     ) dut_off (
         .clk       (clk),
+        .run       (run),
         .pre_spk   (pre_spk),
         .post_spk  (post_spk),
         .rst       (rst),
@@ -70,6 +72,7 @@ module tb_eligibility_updater ();
         .MIN_E_TRACE(MIN_E_TRACE)
     ) dut_on (
         .clk       (clk),
+        .run       (run),
         .pre_spk   (pre_spk),
         .post_spk  (post_spk),
         .rst       (rst),
@@ -83,6 +86,7 @@ module tb_eligibility_updater ();
         .LEARNING_MODE(1)
     ) dut_clamp (
         .clk       (clk),
+        .run       (run),
         .pre_spk   (pre_spk),
         .post_spk  (post_spk),
         .rst       (rst),
