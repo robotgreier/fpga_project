@@ -271,6 +271,14 @@ logic [7:0] w_learned [N_OUTPUTS-1:0][(N_INPUTS+FEEDBACK)-1:0];
 // falls through to the SNN driver.
 wire load_active = (master_address <= 8'd198);
 
+// weight_loader and the w_syn mux both update on the same posedge, so w_syn
+// reads the OLD w_loaded on the last address cycle.  Holding load_active one
+// extra cycle lets w_syn capture the now-updated w_loaded before switching to
+// w_learned.
+logic load_active_prev;
+always_ff @(posedge clk) load_active_prev <= load_active;
+wire load_active_latched = load_active || load_active_prev;
+
 // Power-on init so weights start at W_INIT after FPGA configuration even when
 // RESET_WEIGHTS=0 and reset never wipes them.
 initial foreach (w_syn[i,j]) w_syn[i][j] = W_INIT;
@@ -278,7 +286,7 @@ initial foreach (w_syn[i,j]) w_syn[i][j] = W_INIT;
 always_ff @(posedge clk) begin
   if (RESET_WEIGHTS && reset)
     foreach (w_syn[i,j]) w_syn[i][j] <= W_INIT;
-  else if (load_active)
+  else if (load_active_latched)
     w_syn <= w_loaded;
   else
     w_syn <= w_learned;
