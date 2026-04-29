@@ -239,7 +239,7 @@ module master #(
             end
 
             STOP_LOOP: begin
-                i = i + 1;
+                i <= i + 1;
                 data_select <= WEIGHT_DATA;
                 weight_select <= i + WEIGHT_OFFSET;
 
