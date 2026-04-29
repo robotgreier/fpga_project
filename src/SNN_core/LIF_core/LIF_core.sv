@@ -4,6 +4,7 @@ module LIF_core #(
     parameter int RESET     = 0
   ) (
     input  logic               clk,
+    input  logic               run,            // Clock enable: only update on asserted cycles
     input  logic               inhibit,        // Lateral inhibition: suppress spike and reset mem
     input  logic [15:0] i_syn,          // Synaptic input current
     input  logic               rst,            // Reset
@@ -24,7 +25,7 @@ module LIF_core #(
       spk           <= '0;
       mem           <= 16'(RESET);
       pre_reset_mem <= 16'(RESET);
-    end else begin
+    end else if (run) begin
       pre_reset_mem <= mem_next;
 
       if (inhibit) begin

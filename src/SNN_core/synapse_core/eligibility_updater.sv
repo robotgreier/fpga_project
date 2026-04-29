@@ -9,6 +9,7 @@ module eligibility_updater #(
     parameter int MIN_E_TRACE   = -256
   ) (
     input  logic              clk,
+    input  logic              run,
     input  logic              pre_spk,
     input  logic              post_spk,
     input  logic              rst,
@@ -35,7 +36,7 @@ module eligibility_updater #(
       if (rst) begin
         pre_spk_r  <= 1'b0;
         post_spk_r <= 1'b0;
-      end else begin
+      end else if (run) begin
         pre_spk_r  <= pre_spk;
         post_spk_r <= post_spk;
       end
@@ -47,7 +48,7 @@ module eligibility_updater #(
       if (rst) begin
         pre_timer  <= DISABLED;
         post_timer <= DISABLED;
-      end else begin
+      end else if (run) begin
         // Pre timer
         if      (pre_edge)
           pre_timer  <= 0;
@@ -84,12 +85,10 @@ module eligibility_updater #(
     begin : eligibility_update
       if (rst) begin
         e_trace <= '0;
-      end else if (e_next > MAX_E_TRACE) begin
-        e_trace <= MAX_E_TRACE;
-      end else if (e_next < MIN_E_TRACE) begin
-        e_trace <= MIN_E_TRACE;
-      end else begin
-        e_trace <= e_next[8:0];
+      end else if (run) begin
+        if      (e_next > MAX_E_TRACE) e_trace <= MAX_E_TRACE;
+        else if (e_next < MIN_E_TRACE) e_trace <= MIN_E_TRACE;
+        else                           e_trace <= e_next[8:0];
       end
     end
 

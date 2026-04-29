@@ -10,6 +10,7 @@ module synapse_core #(
     parameter int LEARNING_MODE = 0
   ) (
     input logic clk,
+    input logic run,                     // Clock enable: only update on asserted cycles
     input logic rst,                     // Synchronous reset (active high)
     input logic pre_spk,                 // Pre-synaptic spike input
     input logic post_spk,                // Post-synaptic spike input
@@ -39,6 +40,7 @@ module synapse_core #(
     .MIN_E_TRACE(-256)
   ) elig_upd (
     .clk       (clk),
+    .run       (run),
     .rst       (rst),
     .pre_spk   (pre_spk),
     .post_spk  (post_spk),

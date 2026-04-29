@@ -316,6 +316,17 @@ weight_dumper #(
 );
 
 
+// SNN run-enable: fires for exactly one cycle after the last spike byte is latched.
+// Keeps the SNN frozen during loading (partial spiketrain) and between packets
+// (prevents the network from re-processing the same spiketrain multiple times).
+localparam int SPIKE_ADDR_LO = 200;
+localparam int SPIKE_ADDR_HI = 210;
+logic snn_in_spike_range_prev;
+wire  snn_in_spike_range = (master_address >= SPIKE_ADDR_LO && master_address <= SPIKE_ADDR_HI);
+always_ff @(posedge clk)
+    snn_in_spike_range_prev <= snn_in_spike_range;
+wire snn_run = snn_in_spike_range_prev && !snn_in_spike_range;
+
 // Load spikes
 // Temp signals
 logic [(N_INPUTS) - 1:0] spiketrain;
@@ -365,7 +376,8 @@ SNN_core #(
     .N_OUTPUTS(N_OUTPUTS),
     .FEEDBACK(FEEDBACK)
 ) snn (
-    .clk(clk), 
+    .clk(clk),
+    .run(snn_run),
     .rst(reset),
     .spiketrain(spiketrain),
     .dopamine(dopamine),

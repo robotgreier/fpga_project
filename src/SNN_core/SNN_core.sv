@@ -16,6 +16,7 @@ module SNN_core #(
     parameter int  FEEDBACK      = 1   // 1: append NOR-feedback neuron as extra input
   ) (
     input  logic                                                    clk,
+    input  logic                                                    run,            // Clock enable: execute one forward pass per pulse
     input  logic                                                    rst,
     input  logic [N_INPUTS-1:0]                                     spiketrain,
     input  logic signed [3:0]                                       dopamine,
@@ -35,7 +36,8 @@ module SNN_core #(
   logic [N_IN_TOTAL-1:0] spiketrain_fb;
 
   always_ff @(posedge clk)
-    feedback_reg <= FEEDBACK ? ~|spk_out : 1'b0;
+    if (rst)      feedback_reg <= 1'b0;
+    else if (run) feedback_reg <= FEEDBACK ? ~|spk_out : 1'b0;
 
   if (FEEDBACK) assign spiketrain_fb = {feedback_reg, spiketrain};
   else          assign spiketrain_fb = spiketrain;
@@ -111,6 +113,7 @@ module SNN_core #(
       .RESET(RESET)
     ) lif_inst (
       .clk(clk),
+      .run(run),
       .rst(rst),
       .inhibit(inhibit[j]),
       .i_syn(i_sum[j]),
@@ -131,6 +134,7 @@ module SNN_core #(
         .LEARNING_MODE(LEARNING_MODE)
       ) syn_inst (
         .clk(clk),
+        .run(run),
         .rst(rst),
         .pre_spk(pre_spk_gated[j][i]),
         .post_spk(post_spk_gated[j]),
