@@ -252,9 +252,23 @@ packer #(
 
 // ----------------------- SNN things ------------------------------ //
 
-// Instantiate weight matrices
-logic [7:0] w_syn  [N_OUTPUTS-1:0][(N_INPUTS+FEEDBACK)-1:0];
-logic [7:0] w_next [N_OUTPUTS-1:0][(N_INPUTS+FEEDBACK)-1:0];
+// Two source matrices feed w_syn:
+//   w_loaded  : weight_loader's view, updated one byte at a time as INIT bytes
+//               stream in over UART.
+//   w_learned : SNN_core's view, produced by synapse_core (w_syn + delta_w,
+//               clamped to [W_MIN, W_MAX]).
+// Mirrors the Python reference (LIF_SNN_network.SNNLayer): load_weights()
+// overwrites the matrix wholesale, while forward()/apply_reward() evolves it
+// through learning -- the two never write the matrix at the same time.
+logic [7:0] w_syn     [N_OUTPUTS-1:0][(N_INPUTS+FEEDBACK)-1:0];
+logic [7:0] w_loaded  [N_OUTPUTS-1:0][(N_INPUTS+FEEDBACK)-1:0];
+logic [7:0] w_learned [N_OUTPUTS-1:0][(N_INPUTS+FEEDBACK)-1:0];
+
+// master_address points at a weight slot only while INIT_LOOP is streaming
+// (0..127 with WEIGHT_OFFSET=0).  weight_loader's accept window is 0..198, so
+// any non-weight master phase (DOPAMINE=199, SPIKE=200..210, NO_ADDRESS=255)
+// falls through to the SNN driver.
+wire load_active = (master_address <= 8'd198);
 
 // Power-on init so weights start at W_INIT after FPGA configuration even when
 // RESET_WEIGHTS=0 and reset never wipes them.
@@ -263,8 +277,10 @@ initial foreach (w_syn[i,j]) w_syn[i][j] = W_INIT;
 always_ff @(posedge clk) begin
   if (RESET_WEIGHTS && reset)
     foreach (w_syn[i,j]) w_syn[i][j] <= W_INIT;
+  else if (load_active)
+    w_syn <= w_loaded;
   else
-    w_syn <= w_next;
+    w_syn <= w_learned;
 end
 
 // Load weights
