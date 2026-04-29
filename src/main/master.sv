@@ -26,7 +26,7 @@ module master #(
         parameter WEIGHT_SELECT = 128,
         parameter DATA_SELECT = 3
     )(
-        input wire clk, reset, empty, err_empty,
+        input wire clk, reset, empty, err_empty, err_full,
         input wire [BIT_WIDTH-1:0] data_in,
         output reg read, write, commit, master_reset, fifo_reset,
         output reg [BIT_WIDTH-1:0] data_out,
@@ -93,6 +93,8 @@ module master #(
     localparam ERR_CMD = 0;
     localparam ERR_SPIKE = 1;
     localparam ERR_WEIGHT = 2;
+    localparam ERR_EMPTY = 3;
+    localparam ERR_FULL = 4;
 
     // MUX select parameters
     localparam WEIGHT_DATA = 0;
@@ -306,7 +308,15 @@ module master #(
             default: state <= IDLE;
         endcase
 
-        if (err_empty) master_reset <= 1;
+        if (err_empty) begin
+            err <= ERR_EMPTY;
+            state <= WRITE_ERROR_1;
+        end
+
+        if (err_full) begin
+            err <= ERR_FULL;
+            state <= WRITE_ERROR_1;
+        end
         end
     end
 

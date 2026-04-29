@@ -138,7 +138,8 @@ master #(
   .weight_select(master_weight_select),
   .data_select(master_data_select),
   .address_out(master_address),
-  .fifo_reset(master_fifo_reset)
+  .fifo_reset(master_fifo_reset),
+  .err_full(fifo_out_full)
 );
 
 uart_rx #(
