@@ -12,7 +12,7 @@ module weight_loader #(
   );
 
   localparam int ADR_MIN = 0;
-  localparam int ADR_MAX = 198;
+  localparam int ADR_MAX = N_OUTPUTS * (N_INPUTS + FEEDBACK) - 1;
 
   logic [7:0] w_temp  [N_OUTPUTS-1:0][(N_INPUTS+FEEDBACK)-1:0];
 

@@ -299,7 +299,7 @@ weight_loader #(
     .rst(reset),
     .data(fifo_in_data),
     .adr(master_address),
-    .w_next(w_next)
+    .w_next(w_loaded)
 );
 
 
@@ -373,7 +373,7 @@ SNN_core #(
     .w_syn(w_syn),
     .spk_out(spk_out),
     .winner_idx(winner_idx),
-    .w_next(w_next)
+    .w_next(w_learned)
 );
 
 
