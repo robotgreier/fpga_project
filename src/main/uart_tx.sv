@@ -8,7 +8,7 @@ module uart_tx #(
   input wire transmit, // Set to high when data transmission should begin
   input wire [BIT_WIDTH-1:0] data, // Data to be sent
   output reg tx, // TX line
-  output reg ready // Is high when module is idle
+  output wire ready // Is high when module is idle
 );
 // Wires
 wire tick;
@@ -30,14 +30,14 @@ wire tick;
     .out(tick)
   );
 
+  assign ready = current_state == IDLE;
+
   always @(posedge clk) begin
     current_state <= next_state;
     delay_rst <= 1'b0;
-    ready <= 1'b0;
     tx <= 1'b1;
     case (current_state)
       IDLE: begin
-        ready <= 1'b1;
       end
       INIT: begin
         delay_rst <= 1'b1;
