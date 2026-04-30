@@ -22,7 +22,8 @@ module main #(
     parameter int BIT_WIDTH     = 8 // Must be over N_OUTPUTS
   )(
   input logic CLK100MHZ, uart_txd_in, btn_reset,
-  output wire uart_rxd_out
+  output wire uart_rxd_out,
+  output wire [N_OUTPUTS-1:0] spk_out_led
 );
 
 // Params
@@ -32,6 +33,9 @@ localparam WEIGHT_DATA = 0;
 localparam SPIKE_DATA = 1;
 localparam MASTER_DATA = 2;
 logic [N_OUTPUTS-1:0] spk_out;
+
+
+assign spk_out_led = spk_out; // Directly drive LEDs from SNN output spikes
 
 // ----------------------- Wires ------------------------------ //
 wire  master_read, master_write, master_commit, master_reset, master_fifo_reset; // Master signals
