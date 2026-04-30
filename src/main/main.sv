@@ -78,7 +78,7 @@ wire clk, rx, tx, reset;
 reg start_reset;
 assign clk = CLK100MHZ;
 assign rx = uart_txd_in;
-assign tx = uart_rxd_out;
+assign uart_rxd_out = tx;
 assign reset = start_reset | master_reset | btn_reset;
 
 // Weight mux

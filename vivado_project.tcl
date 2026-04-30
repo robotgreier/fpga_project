@@ -767,6 +767,84 @@ set_property -name "netlist_only" -value "0" -objects $file_obj
 # Set 'utils_1' fileset properties
 set obj [get_filesets utils_1]
 
+
+# Adding sources referenced in BDs, if not already added
+
+
+# Proc to create BD design_1
+proc cr_bd_design_1 { parentCell } {
+
+  # CHANGE DESIGN NAME HERE
+  set design_name design_1
+
+  common::send_gid_msg -ssname BD::TCL -id 2010 -severity "INFO" "Currently there is no design <$design_name> in project, so creating one..."
+
+  create_bd_design $design_name
+
+  set bCheckIPsPassed 1
+##################################################################
+# There are no IPs, Modules, nor sources to check.
+##################################################################
+
+  if { $bCheckIPsPassed != 1 } {
+    common::send_gid_msg -ssname BD::TCL -id 2023 -severity "WARNING" "Will not continue with creation of design due to the error(s) above."
+    return 3
+  }
+
+  variable script_folder
+
+  if { $parentCell eq "" } {
+     set parentCell [get_bd_cells /]
+  }
+
+  # Get object for parentCell
+  set parentObj [get_bd_cells $parentCell]
+  if { $parentObj == "" } {
+     catch {common::send_gid_msg -ssname BD::TCL -id 2090 -severity "ERROR" "Unable to find parent cell <$parentCell>!"}
+     return
+  }
+
+  # Make sure parentObj is hier blk
+  set parentType [get_property TYPE $parentObj]
+  if { $parentType ne "hier" } {
+     catch {common::send_gid_msg -ssname BD::TCL -id 2091 -severity "ERROR" "Parent <$parentObj> has TYPE = <$parentType>. Expected to be <hier>."}
+     return
+  }
+
+  # Save current instance; Restore later
+  set oldCurInst [current_bd_instance .]
+
+  # Set parent object as current
+  current_bd_instance $parentObj
+
+
+  # Create interface ports
+
+  # Create ports
+
+  # Create port connections
+
+  # Create address segments
+
+
+  # Restore current instance
+  current_bd_instance $oldCurInst
+
+  save_bd_design
+common::send_gid_msg -ssname BD::TCL -id 2050 -severity "WARNING" "This Tcl script was generated from a block design that has not been validated. It is possible that design <$design_name> may result in errors during validation."
+
+  close_bd_design $design_name 
+}
+# End of cr_bd_design_1()
+
+cr_bd_design_1 ""
+set_property REGISTERED_WITH_MANAGER "1" [get_files design_1.bd ] 
+set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files design_1.bd ] 
+
+
+# Create wrapper file for design_1.bd
+make_wrapper -files [get_files design_1.bd] -import -top
+
 set idrFlowPropertiesConstraints ""
 catch {
  set idrFlowPropertiesConstraints [get_param runs.disableIDRFlowPropertyConstraints]
@@ -793,7 +871,6 @@ if { $obj != "" } {
 
 }
 set obj [get_runs synth_1]
-set_property -name "needs_refresh" -value "1" -objects $obj
 set_property -name "part" -value "xc7a100tcsg324-2" -objects $obj
 set_property -name "incremental_checkpoint" -value "$proj_dir/vivado_project.srcs/utils_1/imports/synth_1/SNN_core.dcp" -objects $obj
 set_property -name "auto_incremental_checkpoint" -value "1" -objects $obj
