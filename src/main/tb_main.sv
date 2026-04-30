@@ -34,7 +34,7 @@ module tb_main ();
     localparam int N_INPUTS  = 31;
     localparam int N_OUTPUTS = 4;
     localparam int FEEDBACK  = 1;
-    localparam int W_MIN     = 8;
+    localparam int W_MIN     = 40;
     localparam int W_MAX     = 254;
     localparam int W_INIT    = (W_MIN + W_MAX) / 2;     // 131
     localparam int ROW_LEN   = N_INPUTS + FEEDBACK;     // 32
@@ -232,6 +232,44 @@ module tb_main ();
         repeat (400) begin @(posedge clk); #1; end
 
         check("spiketrain matches programmed bits", dut.spiketrain === spike_pattern);
+
+        // --- spike pattern 2: all inputs firing ---
+        $display("\n[%0t] TEST 3b: CMD_SPIKE all-ones spiketrain", $time);
+        spike_pattern = '1;
+
+        spike_data.delete();
+        for (int b = 0; b < N_SPIKE_BYTES; b++)
+            spike_data.push_back(spike_byte(b, spike_pattern));
+        send_packet(8'd1, spike_data);
+        repeat (400) begin @(posedge clk); #1; end
+
+        check("spiketrain all-ones", dut.spiketrain === spike_pattern);
+
+        // --- spike pattern 3: even-indexed inputs only ---
+        $display("\n[%0t] TEST 3c: CMD_SPIKE even-index spiketrain", $time);
+        spike_pattern = '0;
+        for (int i = 0; i < N_INPUTS; i += 2)
+            spike_pattern[i] = 1'b1;
+
+        spike_data.delete();
+        for (int b = 0; b < N_SPIKE_BYTES; b++)
+            spike_data.push_back(spike_byte(b, spike_pattern));
+        send_packet(8'd1, spike_data);
+        repeat (400) begin @(posedge clk); #1; end
+
+        check("spiketrain even-indexed neurons", dut.spiketrain === spike_pattern);
+
+        // --- spike pattern 4: clear all spikes ---
+        $display("\n[%0t] TEST 3d: CMD_SPIKE all-zeros (clear) spiketrain", $time);
+        spike_pattern = '0;
+
+        spike_data.delete();
+        for (int b = 0; b < N_SPIKE_BYTES; b++)
+            spike_data.push_back(spike_byte(b, spike_pattern));
+        send_packet(8'd1, spike_data);
+        repeat (400) begin @(posedge clk); #1; end
+
+        check("spiketrain cleared via CMD_SPIKE", dut.spiketrain === spike_pattern);
 
         // ==================================================================
         // TEST 4: CMD_DOPAMINE drives dopamine + reward_en at adr==DOP_ADR.
