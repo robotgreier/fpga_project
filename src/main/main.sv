@@ -33,6 +33,9 @@ localparam DATA_N = 3;
 localparam WEIGHT_DATA = 0;
 localparam SPIKE_DATA = 1;
 localparam MASTER_DATA = 2;
+localparam CLK_RATE = 50000000;
+localparam BAUD_RATE = 250000;
+localparam CLOCK_BAUD_RATIO = CLK_RATE / BAUD_RATE;
 logic [N_OUTPUTS-1:0] spk_out;
 
 
@@ -89,6 +92,8 @@ always @(posedge CLK100MHZ, posedge reset) begin
     else
         clk <= ~clk;   // toggle every clock edge
 end
+
+// assign clk = CLK100MHZ;
 
 assign rx = uart_txd_in;
 assign uart_rxd_out = tx;
@@ -156,7 +161,7 @@ master #(
 );
 
 uart_rx #(
-  .CLOCK_BAUD_RATIO(400),
+  .CLOCK_BAUD_RATIO(CLOCK_BAUD_RATIO),
   .BIT_WIDTH(BIT_WIDTH)
 ) uart_r (
   .clk(clk),
@@ -167,7 +172,7 @@ uart_rx #(
 );
 
 uart_tx #(
-  .CLOCK_BAUD_RATIO(400),
+  .CLOCK_BAUD_RATIO(CLOCK_BAUD_RATIO),
   .BIT_WIDTH(BIT_WIDTH)
 ) uart_t (
   .clk(clk),
