@@ -80,9 +80,16 @@ wire  tx_ready; // TX signals
 
 // ----------------------- Connections ------------------------------ //
 
-wire clk, rx, tx, reset;
-reg start_reset;
-assign clk = CLK100MHZ;
+wire rx, tx, reset;
+reg start_reset, clk;
+
+always @(posedge CLK100MHZ, posedge reset) begin
+    if (reset)
+        clk <= 1'b0;
+    else
+        clk <= ~clk;   // toggle every clock edge
+end
+
 assign rx = uart_txd_in;
 assign uart_rxd_out = tx;
 assign reset = start_reset | master_reset | btn_reset;
