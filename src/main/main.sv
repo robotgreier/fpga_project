@@ -370,6 +370,8 @@ spike_loader #(
 // Temp signals
 logic signed [3:0] dopamine;
 logic reward_en;
+logic signed [3:0] dopamine_r;
+logic             reward_en_r;
 
 dopamine_loader #(
     // .N_OUTPUTS(N_OUTPUTS) Does not exist
@@ -379,6 +381,11 @@ dopamine_loader #(
     .dopamine(dopamine),
     .reward_en(reward_en)
 );
+
+always_ff @(posedge clk) begin
+    dopamine_r  <= dopamine;
+    reward_en_r <= reward_en;
+end
 
 
 // Instantiate SNN core
@@ -406,8 +413,8 @@ SNN_core #(
     .run(snn_run),
     .rst(reset),
     .spiketrain(spiketrain),
-    .dopamine(dopamine),
-    .reward_en(reward_en),
+    .dopamine(dopamine_r),
+    .reward_en(reward_en_r),
     .w_syn(w_syn),
     .spk_out(spk_out),
     .winner_idx(winner_idx),

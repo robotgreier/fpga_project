@@ -25,7 +25,7 @@ assign empty = commit_pointer == read_pointer;
 
 assign data_out = memory[read_pointer];
 
-always @ (posedge clk or posedge soft_reset or posedge hard_reset) begin
+always @ (posedge clk or posedge hard_reset) begin
 
     if (hard_reset) begin
         read_pointer <= 0;
@@ -33,23 +33,24 @@ always @ (posedge clk or posedge soft_reset or posedge hard_reset) begin
         commit_pointer <= 0;
     end
 
-    else if (soft_reset) begin // Reset
-        write_pointer <= commit_pointer;
-    end
-
     else begin // CLK
 
-        if (write && !full) begin
-            memory[write_pointer] <= data_in;
-            write_pointer <= write_pointer + 1;
-        end
+        if (soft_reset) begin
+            write_pointer <= commit_pointer;
+        end else begin
 
-        if (read && !empty) begin
-            read_pointer <= read_pointer + 1;
-        end
+            if (write && !full) begin
+                memory[write_pointer] <= data_in;
+                write_pointer <= write_pointer + 1;
+            end
 
-        if (commit) begin
-            commit_pointer <= write_pointer;
+            if (read && !empty) begin
+                read_pointer <= read_pointer + 1;
+            end
+
+            if (commit) begin
+                commit_pointer <= write_pointer;
+            end
         end
     end
 end
