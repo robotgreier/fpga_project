@@ -58,16 +58,29 @@ module SNN_core #(
   // ---------------------------------------------------------------------------
   // WTA: picks winner from raw LIF spikes
   // ---------------------------------------------------------------------------
-  logic winner_valid;
+  logic                         wta_valid_c;
+  logic [$clog2(N_OUTPUTS)-1:0] wta_idx_c;
+  logic                         winner_valid;
 
   WTA #(.N_OUTPUTS(N_OUTPUTS)) wta_inst (
     .spk          (spk_raw),
     .pre_reset_mem(pre_reset_mem),
-    .winner_idx   (winner_idx),
-    .winner_valid (winner_valid)
+    .winner_idx   (wta_idx_c),
+    .winner_valid (wta_valid_c)
   );
 
-  // Build one-hot spk_out from winner_idx
+  // Pipeline register: breaks spk_reg → WTA → e_trace2_carry path (~19 levels, -2.7 ns)
+  always_ff @(posedge clk) begin
+    if (rst) begin
+      winner_idx   <= '0;
+      winner_valid <= 1'b0;
+    end else begin
+      winner_idx   <= wta_idx_c;
+      winner_valid <= wta_valid_c;
+    end
+  end
+
+  // Build one-hot spk_out from registered winner
   always_comb begin
     spk_out = '0;
     if (winner_valid)

@@ -104,7 +104,7 @@ module master #(
     // reg [$clog2(LEN_MAX)-1:0] n;
     reg [$clog2(LEN_MAX)-1:0] i;
 
-    always @(posedge clk, posedge reset, posedge err_empty) begin
+    always @(posedge clk, posedge reset) begin
         state <= state;
         read <= 0;
         write <= 0;
@@ -123,8 +123,6 @@ module master #(
             // n <= 0;
             i <= 0;
         end
-
-        else if (err_empty) master_reset <= 1;
 
         else begin
         case(state)
@@ -309,6 +307,7 @@ module master #(
         endcase
 
         if (err_empty) begin
+            master_reset <= 1;
             err <= ERR_EMPTY;
             state <= WRITE_ERROR_1;
         end
