@@ -170,11 +170,12 @@ module master #(
             SPIKE: begin
                 i <= 0;
                 read <= 1;
+                address_out <= SPIKE_OFFSET;
                 state <= SPIKE_LOOP;
             end
 
             SPIKE_LOOP: begin
-                address_out <= i + SPIKE_OFFSET;
+                address_out <= i + 1 + SPIKE_OFFSET;
                 read <= 1;
 
                 state <= state;
