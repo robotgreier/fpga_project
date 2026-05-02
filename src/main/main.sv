@@ -7,8 +7,8 @@ module main #(
     parameter int T_PRE         = 2,
     parameter int T_POST        = 2,
     parameter int TAU_E_SHIFT   = 3,
-    parameter int DW_POS        = 16,
-    parameter int DW_NEG        = -8,
+    parameter int DW_POS        = 32,
+    parameter int DW_NEG        = 16,
     parameter int W_MIN         = 40,
     parameter int W_MAX         = 254,
     parameter logic [7:0] W_INIT = (W_MIN + W_MAX) / 2,
@@ -40,7 +40,7 @@ logic [N_OUTPUTS-1:0] spk_out;
 
 
 assign spk_out_led = spk_out; // Directly drive LEDs from SNN output spikes
-assign rst_led = btn_reset; // Drive reset LED from reset button for debugging
+assign rst_led = btn_reset; // Drive reset LED from reset button|
 
 // ----------------------- Wires ------------------------------ //
 wire  master_read, master_write, master_commit, master_reset, master_fifo_reset; // Master signals
