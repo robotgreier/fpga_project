@@ -276,23 +276,13 @@ packer #(
 //               stream in over UART.
 //   w_learned : SNN_core's view, produced by synapse_core (w_syn + delta_w,
 //               clamped to [W_MIN, W_MAX]).
-// Mirrors the Python reference (LIF_SNN_network.SNNLayer): load_weights()
-// overwrites the matrix wholesale, while forward()/apply_reward() evolves it
-// through learning -- the two never write the matrix at the same time.
 logic [7:0] w_syn     [N_OUTPUTS-1:0][(N_INPUTS+FEEDBACK)-1:0];
 logic [7:0] w_loaded  [N_OUTPUTS-1:0][(N_INPUTS+FEEDBACK)-1:0];
 logic [7:0] w_learned [N_OUTPUTS-1:0][(N_INPUTS+FEEDBACK)-1:0];
 
-// master_address points at a weight slot only while INIT_LOOP is streaming
-// (0..127 with WEIGHT_OFFSET=0).  weight_loader's accept window is 0..198, so
-// any non-weight master phase (DOPAMINE=199, SPIKE=200..210, NO_ADDRESS=255)
-// falls through to the SNN driver.
+
 wire load_active = (master_address <= 8'd198);
 
-// weight_loader and the w_syn mux both update on the same posedge, so w_syn
-// reads the OLD w_loaded on the last address cycle.  Holding load_active one
-// extra cycle lets w_syn capture the now-updated w_loaded before switching to
-// w_learned.
 logic load_active_prev;
 always_ff @(posedge clk) load_active_prev <= load_active;
 wire load_active_latched = load_active || load_active_prev;
@@ -310,9 +300,6 @@ always_ff @(posedge clk) begin
     w_syn <= w_learned;
 end
 
-// Load weights
-// Temp signals
-// logic [7:0] master_address; // Placed by master signals
 
 weight_loader #(
     .N_INPUTS(N_INPUTS),
@@ -330,8 +317,6 @@ weight_loader #(
 
 
 // Dump weights
-
-// w_parallel_out moved to connections section
 weight_dumper #(
     .N_INPUTS(N_INPUTS),
     .N_OUTPUTS(N_OUTPUTS),
