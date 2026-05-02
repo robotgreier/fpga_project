@@ -118,9 +118,9 @@ end
 reg [7:0] reset_counter = 0;
 reg already_reset = 0;
 
-always @(posedge clk) begin
+always @(posedge CLK100MHZ) begin
   if (already_reset == 1'b0) begin  // Check if system is already delayed
-    if (reset_counter >= 60) begin // Check if counter is over 60 cycles
+    if (reset_counter >= 120) begin // Check if counter is over 120 cycles
       if (start_reset == 1'b1) begin // Check if reset signal is high
         start_reset <= 1'b0;
         already_reset <= 1'b1;
