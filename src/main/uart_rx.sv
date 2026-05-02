@@ -2,7 +2,7 @@
 /* verilator lint_off WIDTHTRUNC */
 
 module uart_rx #(
-  parameter CLOCK_BAUD_RATIO = 400,
+  parameter CLOCK_BAUD_RATIO = 200,
   parameter BIT_WIDTH = 8
 )(
   input wire clk,

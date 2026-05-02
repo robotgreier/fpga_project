@@ -24,7 +24,10 @@ module main #(
   input logic CLK100MHZ, uart_txd_in, btn_reset,
   output wire uart_rxd_out,
   output wire [N_OUTPUTS-1:0] spk_out_led,
-  output wire rst_led
+  output wire rst_led, 
+  output wire fifo_out_empty_led, fifo_out_full_led, 
+  output wire fifo_in_empty_led, fifo_in_full_led,
+  output wire packer_err_empty_led, packer_transmit_led
 );
 
 // Params
@@ -40,7 +43,8 @@ logic [N_OUTPUTS-1:0] spk_out;
 
 
 assign spk_out_led = spk_out; // Directly drive LEDs from SNN output spikes
-assign rst_led = btn_reset; // Drive reset LED from reset button|
+assign rst_led = btn_reset; // Drive reset LED from reset button
+
 
 // ----------------------- Wires ------------------------------ //
 wire  master_read, master_write, master_commit, master_reset, master_fifo_reset; // Master signals
@@ -63,12 +67,19 @@ wire  packer_transmit, // Packer signals
       packer_read,
       packer_err_empty;
 wire  [7:0] packer_data;
+assign packer_err_empty_led = packer_err_empty; // Drive packer error LED from packer error signal
+assign packer_transmit_led = packer_transmit; // Drive packer transmit LED from packer transmit signal
 
 wire  fifo_in_full, fifo_in_empty; // fifo_in signals
 wire  [7:0] fifo_in_data;
+assign fifo_in_empty_led = fifo_in_empty; // Drive FIFO empty LED from FIFO empty signal
+assign fifo_in_full_led = fifo_in_full; // Drive FIFO full LED from FIFO full signal
 
 wire  fifo_out_full, fifo_out_empty; // fifo_out signals
 wire  [7:0] fifo_out_data;
+assign fifo_out_empty_led = fifo_out_empty; // Drive FIFO empty LED from FIFO empty signal
+assign fifo_out_full_led = fifo_out_full; // Drive FIFO full LED from FIFO full signal
+
 
 wire  fletcher_in_reset; // fletcher_in signals
 wire  [15:0] fletcher_in_sum;
