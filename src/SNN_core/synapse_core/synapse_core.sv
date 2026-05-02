@@ -1,13 +1,13 @@
 module synapse_core #(
-    parameter int LR_SHIFT     = 2,
+    parameter int LR_SHIFT     = 7,
     parameter int T_PRE        = 2,
     parameter int T_POST       = 2,
-    parameter int TAU_E_SHIFT  = 2,
-    parameter int DW_POS       = 16,
-    parameter int DW_NEG       = 64,
-    parameter int W_MIN        = 8,
+    parameter int TAU_E_SHIFT  = 3,
+    parameter int DW_POS       = 32,
+    parameter int DW_NEG       = 16,
+    parameter int W_MIN        = 16,
     parameter int W_MAX        = 254,
-    parameter int LEARNING_MODE = 0
+    parameter int LEARNING_MODE = 1
   ) (
     input logic clk,
     input logic run,                     // Clock enable: only update on asserted cycles

@@ -1,16 +1,16 @@
 module SNN_core #(
-    parameter int  DECAY         = 256,
-    parameter int  THRESHOLD     = 1024,
+    parameter int  DECAY         = 63,
+    parameter int  THRESHOLD     = 1023,
     parameter int  RESET         = 0,
-    parameter int  LR_SHIFT      = 2,
+    parameter int  LR_SHIFT      = 7,
     parameter int  T_PRE         = 2,
     parameter int  T_POST        = 2,
-    parameter int  TAU_E_SHIFT   = 2,
-    parameter int  DW_POS        = 16,
-    parameter int  DW_NEG        = 64,
-    parameter int  W_MIN         = 8,
+    parameter int  TAU_E_SHIFT   = 3,
+    parameter int  DW_POS        = 32,
+    parameter int  DW_NEG        = 16,
+    parameter int  W_MIN         = 16,
     parameter int  W_MAX         = 254,
-    parameter int  LEARNING_MODE = 0,  // 0: None, 1: R-STDP, 2: STDP
+    parameter int  LEARNING_MODE = 1,  // 0: None, 1: R-STDP, 2: STDP
     parameter int  N_INPUTS      = 31,
     parameter int  N_OUTPUTS     = 4,
     parameter int  FEEDBACK      = 1   // 1: append NOR-feedback neuron as extra input

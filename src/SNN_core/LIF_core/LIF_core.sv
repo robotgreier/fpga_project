@@ -1,6 +1,6 @@
 module LIF_core #(
-    parameter int DECAY     = 256,
-    parameter int THRESHOLD = 1024,
+    parameter int DECAY     = 63,
+    parameter int THRESHOLD = 1023,
     parameter int RESET     = 0
   ) (
     input  logic               clk,

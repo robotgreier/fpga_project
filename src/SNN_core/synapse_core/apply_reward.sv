@@ -1,6 +1,6 @@
 module apply_reward #(
     parameter int LR_SHIFT = 7,
-    parameter int LEARNING_MODE = 2
+    parameter int LEARNING_MODE = 1
   ) (
     input  logic signed [3:0] dopamine,
     input  logic signed [8:0] elig_trace,

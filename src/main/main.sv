@@ -1,7 +1,7 @@
 module main #(
   // SNN parameters
-    parameter int DECAY         = 512,
-    parameter int THRESHOLD     = 4096,
+    parameter int DECAY         = 63,
+    parameter int THRESHOLD     = 1023,
     parameter int RESET         = 0,
     parameter int LR_SHIFT      = 7,
     parameter int T_PRE         = 2,
@@ -9,7 +9,7 @@ module main #(
     parameter int TAU_E_SHIFT   = 3,
     parameter int DW_POS        = 32,
     parameter int DW_NEG        = 16,
-    parameter int W_MIN         = 40,
+    parameter int W_MIN         = 16,
     parameter int W_MAX         = 254,
     parameter logic [7:0] W_INIT = (W_MIN + W_MAX) / 2,
     parameter bit RESET_WEIGHTS = 0,  // 1: reset wipes weights to W_INIT, 0: weights survive reset

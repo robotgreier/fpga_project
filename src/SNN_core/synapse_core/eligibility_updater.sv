@@ -1,9 +1,9 @@
 module eligibility_updater #(
     parameter int T_PRE         = 2,
     parameter int T_POST        = 2,
-    parameter int TAU_E_SHIFT   = 2,
-    parameter int DW_POS        = 16,
-    parameter int DW_NEG        = 64,
+    parameter int TAU_E_SHIFT   = 3,
+    parameter int DW_POS        = 32,
+    parameter int DW_NEG        = 16,
     parameter int LEARNING_MODE = 1,   // 0: None, 1: R-STDP, 2: STDP
     parameter int MAX_E_TRACE   = 255,
     parameter int MIN_E_TRACE   = -256
