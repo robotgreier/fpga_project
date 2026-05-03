@@ -16,9 +16,9 @@ create_clock -period 10.000 -name sys_clk_pin -waveform {0.000 5.000} -add [get_
 ## RGB LEDs
 
 # Reset button
-#set_property -dict { PACKAGE_PIN E1    IOSTANDARD LVCMOS33 } [get_ports { led0_b }]; #IO_L18N_T2_35 Sch=led0_b
+set_property -dict { PACKAGE_PIN E1    IOSTANDARD LVCMOS33 } [get_ports { rst_led }]; #IO_L18N_T2_35 Sch=led0_b
 #set_property -dict { PACKAGE_PIN F6    IOSTANDARD LVCMOS33 } [get_ports { led0_g }]; #IO_L19N_T3_VREF_35 Sch=led0_g
-set_property -dict {PACKAGE_PIN G6 IOSTANDARD LVCMOS33} [get_ports rst_led]
+set_property -dict {PACKAGE_PIN G6 IOSTANDARD LVCMOS33} [get_ports error_led]
 
 # Packer
 #set_property -dict { PACKAGE_PIN G4    IOSTANDARD LVCMOS33 } [get_ports { led1_b }]; #IO_L20P_T3_35 Sch=led1_b

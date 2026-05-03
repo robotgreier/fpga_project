@@ -3,7 +3,7 @@ module main #(
     parameter int DECAY         = 63,
     parameter int THRESHOLD     = 1023,
     parameter int RESET         = 0,
-    parameter int REFRACTORY    = 0,
+    parameter int REFRACTORY    = 1,
     parameter int LR_SHIFT      = 7,
     parameter int T_PRE         = 2,
     parameter int T_POST        = 2,
@@ -28,7 +28,8 @@ module main #(
   output wire rst_led, 
   output wire fifo_out_empty_led, fifo_out_full_led, 
   output wire fifo_in_empty_led, fifo_in_full_led,
-  output wire packer_err_empty_led, packer_transmit_led
+  output wire packer_err_empty_led, packer_transmit_led,
+  output wire error_led
 );
 
 // Params
@@ -68,8 +69,9 @@ wire  packer_transmit, // Packer signals
       packer_read,
       packer_err_empty;
 wire  [7:0] packer_data;
-assign packer_err_empty_led = packer_err_empty; // Drive packer error LED from packer error signal
-assign packer_transmit_led = packer_transmit; // Drive packer transmit LED from packer transmit signal
+assign packer_err_empty_led = packer_err_empty;
+assign packer_transmit_led = packer_transmit;
+assign error_led = !packer_err_empty | fifo_out_full | fifo_in_full;
 
 wire  fifo_in_full, fifo_in_empty; // fifo_in signals
 wire  [7:0] fifo_in_data;
