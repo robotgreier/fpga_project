@@ -71,7 +71,6 @@ wire  packer_transmit, // Packer signals
 wire  [7:0] packer_data;
 assign packer_err_empty_led = packer_err_empty;
 assign packer_transmit_led = packer_transmit;
-assign error_led = !packer_err_empty | fifo_out_full | fifo_in_full;
 
 wire  fifo_in_full, fifo_in_empty; // fifo_in signals
 wire  [7:0] fifo_in_data;
@@ -82,6 +81,9 @@ wire  fifo_out_full, fifo_out_empty; // fifo_out signals
 wire  [7:0] fifo_out_data;
 assign fifo_out_empty_led = fifo_out_empty; // Drive FIFO empty LED from FIFO empty signal
 assign fifo_out_full_led = fifo_out_full; // Drive FIFO full LED from FIFO full signal
+
+assign error_led = !packer_err_empty;
+
 
 
 wire  fletcher_in_reset; // fletcher_in signals
