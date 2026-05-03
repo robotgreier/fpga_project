@@ -2,6 +2,7 @@ module SNN_core #(
     parameter int  DECAY         = 63,
     parameter int  THRESHOLD     = 1023,
     parameter int  RESET         = 0,
+    parameter int  REFRACTORY    = 0,    // Dead-tick count after spike (0 = disabled)
     parameter int  LR_SHIFT      = 7,
     parameter int  T_PRE         = 2,
     parameter int  T_POST        = 2,
@@ -123,7 +124,8 @@ module SNN_core #(
     LIF_core #(
       .DECAY(DECAY),
       .THRESHOLD(THRESHOLD),
-      .RESET(RESET)
+      .RESET(RESET),
+      .REFRACTORY(REFRACTORY)
     ) lif_inst (
       .clk(clk),
       .run(run),
