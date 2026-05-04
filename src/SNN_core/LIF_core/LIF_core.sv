@@ -34,21 +34,23 @@ module LIF_core #(
       pre_reset_mem    <= 16'(RESET);
       refractory_timer <= '0;
     end else if (run) begin
-      pre_reset_mem <= mem_next;
-
       if (in_refractory) begin
         // Refractory: hold at reset, suppress spike, discard synaptic input
         spk              <= 1'b0;
         mem              <= 16'(RESET);
+        pre_reset_mem    <= 16'(RESET);
         refractory_timer <= refractory_timer - 1'b1;
       end else if (inhibit) begin
+        pre_reset_mem <= mem_next;
         spk <= 1'b0;
         mem <= 16'(RESET);
       end else if (mem_next >= THRESHOLD) begin
+        pre_reset_mem    <= mem_next;
         spk              <= 1'b1;
         mem              <= 16'(RESET);
         refractory_timer <= REFRAC_W'(REFRACTORY);
       end else begin
+        pre_reset_mem <= mem_next;
         spk <= 1'b0;
         mem <= mem_next;
       end
