@@ -38,7 +38,7 @@ localparam DATA_N = 3;
 localparam WEIGHT_DATA = 0;
 localparam SPIKE_DATA = 1;
 localparam MASTER_DATA = 2;
-localparam CLK_RATE = 50000000;
+localparam CLK_RATE = 100000000;
 localparam BAUD_RATE = 250000;
 localparam CLOCK_BAUD_RATIO = CLK_RATE / BAUD_RATE;
 logic [N_OUTPUTS-1:0] spk_out;
@@ -85,7 +85,6 @@ assign fifo_out_full_led = fifo_out_full; // Drive FIFO full LED from FIFO full 
 assign error_led = !packer_err_empty;
 
 
-
 wire  fletcher_in_reset; // fletcher_in signals
 wire  [15:0] fletcher_in_sum;
 
@@ -99,21 +98,23 @@ wire  tx_ready; // TX signals
 
 // ----------------------- Connections ------------------------------ //
 
-wire rx, tx, reset;
-reg start_reset, clk;
+wire rx, tx, reset, clk, sync_reset;
+reg start_reset;
 
-always @(posedge CLK100MHZ, posedge reset) begin
-    if (reset)
-        clk <= 1'b0;
-    else
-        clk <= ~clk;   // toggle every clock edge
-end
+assign clk = CLK100MHZ;
+
+// always @(posedge CLK100MHZ, posedge reset) begin
+//     if (reset)
+//         clk <= 1'b0;
+//     else
+//         clk <= ~clk;   // toggle every clock edge
+// end
 
 // assign clk = CLK100MHZ;
 
 assign rx = uart_txd_in;
 assign uart_rxd_out = tx;
-assign reset = start_reset | master_reset | btn_reset;
+assign reset = start_reset | master_reset | sync_reset;
 
 // Weight mux
 logic [BIT_WIDTH-1:0] weight_out;
@@ -152,6 +153,12 @@ always @(posedge CLK100MHZ) begin
 end
 
 // ----------------------- Verification things ------------------------------ //
+
+reset_sync res_sync(
+    .clk(clk),
+    .async_reset(btn_reset),   // push button
+    .reset(sync_reset)          // synchronous reset
+);
 
 master #(
   .BIT_WIDTH(BIT_WIDTH),
@@ -201,10 +208,11 @@ uart_tx #(
 fletcher #(
     .BIT_WIDTH(BIT_WIDTH)
 ) fletcher_in (
-    .reset(verifier_fletcher_reset),
+    .reset(verifier_fletcher_reset | reset),
     .check(verifier_check),
     .data(rx_data),
-    .sum(fletcher_in_sum)
+    .sum(fletcher_in_sum),
+    .clk(clk)
 );
 
 fifo_memory #(
@@ -246,10 +254,11 @@ verifier #(
 fletcher #(
     .BIT_WIDTH(BIT_WIDTH)
 ) fletcher_out (
-    .reset(packer_fletcher_reset),
+    .reset(packer_fletcher_reset | reset),
     .check(packer_check),
     .data(packer_data),
-    .sum(fletcher_out_sum)
+    .sum(fletcher_out_sum),
+    .clk(clk)
 );
 
 fifo_memory #(

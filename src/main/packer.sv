@@ -55,11 +55,12 @@ module packer #(
     reg [BIT_WIDTH-1:0] state, len, i;
     reg [(BIT_WIDTH*2)-1:0] sum;
 
-    always @(posedge clk, posedge reset) begin
+    always @(posedge clk) begin
         if (reset) begin // Reset
             fletcher_reset <= 1;
             state <= IDLE;
         end
+        
         else begin // Clk
         transmit <= 0;
         check <= 0;

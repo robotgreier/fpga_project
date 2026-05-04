@@ -104,8 +104,7 @@ module master #(
     // reg [$clog2(LEN_MAX)-1:0] n;
     reg [$clog2(LEN_MAX)-1:0] i;
 
-    always @(posedge clk, posedge reset) begin
-        state <= state;
+    always @(posedge clk) begin
         read <= 0;
         write <= 0;
         commit <= 0;

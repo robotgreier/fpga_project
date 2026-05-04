@@ -86,55 +86,86 @@ module main_tb(
 
         #(400*200);
         
-        // SPIKE
+        // STOP
+        send_byte(255);
+        send_byte(3);
+        send_byte(0);
+        send_byte(3);
+        send_byte(6);
+
+        #(12000000);
+
+        // INIT
         send_byte(255); // SOF
-        send_byte(1); // CMD = SPIKE
-        send_byte(11); // N = 11
-        for (int i = 0; i < 11; i++) begin // DATA
+        send_byte(0); // CMD = INIT
+        send_byte(128); // N = 128
+        for (int i = 0; i < 128; i++) begin // DATA
             send_byte(i);
         end
-        send_byte(67); // CHECKSUM 1
-        send_byte(110); // CHECKSUM 2
+        send_byte(96); // CHECKSUM 1
+        send_byte(91); // CHECKSUM 2
+
+        #(400*200);
+        
+        // STOP
+        send_byte(255);
+        send_byte(3);
+        send_byte(0);
+        send_byte(3);
+        send_byte(6);
+
+        #(12000000);
+
+        $finish;
+        // SPIKE
+        // send_byte(255); // SOF
+        // send_byte(1); // CMD = SPIKE
+        // send_byte(11); // N = 11
+        // for (int i = 0; i < 11; i++) begin // DATA
+        //     send_byte(i);
+        // end
+        // send_byte(67); // CHECKSUM 1
+        // send_byte(110); // CHECKSUM 2
 
         #(400*200)
 
         // ERROR
-        send_byte(255); // SOF
-        send_byte(5); // CMD = ERR
-        send_byte(1); // N = 1
-        send_byte(1); // Spike error
-        send_byte(7); // CHECKSUM 1
-        send_byte(18); // CHECKSUM 2
+        // send_byte(255); // SOF
+        // send_byte(5); // CMD = ERR
+        // send_byte(1); // N = 1
+        // send_byte(1); // Spike error
+        // send_byte(7); // CHECKSUM 1
+        // send_byte(18); // CHECKSUM 2
 
         #(400*200)
 
         // DOPAMINE
-        send_byte(255); // SOF
-        send_byte(2); // CMD = DOPAMINE
-        send_byte(1); // N = 11
-        send_byte(210); // DATA = 210
-        send_byte(213); // CHECKSUM 1
-        send_byte(218); // CHECKSUM 2
+        // send_byte(255); // SOF
+        // send_byte(2); // CMD = DOPAMINE
+        // send_byte(1); // N = 11
+        // send_byte(210); // DATA = 210
+        // send_byte(213); // CHECKSUM 1
+        // send_byte(218); // CHECKSUM 2
 
         #(400*200);
 
         // STOP
-        send_byte(255); // SOF
-        send_byte(3); // CMD = STOP
-        send_byte(0); // N = 0
-        send_byte(3); // CHECKSUM 1
-        send_byte(6); // CHECKSUM 2
+        // send_byte(255); // SOF
+        // send_byte(3); // CMD = STOP
+        // send_byte(0); // N = 0
+        // send_byte(3); // CHECKSUM 1
+        // send_byte(6); // CHECKSUM 2
 
         #(400*600);
 
-        // // RESET
-        send_byte(255); // SOF
-        send_byte(4); // CMD = RESET
-        send_byte(0); // N = 0
-        send_byte(4); // CHECKSUM 1
-        send_byte(8); // CHECKSUM 2
+        // RESET
+        // send_byte(255); // SOF
+        // send_byte(4); // CMD = RESET
+        // send_byte(0); // N = 0
+        // send_byte(4); // CHECKSUM 1
+        // send_byte(8); // CHECKSUM 2
 
         #(400*15000);
-        $finish;
+        // $finish;
     end
 endmodule

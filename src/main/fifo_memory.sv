@@ -25,7 +25,7 @@ assign empty = commit_pointer == read_pointer;
 
 assign data_out = memory[read_pointer];
 
-always @ (posedge clk or posedge hard_reset) begin
+always @ (posedge clk) begin
 
     if (hard_reset) begin
         read_pointer <= 0;
