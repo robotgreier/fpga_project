@@ -1,22 +1,22 @@
 module main #(
   // SNN parameters
-    parameter int DECAY         = 63,
-    parameter int THRESHOLD     = 1023,
-    parameter int RESET         = 0,
+    parameter int DECAY         = 400,
+    parameter int THRESHOLD     = 750,
+    parameter int RESET         = 100,
     parameter int REFRACTORY    = 1,
-    parameter int LR_SHIFT      = 7,
-    parameter int T_PRE         = 2,
-    parameter int T_POST        = 2,
-    parameter int TAU_E_SHIFT   = 3,
-    parameter int DW_POS        = 32,
-    parameter int DW_NEG        = 16,
-    parameter int W_MIN         = 16,
+    parameter int LR_SHIFT      = 5,
+    parameter int T_PRE         = 3,
+    parameter int T_POST        = 1,
+    parameter int TAU_E_SHIFT   = 2, 
+    parameter int DW_POS        = 10,
+    parameter int DW_NEG        = 8,
+    parameter int W_MIN         = 16, 
     parameter int W_MAX         = 254,
     parameter logic [7:0] W_INIT = (W_MIN + W_MAX) / 2,
     parameter bit RESET_WEIGHTS = 0,  // 1: reset wipes weights to W_INIT, 0: weights survive reset
     parameter int LEARNING_MODE = 1,  // 0: None, 1: R-STDP, 2: STDP
-    parameter int N_INPUTS      = 31,
-    parameter int N_OUTPUTS     = 4,
+    parameter int N_INPUTS      = 27,
+    parameter int N_OUTPUTS     = 3,
     parameter int FEEDBACK      = 1,   // 1: append NOR-feedback neuron as extra input
     // Main parameters
     parameter int MAX_DATA      = 256,
