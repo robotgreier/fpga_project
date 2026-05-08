@@ -25,6 +25,7 @@ module fletcher #(
 )(
     input  wire reset,
     input  wire check,
+    input  wire clk,
     input  wire [BIT_WIDTH-1:0] data,
     output wire  [(BIT_WIDTH * 2)-1:0] sum
 );
@@ -42,13 +43,13 @@ assign temp_sum_2 = ({1'b0, temp_sum_1} + {1'b0, sum_2} >= MODULO) ? {1'b0, temp
 
 assign sum = {sum_1, sum_2};
 
-always @(posedge check or posedge reset) begin
+always @(posedge clk) begin
     if (reset) begin
         sum_1 <= 0;
         sum_2 <= 0;
     end
 
-    else begin
+    else if (check) begin
     sum_1 <= temp_sum_1[BIT_WIDTH-1:0];
     sum_2 <= temp_sum_2[BIT_WIDTH-1:0];
     end

@@ -1,13 +1,13 @@
 module synapse_core #(
-    parameter int LR_SHIFT     = 2,
+    parameter int LR_SHIFT     = 7,
     parameter int T_PRE        = 2,
     parameter int T_POST       = 2,
-    parameter int TAU_E_SHIFT  = 2,
-    parameter int DW_POS       = 16,
-    parameter int DW_NEG       = 64,
-    parameter int W_MIN        = 8,
+    parameter int TAU_E_SHIFT  = 3,
+    parameter int DW_POS       = 32,
+    parameter int DW_NEG       = 16,
+    parameter int W_MIN        = 16,
     parameter int W_MAX        = 254,
-    parameter int LEARNING_MODE = 0
+    parameter int LEARNING_MODE = 1
   ) (
     input logic clk,
     input logic run,                     // Clock enable: only update on asserted cycles
@@ -23,7 +23,8 @@ module synapse_core #(
 
   // Internal signals
   logic signed [8:0]  elig_trace; // Eligibility trace (matches eligibility_updater output)
-  logic signed [8:0]  delta_w;    // Weight change from reward application
+  logic signed [8:0]  delta_w;    // Weight change from reward application (combinational)
+  logic signed [8:0]  delta_w_r;  // Registered pipeline stage — breaks multiply→add timing path
   logic signed [9:0]  w_sum;      // Intermediate sum before clamping
 
   assign I_syn = (pre_spk) ? w_syn : 8'h00; // Output synaptic current based on pre-synaptic spike
@@ -58,8 +59,10 @@ module synapse_core #(
     .delta_w   (delta_w)
   );
 
+  always_ff @(posedge clk) delta_w_r <= delta_w;
+
   // Compute sum combinationally, then clamp
-  assign w_sum = $signed(10'({1'b0, w_syn})) + $signed({{1{delta_w[8]}}, delta_w});
+  assign w_sum = $signed(10'({1'b0, w_syn})) + $signed({{1{delta_w_r[8]}}, delta_w_r});
 
   always_comb begin
     if      (w_sum > W_MAX) w_next = W_MAX;

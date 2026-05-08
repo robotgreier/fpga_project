@@ -79,7 +79,8 @@ module master #(
     localparam WRITE_ERROR_2 = 23;
     localparam WRITE_ERROR_3 = 24;
     localparam WRITE_ERROR_4 = 25;
-    localparam CMD_ERROR = 26;
+    localparam WRITE_ERROR_5 = 26;
+    localparam CMD_ERROR = 27;
 
     // Command parameters
     localparam CMD_INIT = 0;
@@ -104,8 +105,7 @@ module master #(
     // reg [$clog2(LEN_MAX)-1:0] n;
     reg [$clog2(LEN_MAX)-1:0] i;
 
-    always @(posedge clk, posedge reset, posedge err_empty) begin
-        state <= state;
+    always @(posedge clk) begin
         read <= 0;
         write <= 0;
         commit <= 0;
@@ -123,8 +123,6 @@ module master #(
             // n <= 0;
             i <= 0;
         end
-
-        else if (err_empty) master_reset <= 1;
 
         else begin
         case(state)
@@ -172,11 +170,12 @@ module master #(
             SPIKE: begin
                 i <= 0;
                 read <= 1;
+                address_out <= SPIKE_OFFSET;
                 state <= SPIKE_LOOP;
             end
 
             SPIKE_LOOP: begin
-                address_out <= i + SPIKE_OFFSET;
+                address_out <= i + 1 + SPIKE_OFFSET;
                 read <= 1;
 
                 state <= state;
@@ -301,6 +300,10 @@ module master #(
             WRITE_ERROR_4: begin
                 data_out <= err;
                 write <= 1;
+                state <= WRITE_ERROR_5;
+            end
+
+            WRITE_ERROR_5: begin
                 commit <= 1;
                 state <= IDLE;
             end
@@ -309,6 +312,7 @@ module master #(
         endcase
 
         if (err_empty) begin
+            master_reset <= 1;
             err <= ERR_EMPTY;
             state <= WRITE_ERROR_1;
         end

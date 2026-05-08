@@ -31,35 +31,36 @@ module packer #(
     );
 
     localparam IDLE = 0;
-    localparam START_WAIT_1 = 2;
-    localparam START_WAIT_2 = 3;
-    localparam START = 4;
-    localparam CMD_WAIT_1 = 5;
-    localparam CMD_WAIT_2 = 6;
-    localparam CMD = 7;
-    localparam LEN_WAIT_1 = 8;
-    localparam LEN_WAIT_2 = 9;
-    localparam LEN = 10;
-    localparam DATA_WAIT_1 = 11;
-    localparam DATA_WAIT_2 = 12;
-    localparam DATA = 13;
-    localparam CHECK_1_WAIT_1 = 14;
-    localparam CHECK_1_WAIT_2 = 15;
-    localparam CHECK_1 = 16;
-    localparam CHECK_2_WAIT_1 = 17;
-    localparam CHECK_2_WAIT_2 = 18;
-    localparam CHECK_2 = 19;
+    localparam START_WAIT_1 = 1;
+    localparam START_WAIT_2 = 2;
+    localparam START = 3;
+    localparam CMD_WAIT_1 = 4;
+    localparam CMD_WAIT_2 = 5;
+    localparam CMD = 6;
+    localparam LEN_WAIT_1 = 7;
+    localparam LEN_WAIT_2 = 8;
+    localparam LEN = 9;
+    localparam DATA_WAIT_1 = 10;
+    localparam DATA_WAIT_2 = 11;
+    localparam DATA = 12;
+    localparam CHECK_1_WAIT_1 = 13;
+    localparam CHECK_1_WAIT_2 = 14;
+    localparam CHECK_1 = 15;
+    localparam CHECK_2_WAIT_1 = 16;
+    localparam CHECK_2_WAIT_2 = 17;
+    localparam CHECK_2 = 18;
 
     localparam SOF = 255;
     
     reg [BIT_WIDTH-1:0] state, len, i;
     reg [(BIT_WIDTH*2)-1:0] sum;
 
-    always @(posedge clk, posedge reset) begin
+    always @(posedge clk) begin
         if (reset) begin // Reset
             fletcher_reset <= 1;
             state <= IDLE;
         end
+        
         else begin // Clk
         transmit <= 0;
         check <= 0;
