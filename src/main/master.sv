@@ -79,7 +79,8 @@ module master #(
     localparam WRITE_ERROR_2 = 23;
     localparam WRITE_ERROR_3 = 24;
     localparam WRITE_ERROR_4 = 25;
-    localparam CMD_ERROR = 26;
+    localparam WRITE_ERROR_5 = 26;
+    localparam CMD_ERROR = 27;
 
     // Command parameters
     localparam CMD_INIT = 0;
@@ -299,6 +300,10 @@ module master #(
             WRITE_ERROR_4: begin
                 data_out <= err;
                 write <= 1;
+                state <= WRITE_ERROR_5;
+            end
+
+            WRITE_ERROR_5: begin
                 commit <= 1;
                 state <= IDLE;
             end

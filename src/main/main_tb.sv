@@ -105,7 +105,7 @@ module main_tb(
         send_byte(4);
         send_byte(17);
 
-        #(400*200);
+        #(400*1000);
 
         $finish;
     end
