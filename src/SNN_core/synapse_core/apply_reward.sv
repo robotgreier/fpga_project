@@ -14,7 +14,7 @@ module apply_reward #(
       product = '0;
       delta_w = '0;
       if (reward_en) begin
-        product = (elig_trace * dopamine) >>> LR_SHIFT;
+        product = (elig_trace * dopamine + $signed(13'(1 << (LR_SHIFT - 1)))) >>> LR_SHIFT;
         if      (product > 255)  delta_w =  255;
         else if (product < -255) delta_w = -255;
         else                     delta_w = product[8:0];
