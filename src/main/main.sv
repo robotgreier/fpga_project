@@ -103,14 +103,10 @@ reg start_reset;
 
 assign clk = CLK100MHZ;
 
-// always @(posedge CLK100MHZ, posedge reset) begin
-//     if (reset)
-//         clk <= 1'b0;
-//     else
-//         clk <= ~clk;   // toggle every clock edge
-// end
-
-// assign clk = CLK100MHZ;
+// clk_wiz_0 clock_gen (
+//  .clk_in1(CLK100MHZ),
+//  .clk_out1(clk_snn) // This is now your slower clock
+//);
 
 assign rx = uart_txd_in;
 assign uart_rxd_out = tx;
