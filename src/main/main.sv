@@ -16,7 +16,7 @@ module main #(
     parameter bit RESET_WEIGHTS = 0,  // 1: reset wipes weights to W_INIT, 0: weights survive reset
     parameter int LEARNING_MODE = 1,  // 0: None, 1: R-STDP, 2: STDP
     parameter int N_INPUTS      = 27,
-    parameter int N_OUTPUTS     = 3,
+    parameter int N_OUTPUTS     = 4,
     parameter int FEEDBACK      = 1,   // 1: append NOR-feedback neuron as extra input
     // Main parameters
     parameter int MAX_DATA      = 256,
