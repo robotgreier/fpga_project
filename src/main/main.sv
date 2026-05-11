@@ -38,7 +38,7 @@ localparam DATA_N = 3;
 localparam WEIGHT_DATA = 0;
 localparam SPIKE_DATA = 1;
 localparam MASTER_DATA = 2;
-localparam CLK_RATE = 100000000;
+localparam CLK_RATE = 50_000_000;
 localparam BAUD_RATE = 250000;
 localparam CLOCK_BAUD_RATIO = CLK_RATE / BAUD_RATE;
 logic [N_OUTPUTS-1:0] spk_out;
@@ -47,6 +47,14 @@ logic [N_OUTPUTS-1:0] spk_out;
 assign spk_out_led = spk_out; // Directly drive LEDs from SNN output spikes
 assign rst_led = btn_reset; // Drive reset LED from reset button
 
+
+// ----------------------- CLK ------------------------------ //
+wire clk;
+
+clk_wiz_0 clock_gen (
+  .clk_in1(CLK100MHZ),
+  .clk_out1(clk) // 50MHz clock
+);
 
 // ----------------------- Wires ------------------------------ //
 wire  master_read, master_write, master_commit, master_reset, master_fifo_reset; // Master signals
@@ -98,15 +106,8 @@ wire  tx_ready; // TX signals
 
 // ----------------------- Connections ------------------------------ //
 
-wire rx, tx, reset, clk, sync_reset;
+wire rx, tx, reset, sync_reset;
 reg start_reset;
-
-assign clk = CLK100MHZ;
-
-// clk_wiz_0 clock_gen (
-//  .clk_in1(CLK100MHZ),
-//  .clk_out1(clk_snn) // This is now your slower clock
-//);
 
 assign rx = uart_txd_in;
 assign uart_rxd_out = tx;
@@ -131,9 +132,9 @@ end
 reg [7:0] reset_counter = 0;
 reg already_reset = 0;
 
-always @(posedge CLK100MHZ) begin
+always @(posedge clk) begin
   if (already_reset == 1'b0) begin  // Check if system is already delayed
-    if (reset_counter >= 120) begin // Check if counter is over 120 cycles
+    if (reset_counter >= 60) begin // Check if counter is over 60 cycles
       if (start_reset == 1'b1) begin // Check if reset signal is high
         start_reset <= 1'b0;
         already_reset <= 1'b1;
