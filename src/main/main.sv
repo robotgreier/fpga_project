@@ -34,6 +34,7 @@ module main #(
 
 // Params
 localparam WEIGHT_N = (N_INPUTS+FEEDBACK)*N_OUTPUTS;
+localparam int SPIKE_N = (N_INPUTS + 2) / 3; // ceil(N_INPUTS/3): 2 bits/spike, 3 spikes/byte
 localparam DATA_N = 3;
 localparam WEIGHT_DATA = 0;
 localparam SPIKE_DATA = 1;
@@ -161,6 +162,7 @@ master #(
   .BIT_WIDTH(BIT_WIDTH),
   .LEN_MAX(MAX_DATA),
   .WEIGHT_SELECT(WEIGHT_N),
+  .SPIKE_SELECT(SPIKE_N),
   .DATA_SELECT(DATA_N)
 ) mas (
   .clk(clk),
@@ -353,7 +355,7 @@ weight_dumper #(
 // Keeps the SNN frozen during loading (partial spiketrain) and between packets
 // (prevents the network from re-processing the same spiketrain multiple times).
 localparam int SPIKE_ADDR_LO = 200;
-localparam int SPIKE_ADDR_HI = 210;
+localparam int SPIKE_ADDR_HI = SPIKE_ADDR_LO + SPIKE_N - 1;
 logic snn_in_spike_range_prev;
 wire  snn_in_spike_range = (master_address >= SPIKE_ADDR_LO && master_address <= SPIKE_ADDR_HI);
 always_ff @(posedge clk)

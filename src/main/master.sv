@@ -24,6 +24,7 @@ module master #(
         parameter BIT_WIDTH = 8,
         parameter LEN_MAX = 8,
         parameter WEIGHT_SELECT = 128,
+        parameter SPIKE_SELECT = 11,
         parameter DATA_SELECT = 3
     )(
         input wire clk, reset, empty, err_empty, err_full,
@@ -45,11 +46,11 @@ module master #(
 
     // Constants
     localparam WEIGHT_OFFSET = 0;
-    localparam WEIGHT_N = 128;
+    localparam WEIGHT_N = WEIGHT_SELECT;
     localparam DOPAMINE_OFFSET = 199;
     localparam DOPAMINE_N = 1;
     localparam SPIKE_OFFSET = 200;
-    localparam SPIKE_N = 11;
+    localparam SPIKE_N = SPIKE_SELECT;
     localparam NO_ADDRESS = 255;
 
     // State parameters
