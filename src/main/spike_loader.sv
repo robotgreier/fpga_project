@@ -29,9 +29,9 @@ module spike_loader #(
         end
     end
 
-    // adr selects which 3-bit chunk of spiketrain to write (MSB-first)
-    // adr=ADR_MIN+0 → bits[TOTAL_SPIKES-1 : TOTAL_SPIKES-3]
-    // adr=ADR_MIN+1 → bits[TOTAL_SPIKES-4 : TOTAL_SPIKES-6], etc.
+    // adr selects which 3-bit chunk of spiketrain to write (LSB-first, matching Python pack_input_spikes)
+    // adr=ADR_MIN+0 → bits[2:0]   (spikes[0..2])
+    // adr=ADR_MIN+1 → bits[5:3]   (spikes[3..5]), etc.
     // After the final chunk is written, spiketrain_temp is committed to spiketrain.
     logic commit;
 
@@ -41,9 +41,9 @@ module spike_loader #(
             spiketrain      <= '0;
             commit          <= '0;
         end else begin
-            commit <= '0; 
+            commit <= '0;
             if (pair_valid && adr >= ADR_MIN && adr <= ADR_MAX) begin
-                spiketrain_temp[TOTAL_SPIKES-1 - 3*(adr - ADR_MIN) -: 3] <= spk_temp;
+                spiketrain_temp[3*(adr - ADR_MIN) +: 3] <= {spk_temp[0], spk_temp[1], spk_temp[2]};
                 if ((adr - ADR_MIN) == LAST_CHUNK)
                     commit <= 1'b1;
             end
