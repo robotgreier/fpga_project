@@ -63,7 +63,6 @@ module master #(
     localparam SPIKE_LOOP = 6;
     localparam SPIKE_WRITE = 7;
     localparam SPIKE_SEND = 8;
-    localparam SPIKE_SELECT = 9;
     localparam SPIKE_COMMIT = 10;
     localparam DOPAMINE = 11;
     localparam DOPAMINE_WRITE = 12;

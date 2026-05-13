@@ -28,6 +28,12 @@ module SNN_core #(
     output logic [7:0] w_next [N_OUTPUTS-1:0][(N_INPUTS+FEEDBACK)-1:0]    // Updated weight matrix out
   );
 
+
+  logic                         wta_valid_c;
+  logic [$clog2(N_OUTPUTS)-1:0] wta_idx_c;
+  logic                         winner_valid;
+  logic [N_OUTPUTS-1:0]         spk_out_c;  // combinational one-hot from this-tick WTA
+
   // ---------------------------------------------------------------------------
   // Feedback neuron: fires when no output spiked last cycle (NOR of spk_out)
   // ---------------------------------------------------------------------------
@@ -59,10 +65,6 @@ module SNN_core #(
   // ---------------------------------------------------------------------------
   // WTA: picks winner from raw LIF spikes
   // ---------------------------------------------------------------------------
-  logic                         wta_valid_c;
-  logic [$clog2(N_OUTPUTS)-1:0] wta_idx_c;
-  logic                         winner_valid;
-  logic [N_OUTPUTS-1:0]         spk_out_c;  // combinational one-hot from this-tick WTA
 
   WTA #(.N_OUTPUTS(N_OUTPUTS)) wta_inst (
     .spk          (spk_raw),
