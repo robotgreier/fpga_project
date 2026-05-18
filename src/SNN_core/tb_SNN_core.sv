@@ -5,13 +5,6 @@
 //   DUT 0 (LEARNING_MODE=0): reset, silence, single-neuron spike, WTA, feedback.
 //   DUT 1 (LEARNING_MODE=2, STDP):  LTP on causal pre→post; no change w/ reward_en=0.
 //   DUT 2 (LEARNING_MODE=1, R-STDP): LTP w/ positive dopamine; LTD w/ negative.
-//
-// Weight-update timing note
-//   elig_trace is registered; it reflects the LTP event one cycle AFTER post fires.
-//   reward_en_syn gates on the *registered* spk_out, so at posedge+#1 (the cycle
-//   after the spike fires) spk_out is still 1 and elig_trace already holds the
-//   LTP increment.  Therefore w_next > w_syn is observable at the SECOND spike
-//   cycle (spike_count >= 2).
 //////////////////////////////////////////////////////////////////////////////////
 
 module tb_SNN_core ();
@@ -236,9 +229,6 @@ module tb_SNN_core ();
 
         // ==================================================================
         // TEST 5: WTA competition -- neuron 1 has higher weight, wins first
-        //   Note: with LEARNING_MODE=0 lateral inhibition is off, so both
-        //   neurons may co-spike.  winner_idx selects the one with the
-        //   highest pre_reset_mem among spikers.
         // ==================================================================
         $display("\n[%0t] TEST 5: WTA -- neuron 1 wins (higher weight)", $time);
         for (int j = 0; j < D0_NO; j++)

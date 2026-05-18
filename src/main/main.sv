@@ -364,7 +364,6 @@ always_ff @(posedge clk)
 wire snn_run = snn_in_spike_range_prev && !snn_in_spike_range;
 
 // Load spikes
-// Temp signals
 logic [(N_INPUTS) - 1:0] spiketrain;
 
 spike_loader #(
@@ -377,7 +376,6 @@ spike_loader #(
     .spiketrain(spiketrain)
 );
 
-// Temp signals
 logic signed [3:0] dopamine;
 logic reward_en;
 logic signed [3:0] dopamine_r;
@@ -400,7 +398,6 @@ end
 
 // Instantiate SNN core
 logic [$clog2(N_OUTPUTS)-1:0] winner_idx;
-// spk_out moved to connections
 
 SNN_core #(
     .DECAY(DECAY),

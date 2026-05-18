@@ -13,18 +13,6 @@
 //              I_syn forwarding, reward_en gating, LTP/LTD weight updates via
 //              R-STDP and STDP, weight clamping, and boundary values.
 //
-//              Pipeline note: elig_trace is registered in eligibility_updater
-//              (1 cycle latency). apply_reward and w_next are combinational.
-//              Therefore w_next is valid 1 cycle after the spike pair.
-//
-//              reward_en gating note: apply_reward is combinational, so
-//              delta_w = 0 immediately when reward_en=0. There is no hold
-//              behaviour -- w_next returns to clamp(w_syn + 0) = w_syn.
-//
-//              Timing note: checks are performed at negedge after the
-//              triggering posedge, giving combinational paths a full
-//              half-cycle to settle after elig_trace updates.
-//
 // Dependencies: synapse_core.sv, eligibility_updater.sv, apply_reward.sv
 //
 // Revision:

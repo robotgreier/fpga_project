@@ -13,10 +13,6 @@
 //              (None / R-STDP / STDP), reward_en gating, sign handling, and
 //              boundary values.
 //
-//              NOTE: apply_reward is purely combinational. rst and clk are
-//              kept as ports for interface consistency but have no effect on
-//              delta_w. Gating is via reward_en only.
-//
 // Dependencies: apply_reward.sv
 //
 // Revision:
